@@ -1,0 +1,2399 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>着るタイル デザイナー v3｜レクレドール</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Old+Mincho:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===== Étoffe tokens v3 : 生成りアトリエ ＋ 茜1色 ===== */
+  :root{
+    --n1:#fcfaf5; --n2:#f8f4ed; --n3:#f0eadf; --n4:#e8e1d2; --n5:#ded5c3;
+    --n6:#d5cab4; --n7:#c3b79d; --n8:#a89b83; --n9:#8a7e68; --n10:#6f6553;
+    --n11:#564d3e; --n12:#2b2620;
+    --bg:#ece5d7; --surface:#f8f4ed; --canvas:#e6dfd0; --paper:#fcfaf5;
+    --ink:#2b2620; --sec:#564d3e; --muted:#7c715c; --faint:#9a8e77;
+    --line:#ded5c3; --line2:#cabfa6;
+    --accent:#b0673f; --accent-h:#985335; --accent-wash:#f2e8de; --ring:rgba(176,103,63,.30);
+    --ok:#4f7a52; --warn:#8a6a1f; --ng:#9e2e24;
+    --mincho:"Zen Old Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
+    --sans:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+    --mono:ui-monospace,"SF Mono","Roboto Mono","DejaVu Sans Mono",monospace;
+    --r-xs:7px; --r-sm:11px; --r-md:14px;
+    --sh-card:0 0 0 1px rgba(43,38,32,.05), 0 10px 26px -14px rgba(120,85,50,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:var(--sans);color:var(--ink);line-height:1.6;background:var(--bg);
+    font-size:13.5px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  button,input{font-family:inherit;color:inherit}
+  button{cursor:pointer}
+  .num{font-family:var(--mono);font-feature-settings:"tnum";font-variant-numeric:tabular-nums}
+  svg.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+
+  /* ===== topbar ===== */
+  .topbar{height:56px;display:flex;align-items:center;gap:22px;padding:0 22px;background:var(--surface);border-bottom:1px solid var(--line)}
+  .brand{display:flex;flex-direction:column;line-height:1}
+  .brand .b{font-size:8.5px;letter-spacing:.36em;color:var(--faint)}
+  .brand .n{font-family:var(--mincho);font-size:20px;font-weight:600;letter-spacing:.06em;margin-top:3px}
+  .tagline{font-size:12px;color:var(--muted);border-left:1px solid var(--line);padding-left:20px;line-height:1.5}
+  .tagline b{color:var(--sec);font-weight:700}
+  .topbar .sp{margin-left:auto}
+  .chip{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px;background:var(--n1)}
+  .chip .dot{width:6px;height:6px;border-radius:50%;background:var(--warn)}
+  @media(max-width:760px){.tagline{display:none}}
+
+  /* ===== workspace ===== */
+  .ws{display:grid;grid-template-columns:318px minmax(0,1fr);gap:0}
+  .inspector{background:var(--surface);border-right:1px solid var(--line);height:calc(100vh - 56px);overflow-y:auto;position:sticky;top:56px}
+  @media(max-width:920px){
+    .ws{display:flex;flex-direction:column}
+    .stage{order:0}
+    .inspector{order:1;height:auto;position:static;border-right:0;border-top:1px solid var(--line)}
+  }
+
+  .sec{padding:18px 20px;border-bottom:1px solid var(--line)}
+  .sec > h2{display:flex;align-items:baseline;gap:10px;margin:0 0 14px;font-size:13.5px;font-weight:700;color:var(--ink)}
+  .sec > h2 .no{font-family:var(--mono);font-size:10.5px;color:var(--accent);letter-spacing:.08em}
+  .sec > h2 .hint{margin-left:auto;font-size:11px;color:var(--faint);font-weight:400}
+  .lb{display:block;font-size:12px;color:var(--muted);margin:0 0 8px}
+  .mini{font-size:11px;color:var(--faint);margin-top:10px;line-height:1.7}
+
+  /* upload */
+  .drop{border:1.5px dashed var(--line2);border-radius:var(--r-sm);padding:16px 12px;text-align:center;cursor:pointer;transition:.15s;background:var(--n2)}
+  .drop:hover{border-color:var(--accent);background:var(--n1)}
+  .drop .ic{width:20px;height:20px;stroke:var(--muted);margin:0 auto 6px;display:block}
+  .drop p{margin:0 0 2px;font-size:12.5px;font-weight:700;color:var(--sec)}
+  .drop small{color:var(--faint);font-size:11px}
+  .samples{margin-top:14px}
+  .samples .cap{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+  .samples .cap span{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--faint)}
+  .samples .cap em{font-style:normal;font-size:11px;color:var(--muted)}
+  .sampgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .samp{border:1px solid var(--line);border-radius:var(--r-xs);background:var(--n1);cursor:pointer;padding:0;overflow:hidden;transition:.14s;position:relative}
+  .samp:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .samp.on{border:1.5px solid var(--accent);box-shadow:0 0 0 3px var(--ring)}
+  .samp canvas{width:100%;aspect-ratio:1;display:block}
+  .samp .nm{display:block;font-size:9.5px;color:var(--muted);text-align:center;padding:3px 2px 4px;line-height:1.2;background:var(--n1)}
+
+  /* cutout */
+  .cutrow{display:flex;gap:14px;align-items:flex-start}
+  .chk{width:80px;height:80px;flex:0 0 80px;border-radius:var(--r-xs);border:1px solid var(--line);background:conic-gradient(var(--n4) 0 25%,var(--n1) 0 50%,var(--n4) 0 75%,var(--n1) 0) 0/12px 12px}
+  .chk canvas{width:100%;height:100%;display:block;border-radius:var(--r-xs);object-fit:contain}
+  .cutrow>div:not(.chk){flex:1;min-width:0}
+  .autobadge{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;color:var(--ok);background:rgba(79,122,82,.08);border-radius:999px;padding:2px 9px;margin-bottom:8px}
+  .motifcount{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:9px}
+
+  /* range + number */
+  .range{display:flex;align-items:center;gap:12px}
+  input[type=range]{flex:1;height:4px;border-radius:999px;-webkit-appearance:none;appearance:none;cursor:pointer;
+    background:linear-gradient(90deg,var(--n10) 0 var(--f,40%),var(--n5) var(--f,40%) 100%)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--n1);border:1px solid var(--n7);box-shadow:0 1px 3px rgba(80,55,35,.25);transition:transform .1s}
+  input[type=range]:active::-webkit-slider-thumb{transform:scale(1.15);border-color:var(--accent)}
+  input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--n1);border:1px solid var(--n7)}
+  .val{font-family:var(--mono);font-size:12.5px;color:var(--ink);min-width:52px;text-align:right;font-variant-numeric:tabular-nums}
+  .val small{color:var(--faint);font-family:var(--sans);margin-left:3px}
+  .numin{display:flex;align-items:center;gap:4px}
+  .numin input[type=number]{width:58px;border:1px solid var(--line);border-radius:var(--r-xs);background:var(--n1);padding:5px 6px;font-family:var(--mono);font-size:12.5px;text-align:right;color:var(--ink)}
+  .numin input[type=number]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+  .numin .unit{font-size:11.5px;color:var(--muted)}
+  .toggle{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);cursor:pointer}
+  .toggle input{accent-color:var(--accent);width:14px;height:14px}
+
+  /* repeat chips */
+  #repeatSeg{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  #repeatSeg button{border:1px solid var(--line);background:var(--n2);border-radius:var(--r-xs);padding:7px 4px 6px;color:var(--muted);
+    font-size:10.5px;display:flex;flex-direction:column;align-items:center;gap:5px;line-height:1.15;transition:.13s}
+  #repeatSeg button:hover{background:var(--n3);border-color:var(--line2)}
+  #repeatSeg button.on{border:1.5px solid var(--accent);background:var(--accent-wash);color:var(--ink);padding:6.5px 3.5px 5.5px}
+  #repeatSeg canvas{width:40px;height:40px;border-radius:5px;border:1px solid var(--line);background:#fff}
+  .segline{display:flex;gap:5px}
+  .segline button{flex:1;border:1px solid var(--line);background:var(--n2);border-radius:var(--r-xs);padding:6px 0;font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .segline button:hover{background:var(--n3)}
+  .segline button.on{border:1.5px solid var(--accent);background:var(--accent-wash);color:var(--ink);padding:5px 0}
+  .segline button .sans{font-family:var(--sans);font-size:11px}
+  #dropRow,#arrangeRow,#tossOpts{margin-top:12px;display:none}
+  .ghost{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--n2);border-radius:var(--r-xs);padding:7px 12px;font-size:11.5px;color:var(--sec)}
+  .ghost:hover{background:var(--n3)}
+  .ghost .ic{width:14px;height:14px;stroke:var(--muted)}
+
+  /* swatches */
+  .swatches{display:flex;gap:8px;flex-wrap:wrap}
+  .sw{width:26px;height:26px;border-radius:50%;border:1px solid rgba(43,38,32,.14);cursor:pointer;transition:.13s}
+  .sw:hover{transform:scale(1.1)}
+  .sw.on{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--accent)}
+  .sw.tp{background:conic-gradient(var(--n5) 0 25%,var(--n1) 0 50%,var(--n5) 0 75%,var(--n1) 0) 0/9px 9px}
+  .pick{display:flex;align-items:center;gap:9px;margin-top:12px;font-size:11.5px;color:var(--muted)}
+  input[type=color]{width:34px;height:26px;border:1px solid var(--line);border-radius:var(--r-xs);padding:0;background:none;cursor:pointer}
+
+  /* ===== stage ===== */
+  .stage{padding:22px;min-width:0}
+  .previews{display:grid;grid-template-columns:1.08fr 1fr;gap:20px}
+  @media(max-width:1180px){.previews{grid-template-columns:1fr}}
+  .pv{background:var(--paper);border-radius:var(--r-md);box-shadow:var(--sh-card);overflow:hidden;display:flex;flex-direction:column}
+  .pv .h{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--n3);flex-wrap:wrap}
+  .pv .h .no{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.08em}
+  .pv .h .t{font-family:var(--mincho);font-size:15px;color:var(--ink)}
+  .pv .cv{background:var(--canvas);display:flex;align-items:center;justify-content:center;position:relative}
+  #patternCv{width:100%;height:auto;display:block;cursor:grab}
+  #patternCv.panning{cursor:grabbing}
+  #patternCv.zoomed{touch-action:none}
+  #productCv{width:100%;max-width:430px;height:auto;display:block}
+  .pv .foot{padding:8px 16px;border-top:1px solid var(--n3);font-family:var(--mono);font-size:10.5px;color:var(--faint);display:flex;gap:14px;flex-wrap:wrap}
+  .tabs{display:flex;gap:2px;margin-left:auto}
+  .tabs button{border:0;background:none;padding:4px 10px 6px;font-size:12px;color:var(--faint);border-bottom:2px solid transparent}
+  .tabs button:hover{color:var(--muted)}
+  .tabs button.on{color:var(--ink);border-bottom-color:var(--accent)}
+  .htools{display:flex;align-items:center;gap:10px;margin-left:auto}
+  .htools .tabs{margin-left:0}
+  .zoomseg{display:flex;gap:3px}
+  .zoomseg button{border:1px solid var(--line);background:var(--n2);border-radius:6px;padding:2px 8px;font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+  .zoomseg button.on{border-color:var(--accent);background:var(--accent-wash);color:var(--ink)}
+
+  /* control strip */
+  .strip{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:18px 22px}
+  .strip .cap{font-size:11px;color:var(--faint);letter-spacing:.06em;margin:0 0 12px;display:flex;gap:8px;align-items:baseline}
+  .strip .cap b{font-size:12.5px;color:var(--sec);letter-spacing:0}
+  .strip .row{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+  @media(max-width:760px){.strip .row{grid-template-columns:1fr;gap:16px}}
+  .strip .c .lb{display:flex;align-items:center;gap:7px}
+  .strip .c .lb .ic{width:14px;height:14px;stroke:var(--muted)}
+  .strip .sub{display:flex;align-items:center;justify-content:space-between;margin-top:7px}
+
+  /* bottom cards */
+  .bottom{margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  @media(max-width:1020px){.bottom{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);padding:20px 22px}
+  .card h2{display:flex;align-items:baseline;gap:10px;margin:0 0 6px;font-size:13.5px;font-weight:700}
+  .card h2 .no{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:.08em}
+  .card h2 .t{font-family:var(--mincho);font-size:15px;font-weight:600}
+  .demo{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--faint);margin-bottom:14px}
+  #fabSeg{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  @media(max-width:560px){#fabSeg{grid-template-columns:repeat(2,1fr)}}
+  #fabSeg button{border:1px solid var(--line);background:var(--n2);border-radius:var(--r-xs);padding:9px 10px;text-align:left;line-height:1.35;color:var(--sec);transition:.13s}
+  #fabSeg button:hover{background:var(--n3)}
+  #fabSeg button.on{border:1.5px solid var(--accent);background:var(--accent-wash);padding:8px 9px}
+  #fabSeg .nm{font-weight:700;display:block;font-size:12px;color:var(--ink)}
+  #fabSeg .mt{color:var(--muted);font-size:10.5px}
+  .orow{display:flex;align-items:center;gap:14px;margin-top:16px}
+  .orow .lb{margin:0;flex:0 0 auto;width:52px}
+  .priceRow{display:flex;justify-content:space-between;align-items:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--n3)}
+  .priceRow .lab{font-size:11.5px;color:var(--muted)}
+  .priceRow .price{font-family:var(--mono);font-size:28px;font-weight:500;color:var(--ink);letter-spacing:-.01em;line-height:1}
+  .cta{display:flex;gap:10px;margin-top:16px}
+  .cart{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;height:46px;border:0;border-radius:var(--r-xs);
+    background:var(--accent);color:#fff;font-size:14px;font-weight:700;transition:.14s}
+  .cart:hover{background:var(--accent-h)}
+  .cart .ic{stroke:#fff;width:17px}
+  .save{display:flex;align-items:center;justify-content:center;gap:7px;height:46px;padding:0 16px;border:1px solid var(--line2);border-radius:var(--r-xs);background:var(--n1);color:var(--sec);font-size:12.5px;font-weight:500}
+  .save:hover{background:var(--n3)}
+  .save .ic{width:15px;stroke:var(--muted)}
+  .note{font-size:11px;color:var(--muted);margin-top:14px;padding-top:12px;border-top:1px solid var(--n3);line-height:1.75}
+
+  /* export card */
+  .exgrid{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:12px;color:var(--muted);margin-top:14px}
+  .exgrid .k{color:var(--faint)}
+  .exgrid .v{font-family:var(--mono);font-size:12px;color:var(--ink)}
+  .exbtns{display:flex;gap:10px;margin-top:16px}
+  .exbtns .tif{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;height:44px;border:1.5px solid var(--accent);border-radius:var(--r-xs);background:var(--n1);color:var(--accent);font-size:13px;font-weight:700}
+  .exbtns .tif:hover{background:var(--accent-wash)}
+  .exbtns .png{display:flex;align-items:center;justify-content:center;gap:7px;height:44px;padding:0 16px;border:1px solid var(--line2);border-radius:var(--r-xs);background:var(--n1);color:var(--sec);font-size:12px}
+  .exbtns .png:hover{background:var(--n3)}
+  .exmsg{font-family:var(--mono);font-size:10.5px;color:var(--ok);margin-top:10px;min-height:15px}
+  #testout{word-break:break-all;font-size:8px;color:transparent;max-height:8px;overflow:hidden}
+
+  /* TIFF取り込みダイアログ */
+  #tiffDlg{display:none;position:fixed;inset:0;background:rgba(43,38,32,.42);z-index:100;align-items:center;justify-content:center;padding:20px}
+  #tiffDlg.open{display:flex}
+  .dlgcard{background:var(--paper);border-radius:var(--r-md);box-shadow:0 24px 60px -20px rgba(43,38,32,.55);max-width:460px;width:100%;padding:24px}
+  .dlgcard h3{margin:0 0 6px;font-family:var(--mincho);font-size:17px;font-weight:600}
+  .dlgcard .mini{margin:0 0 16px}
+  .dlgopt{display:block;width:100%;text-align:left;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--n1);padding:14px 16px;margin-bottom:10px;transition:.14s;line-height:1.5}
+  .dlgopt:hover{border-color:var(--accent);background:var(--accent-wash)}
+  .dlgopt b{display:block;font-size:13.5px;color:var(--ink)}
+  .dlgopt small{display:block;font-size:11.5px;color:var(--muted);margin-top:3px}
+  .dlgopt .rec{display:inline-block;font-size:9.5px;color:#fff;background:var(--accent);border-radius:999px;padding:1px 8px;margin-left:8px;vertical-align:2px}
+  .dlgcancel{display:block;margin:4px auto 0;border:0;background:none;color:var(--muted);font-size:12px;padding:6px 14px}
+  .dlgcancel:hover{color:var(--ink)}
+  /* タイルモードで使えないリピート方式 */
+  #repeatSeg button.dis{opacity:.35;pointer-events:none}
+</style>
+</head>
+<body>
+<script>
+(function(){
+  var KEY='kt_gate_ok',PASS='きるたいる';
+  if(sessionStorage.getItem(KEY)==='1')return;
+  for(var i=0;i<3;i++){
+    var v=prompt('合言葉を入力してください');
+    if(v===null)break;
+    if(v&&v.trim()===PASS){sessionStorage.setItem(KEY,'1');return;}
+  }
+  document.write('<style>body *{display:none!important}</style><p style="font-family:sans-serif;padding:40px;display:block!important">このページの閲覧には合言葉が必要です。再読み込みしてやり直してください。</p>');
+})();
+</script>
+
+<div class="topbar">
+  <div class="brand"><span class="b">L E C R E D O R</span><span class="n">着るタイル</span></div>
+  <div class="tagline">描いた絵が、そのまま総柄の生地に。<br><b>かんたん4ステップ・約3分</b>で完成イメージまで</div>
+  <span class="sp"></span>
+  <div class="chip"><span class="dot"></span>プロトタイプ v3</div>
+</div>
+
+<div class="ws">
+  <!-- ===== INSPECTOR ===== -->
+  <aside class="inspector">
+    <section class="sec">
+      <h2><span class="no">01</span>絵をえらぶ</h2>
+      <div class="drop" id="drop">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M12 16V5M8 9l4-4 4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+        <p>じぶんの絵をアップ</p>
+        <small>手描き・写真・既存プリントデータ（TIFF）OK</small>
+        <input type="file" id="file" accept="image/*,.tif,.tiff" hidden>
+      </div>
+      <div class="samples">
+        <div class="cap"><span>SAMPLE</span><em>そのまま使える見本柄</em></div>
+        <div class="sampgrid" id="sampGrid"></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2><span class="no">02</span>切り抜き<span class="hint">背景を自動で透過</span></h2>
+      <div id="cutTile" style="display:none">
+        <div class="chk" style="width:100%;height:auto;aspect-ratio:2.2;margin-bottom:10px"><canvas id="tileCv" width="440" height="200" style="object-fit:contain;width:100%;height:100%"></canvas></div>
+        <div class="autobadge"><svg class="ic" viewBox="0 0 24 24" style="width:12px;height:12px"><path d="M20 6L9 17l-5-5"/></svg>既存プリントデータをそのまま使用（切り抜きなし）</div>
+        <div class="mini" id="tileInfo">—</div>
+        <button class="ghost" id="tileToMotif" type="button" style="margin-top:10px"><svg class="ic" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M8.5 8.5L20 18M8.5 15.5L20 6"/></svg>絵として切り抜き直す</button>
+      </div>
+      <div id="cutNormal">
+      <div class="cutrow">
+        <div class="chk"><canvas id="cutCv" width="200" height="200"></canvas></div>
+        <div>
+          <div class="autobadge" id="autoBadge"><svg class="ic" viewBox="0 0 24 24" style="width:12px;height:12px"><path d="M20 6L9 17l-5-5"/></svg>自動判定</div>
+          <label class="lb">微調整 <span class="val num" id="tolV" style="min-width:auto">±0</span></label>
+          <div class="range"><input type="range" id="tol" min="0" max="100" value="50"></div>
+          <label class="toggle" style="margin-top:11px"><input type="checkbox" id="skipCut"> 切り抜かない</label>
+          <div class="motifcount" id="motifCount">—</div>
+        </div>
+      </div>
+      <div class="mini">背景の色ムラ・質感にも追従します。複数の絵は自動で個別のモチーフに分かれます。</div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2><span class="no">03</span>柄の並べ方</h2>
+      <div id="repeatSeg"></div>
+      <div id="dropRow">
+        <label class="lb">柄送り（ずらす量）</label>
+        <div class="segline" id="dropSeg">
+          <button data-d="2" class="on">1/2</button>
+          <button data-d="3">1/3</button>
+          <button data-d="4">1/4</button>
+        </div>
+      </div>
+      <div id="arrangeRow">
+        <label class="lb">モチーフの並び（複数柄）</label>
+        <div class="segline" id="arrangeSeg">
+          <button data-a="checker" class="on"><span class="sans">市松</span></button>
+          <button data-a="col"><span class="sans">ヨコ交互</span></button>
+          <button data-a="row"><span class="sans">タテ交互</span></button>
+          <button data-a="random"><span class="sans">ランダム</span></button>
+        </div>
+      </div>
+      <div id="tossOpts">
+        <button class="ghost" id="shuffle" type="button"><svg class="ic" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>散らしをシャッフル</button>
+        <label class="lb" style="margin-top:13px">すき間に散らす背景モチーフ</label>
+        <div class="segline" id="fillerSeg">
+          <button data-f="none" class="on"><span class="sans">なし</span></button>
+          <button data-f="paw"><span class="sans">肉球</span></button>
+          <button data-f="motif"><span class="sans">モチーフから</span></button>
+          <button data-f="upload"><span class="sans">絵をアップ</span></button>
+        </div>
+        <input type="file" id="fillerFile" accept="image/*,.tif,.tiff" hidden>
+        <div id="fillerPick" style="display:none;margin-top:10px">
+          <label class="lb">背景に回すモチーフ</label>
+          <div class="sampgrid" id="fillerPickGrid" style="grid-template-columns:repeat(6,1fr)"></div>
+        </div>
+        <div id="fillerScaleRow" style="display:none;margin-top:12px">
+          <label class="lb">背景モチーフの大きさ <span class="val num" id="fillerScaleV" style="min-width:auto">30%</span></label>
+          <div class="range"><input type="range" id="fillerScale" min="15" max="50" value="30"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2><span class="no">04</span>背景の色</h2>
+      <div class="swatches" id="swatches"></div>
+      <div class="pick">自由に <input type="color" id="bgColor" value="#f2ebdc"></div>
+    </section>
+  </aside>
+
+  <!-- ===== STAGE ===== -->
+  <main class="stage">
+    <div class="previews">
+      <div class="pv">
+        <div class="h"><span class="no">05</span><span class="t">生地プレビュー</span>
+          <div class="htools">
+            <div class="tabs" id="patTabs">
+              <button data-t="surface" class="on">敷き詰め</button>
+              <button data-t="unit">1リピート</button>
+            </div>
+            <div class="zoomseg" id="zoomSeg">
+              <button data-z="0.5">50%</button>
+              <button data-z="1" class="on">100%</button>
+              <button data-z="2">200%</button>
+              <button data-z="5">500%</button>
+            </div>
+            <label class="toggle"><input type="checkbox" id="seams"> 継ぎ目</label>
+          </div>
+        </div>
+        <div class="cv"><canvas id="patternCv" width="980" height="600"></canvas></div>
+        <div class="foot"><span id="unitInfo">—</span><span id="seamlessInfo" style="color:var(--ok)">継ぎ目なし保証（トーラス配置）</span></div>
+      </div>
+      <div class="pv">
+        <div class="h"><span class="no">06</span><span class="t">仕上がりイメージ</span>
+          <div class="htools">
+            <div class="tabs" id="prodTabs">
+              <button data-prod="tshirt" class="on">Tシャツ</button>
+              <button data-prod="tote">トート</button>
+              <button data-prod="bolt">反物</button>
+            </div>
+            <div class="zoomseg" id="prodZoomSeg">
+              <button data-z="full" class="on">全体</button>
+              <button data-z="zoom">プリント拡大</button>
+            </div>
+          </div>
+        </div>
+        <div class="cv" style="flex:1"><canvas id="productCv" width="860" height="900"></canvas></div>
+        <div class="foot"><span id="prodNote">縫製で柄はつながりません（実物と同じ見え方で表示）</span></div>
+      </div>
+    </div>
+
+    <div class="strip">
+      <p class="cap"><b>柄の調整</b>動かすと即反映</p>
+      <div class="row">
+        <div class="c">
+          <label class="lb"><svg class="ic" viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg><span id="sizeLb">柄の大きさ（実寸）</span></label>
+          <div class="range"><input type="range" id="size" min="2" max="20" step="0.5" value="7"></div>
+          <div class="sub"><span class="val num" id="sizeV" style="text-align:left">7<small>cm・中</small></span>
+            <span class="numin"><input type="number" id="sizeN" min="2" max="20" step="0.5" value="7"><span class="unit">cm</span></span></div>
+        </div>
+        <div class="c">
+          <label class="lb"><svg class="ic" viewBox="0 0 24 24"><circle cx="6" cy="6" r="1"/><circle cx="12" cy="6" r="1"/><circle cx="18" cy="6" r="1"/><circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/><circle cx="6" cy="18" r="1"/><circle cx="12" cy="18" r="1"/><circle cx="18" cy="18" r="1"/></svg>密度（詰まり具合）</label>
+          <div class="range"><input type="range" id="dens" min="0" max="100" value="45"></div>
+          <div class="sub"><span class="val num" id="densV" style="text-align:left">45%</span></div>
+        </div>
+        <div class="c">
+          <label class="lb"><svg class="ic" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.3"/><path d="M3 4v4h4"/></svg>回転のゆらぎ</label>
+          <div class="range"><input type="range" id="rot" min="0" max="180" value="0"></div>
+          <div class="sub"><span class="val num" id="rotV" style="text-align:left">0°</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <div class="card">
+        <h2><span class="no">07</span><span class="t">生地をえらんで注文</span></h2>
+        <div class="demo">数値・生地はダミー（プロトタイプ）</div>
+        <div id="fabSeg"></div>
+        <div class="orow">
+          <label class="lb">長さ</label>
+          <div class="range" style="flex:1"><input type="range" id="meters" min="1" max="10" value="1"></div>
+          <span class="val num" id="metersV">1m</span>
+        </div>
+        <div class="priceRow"><span class="lab" id="lenLabel">—</span><span class="price num" id="price">¥—</span></div>
+        <div class="cta">
+          <button class="cart" id="cart"><svg class="ic" viewBox="0 0 24 24"><path d="M6 2 3 6v13a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>カートに入れる</button>
+          <button class="save" id="save"><svg class="ic" viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>保存</button>
+        </div>
+        <div class="note" id="fabNote">—</div>
+      </div>
+
+      <div class="card">
+        <h2><span class="no">08</span><span class="t">入稿データ（自社プリント用）</span></h2>
+        <div class="demo">Mimaki RIP（TxLink/RasterLink）へそのまま入稿できる1リピートタイル</div>
+        <label class="lb">解像度</label>
+        <div class="segline" id="dpiSeg" style="max-width:280px">
+          <button data-dpi="150">150dpi</button>
+          <button data-dpi="200">200dpi</button>
+          <button data-dpi="300" class="on">300dpi</button>
+        </div>
+        <div class="exgrid">
+          <span class="k">リピートタイル実寸</span><span class="v" id="exCm">—</span>
+          <span class="k">ピクセル</span><span class="v" id="exPx">—</span>
+          <span class="k">推定ファイルサイズ</span><span class="v" id="exMb">—</span>
+          <span class="k">形式</span><span class="v">TIFF 6.0（RGB 8bit・アルファ無し・PackBits/無圧縮 自動）</span>
+        </div>
+        <div class="exbtns">
+          <button class="tif" id="exTif"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>TIFFを書き出す（入稿用）</button>
+          <button class="png" id="exPng">PNG</button>
+        </div>
+        <div class="exmsg" id="exMsg"></div>
+        <div class="mini" id="exSrcNote" style="display:none;color:var(--warn)"></div>
+        <div class="note">透過背景は白地に合成して書き出します。画面の色は参考表示（実発色はRIPプロファイル＋物理スワッチ色校正が基準）。</div>
+      </div>
+    </div>
+    <div id="testout"></div>
+  </main>
+</div>
+
+<!-- TIFF取り込みモード選択 -->
+<div id="tiffDlg">
+  <div class="dlgcard">
+    <h3>TIFFデータの取り込み方法</h3>
+    <p class="mini" id="tiffDlgInfo">—</p>
+    <button class="dlgopt" id="dlgTile">
+      <b>そのままリピートタイルとして使う<span class="rec">推奨</span></b>
+      <small>既存の入稿データ・完成柄向け。実寸を自動設定し、敷き詰め確認・製品イメージ・別解像度での再書き出しができます。</small>
+    </button>
+    <button class="dlgopt" id="dlgMotif">
+      <b>絵として切り抜いて総柄にする</b>
+      <small>描いた絵のスキャン・写真向け。背景を透過してモチーフ化し、リピートを組み直します。</small>
+    </button>
+    <button class="dlgcancel" id="dlgCancel">キャンセル</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   着るタイル エンジン v3
+   ①切り抜き: 境界flood-fill(2段しきい値)＋k-means背景モデル＋自動しきい値
+              ＋despeckle＋穴埋め＋defringe＋feather
+   ②レイアウト: 正規化座標(モチーフ長辺=1)で計算 → プレビューと入稿を
+              同一レイアウトでレンダリング（整数分数の柄送り・朱子送り対応）
+   ③製品表示: 陰影つきベクターフラットレイ（S字シルエット・リブ襟・
+              4層シェーディング・パネル別柄オフセット＝縫製の柄ズレ再現）
+   ④入稿: Baseline TIFF 6.0 (RGB 8bit / PackBits・無圧縮自動 / 解像度タグ)
+============================================================ */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function makeCanvas(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c;}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function lerp(a,b,t){return a+(b-a)*t;}
+const TAU=Math.PI*2;
+
+/* ---- 状態 ---- */
+const state={
+  rawFull:null, raw:null,        // アップ原寸 / 解析用(≤700px)
+  motifs:[],                     // [{pv:canvas, hi:fn(px)->canvas|null, _hiCache:{}}]
+  mode:'motif',                  // 'motif'=切り抜き総柄 / 'tile'=既存プリントデータをリピートタイルとして使用
+  tileSrc:null,                  // tileモード: decodeTiff結果 {canvas,width,height,dpi,cmW,info}
+  sample:null,                   // 選択中サンプルキー
+  repeat:'half', dropDen:2, arrange:'checker',
+  sizeCm:7, density:45, rot:0, bg:'#f2ebdc',
+  tol:50, skipCut:false, seed:20260710,
+  filler:{type:'none',motifIdx:-1,motif:null}, // すき間の背景モチーフ: none/paw/motif/upload
+  fillerScale:30,                              // 主役に対する大きさ%（15-50）
+  patTab:'surface', zoom:1, showSeams:false,
+  panCmX:0, panCmY:0,            // 生地プレビューのスライド位置（実寸cm・ズーム非依存）
+  product:'tshirt', prodZoom:'full',
+  fabric:'sheeting', meters:1, dpi:300,
+  layout:null, autoBase:0,
+};
+const PPCM=7;               // プレビュー基準スケール(px/cm・zoom=1)
+const CUT_MAX=700;          // 解析解像度
+const HI_MAX=2200;          // 入稿用切り抜きの上限解像度
+
+const FABRICS={
+  sheeting:{name:'シーチング',comp:'綿100%',price:1200,note:'薄手で扱いやすく初心者に。用途が広い定番。'},
+  oxford:{name:'オックス',comp:'綿100%',price:1500,note:'しっかりした厚みでバッグや小物に。'},
+  tenjiku:{name:'天竺ニット',comp:'綿100%',price:1900,note:'伸縮性があり、Tシャツや子供服に。'},
+  canvas:{name:'キャンバス',comp:'綿100%',price:2200,note:'厚手で丈夫。トートやインテリアに。'},
+  linen:{name:'リネン混',comp:'綿麻',price:2400,note:'ナチュラルな風合いで大人の作品に。'},
+  gauze:{name:'ダブルガーゼ',comp:'綿100%',price:2000,note:'柔らかくベビー・スタイに人気。'}
+};
+
+/* ============================================================
+   サンプル柄（2026トレンド準拠・シード固定・Canvas 2Dのみ）
+============================================================ */
+function wobblyPath(x,cx,cy,r,n,jit,rnd){
+  const p=[];for(let i=0;i<n;i++){const a=i/n*TAU,rr=r*(1+jit*(rnd()-0.5));p.push([cx+Math.cos(a)*rr,cy+Math.sin(a)*rr]);}
+  x.beginPath();
+  for(let i=0;i<n;i++){const[x1,y1]=p[i],[x2,y2]=p[(i+1)%n];const mx=(x1+x2)/2,my=(y1+y2)/2;i===0?x.moveTo(mx,my):0;x.quadraticCurveTo(x1,y1,mx,my);}
+  x.closePath();
+}
+/* マティス・カットアウトリーフ（基部から扇状に伸びる指状ローブ・塗りのみ） */
+function drawMatisseLeaf(size,color,seed){
+  const c=makeCanvas(size,size),x=c.getContext('2d'),rnd=mulberry32(seed);
+  x.fillStyle=color;
+  x.translate(size/2,size*0.94);x.rotate((rnd()-0.5)*0.2);
+  const n=5,spread=1.55; // 指5本・扇の開き
+  for(let i=0;i<n;i++){
+    const a=(i/(n-1)-0.5)*spread+(rnd()-0.5)*0.09;
+    const L=size*(0.62+0.26*Math.sin(Math.PI*(i+0.5)/n))*(1+0.12*(rnd()-0.5)); // 中央が長い
+    const wF=L*(0.15+0.05*rnd());
+    x.save();x.rotate(a);
+    x.beginPath();x.moveTo(0,0);
+    x.quadraticCurveTo(-wF,-L*0.42,(rnd()-0.5)*wF*0.6,-L);
+    x.quadraticCurveTo(wF,-L*0.42,0,0);
+    x.closePath();x.fill();
+    x.restore();
+  }
+  return c;
+}
+/* 小石（アクセント） */
+function drawPebble(size,color,seed){
+  const c=makeCanvas(size,size),x=c.getContext('2d'),rnd=mulberry32(seed);
+  x.fillStyle=color;wobblyPath(x,size*0.5,size*0.5,size*0.34,6,0.3,rnd);x.fill();return c;
+}
+/* レトロデイジー（不揃い花びら・芯オフセット・版ずれ線） */
+function drawDaisy(size,petal,center,seed){
+  const c=makeCanvas(size,size),x=c.getContext('2d'),rnd=mulberry32(seed);
+  const cx=size/2,cy=size/2,np=7,r0=size*0.10,pl=size*0.30,pw=size*0.115;
+  x.translate(cx,cy);
+  const draw=(fill)=>{
+    for(let i=0;i<np;i++){
+      const th=i/np*TAU+(rnd()-0.5)*0.14,plv=pl*(1+0.16*(rnd()-0.5));
+      x.save();x.rotate(th);x.beginPath();x.moveTo(0,r0);
+      x.bezierCurveTo(pw,r0+plv*0.3,pw,r0+plv*0.9,0,r0+plv);
+      x.bezierCurveTo(-pw,r0+plv*0.9,-pw,r0+plv*0.3,0,r0);
+      if(fill){x.fillStyle=petal;x.fill();}else{x.strokeStyle=center;x.lineWidth=size*0.014;x.stroke();}
+      x.restore();
+    }
+  };
+  draw(true);
+  // 版ずれ: 同シード＝同形状のパスを2px+2°ずらして細線でなぞる（レトロ印刷の要）
+  x.save();x.translate(size*0.02,size*0.014);x.rotate(0.035);
+  (function(){const rr=mulberry32(seed);for(let i=0;i<np;i++){
+    const th=i/np*TAU+(rr()-0.5)*0.14,plv=pl*(1+0.16*(rr()-0.5));
+    x.save();x.rotate(th);x.beginPath();x.moveTo(0,r0);
+    x.bezierCurveTo(pw,r0+plv*0.3,pw,r0+plv*0.9,0,r0+plv);
+    x.bezierCurveTo(-pw,r0+plv*0.9,-pw,r0+plv*0.3,0,r0);
+    x.strokeStyle=center;x.lineWidth=size*0.012;x.globalAlpha=0.85;x.stroke();x.restore();}})();
+  x.restore();
+  // 花芯（非同心）
+  x.fillStyle=center;x.beginPath();x.arc(size*0.012,size*0.02,r0*1.18,0,TAU);x.fill();
+  return c;
+}
+/* 北欧スワッグ（S字枝・互生非対称葉・歪み楕円の実） */
+function drawSwag(size,seed){
+  const c=makeCanvas(Math.round(size*0.72),size),x=c.getContext('2d'),rnd=mulberry32(seed);
+  const W=c.width,L=size*0.84,x0=W*0.5,y0=size*0.08,bend=L*0.16*(1+0.4*(rnd()-0.5));
+  const leafCols=['#4a6b57','#97a578'],berry='#d9a441',branch='#5d5340';
+  // 枝（緩いS字）
+  x.strokeStyle=branch;x.lineWidth=size*0.030;x.lineCap='round';
+  x.beginPath();x.moveTo(x0,y0);x.quadraticCurveTo(x0+bend,y0+L*0.5,x0+bend*0.3,y0+L);x.stroke();
+  const bx=t=>x0+2*(1-t)*t*bend+t*t*bend*0.3, by=t=>y0+L*t;
+  // 葉（互生・左右交互・先端へ漸減・非対称制御点）
+  const nl=8;
+  for(let i=0;i<nl;i++){
+    const t=0.10+0.80*i/(nl-1)+(rnd()-0.5)*0.04,side=i%2?1:-1;
+    const ll=size*0.26*lerp(1,0.68,i/(nl-1))*(1+0.18*(rnd()-0.5)),lw=ll*0.46;
+    x.save();x.translate(bx(t),by(t));
+    // 枝から斜め下向きに生える（垂れ枝スワッグの定番角度）
+    x.rotate(side*(1.05+rnd()*0.3)-Math.PI*0.5);
+    x.fillStyle=leafCols[(rnd()*2)|0];
+    x.beginPath();x.moveTo(0,0);
+    x.quadraticCurveTo(lw,ll*0.35,0,ll);
+    x.quadraticCurveTo(-lw*0.85,ll*0.6,0,0);
+    x.fill();x.restore();
+  }
+  // 実（枝先に3個・歪み楕円）
+  for(let i=0;i<3;i++){
+    const t=0.88+(rnd()-0.5)*0.12,r=size*0.045*(1+0.25*(rnd()-0.5));
+    x.fillStyle=berry;x.beginPath();
+    x.ellipse(bx(t)+(rnd()-0.5)*size*0.14,by(t)+(rnd()-0.3)*size*0.08,r*(1+0.1*(rnd()-0.5)),r*(1-0.1*(rnd()-0.5)),rnd()*Math.PI,0,TAU);x.fill();
+  }
+  return c;
+}
+/* 木版スタンプa: 花十字（太ストローク4本・二度打ちにじみ） */
+function drawStampCross(size,color,seed){
+  const c=makeCanvas(size,size),x=c.getContext('2d'),rnd=mulberry32(seed);
+  x.translate(size/2,size/2);
+  // 同シード＝同形状で「本打ち→1px斜めオフセットの二度打ち」（木版のにじみ）
+  const put=(alpha,ox,oy)=>{
+    const rr=mulberry32(seed);
+    x.save();x.translate(ox,oy);x.globalAlpha=alpha;x.strokeStyle=color;x.lineWidth=size*0.16;x.lineCap='round';
+    for(let k=0;k<4;k++){
+      x.save();x.rotate(k*Math.PI/2+(rr()-0.5)*0.14);
+      x.beginPath();x.moveTo(0,size*0.10);x.quadraticCurveTo(size*0.05*(rr()-0.5),size*0.26,(rr()-0.5)*size*0.04,size*0.40);x.stroke();
+      x.restore();
+    }
+    x.restore();
+  };
+  put(0.85,0,0);
+  put(0.5,size*0.008,size*0.008);
+  return c;
+}
+/* 木版スタンプb: ドット輪（欠け1-2個＝木版のカスレ） */
+function drawStampRing(size,color,seed){
+  const c=makeCanvas(size,size),x=c.getContext('2d'),rnd=mulberry32(seed);
+  x.translate(size/2,size/2);x.fillStyle=color;
+  wobblyPath(x,0,0,size*0.13,8,0.2,rnd);x.fill();
+  const nd=8,skip=(rnd()*nd)|0,skip2=rnd()<0.5?((rnd()*nd)|0):-1;
+  for(let i=0;i<nd;i++){
+    if(i===skip||i===skip2)continue;
+    const a=i/nd*TAU+(rnd()-0.5)*0.1,R=size*0.32,r=size*0.055*(1+0.4*(rnd()-0.5));
+    x.globalAlpha=0.75+rnd()*0.25;
+    x.beginPath();x.arc(Math.cos(a)*R,Math.sin(a)*R,r,0,TAU);x.fill();
+  }
+  return c;
+}
+
+const PRESETS={
+  matisse:{name:'マティスリーフ', bg:'#f2ebdc', repeat:'toss', dropDen:2, sizeCm:7, density:52, rot:180,
+    make:px=>[
+      {hi:p=>drawMatisseLeaf(p,'#c96f4a',11)},
+      {hi:p=>drawMatisseLeaf(p,'#8fa98f',12)},
+      {hi:p=>drawPebble(p,'#2f3a4a',13)},
+    ]},
+  daisy:{name:'レトロデイジー', bg:'#f6efe6', repeat:'half', dropDen:2, sizeCm:6, density:58, rot:12, arrange:'checker',
+    make:px=>[
+      {hi:p=>drawDaisy(p,'#e8b4a8','#8a5a44',21)},
+      {hi:p=>drawDaisy(p,'#ebcb7c','#8a5a44',22)},
+    ]},
+  swag:{name:'北欧スワッグ', bg:'#f4eee1', repeat:'half', dropDen:2, sizeCm:8, density:66, rot:5,
+    make:px=>[
+      {hi:p=>drawSwag(p,31)},
+    ]},
+  block:{name:'木版スタンプ', bg:'#f2ebdc', repeat:'full', dropDen:2, sizeCm:4.5, density:62, rot:0, arrange:'checker',
+    make:px=>[
+      {hi:p=>drawStampCross(p,'#33506b',41)},
+      {hi:p=>drawStampRing(p,'#c98d7e',42)},
+    ]},
+};
+
+/* モチーフ取得（hiキャッシュ付き）。_expensive(アップ画像の原寸切り抜き)は印刷時のみhiを使う */
+function motifCanvas(m,px,forPrint){
+  if(!m.hi||(m._expensive&&!forPrint))return m.pv;
+  if(m._expensive)return m.hi(px);
+  const key=Math.min(2048,Math.max(64,Math.round(px/64)*64));
+  m._hiCache=m._hiCache||{};
+  if(!m._hiCache[key])m._hiCache[key]=m.hi(key);
+  return m._hiCache[key];
+}
+
+/* ============================================================
+   切り抜きエンジン（実サンプル画像で検証済み）
+============================================================ */
+function redmean2(p,c){const dr=p[0]-c[0],dg=p[1]-c[1],db=p[2]-c[2],rm=(p[0]+c[0])/2;
+  return (2+rm/256)*dr*dr+4*dg*dg+(2+(255-rm)/256)*db*db;}
+
+function cutoutPro(src,tolMul,skip){
+  const w=src.width,h=src.height,N=w*h;
+  const c=makeCanvas(w,h),cx=c.getContext('2d');cx.drawImage(src,0,0);
+  if(skip||hasAlpha(c))return{canvas:trim(c),auto:0};
+  const img=cx.getImageData(0,0,w,h),d=img.data;
+
+  /* 1. 縁リングサンプル */
+  const ring=Math.max(4,Math.round(Math.min(w,h)*0.03));
+  const samples=[];
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    if(x>=ring&&x<w-ring&&y>=ring&&y<h-ring)continue;
+    if(((x+y)&1)===0)continue;
+    const k=(y*w+x)*4;if(d[k+3]<200)continue;
+    samples.push([d[k],d[k+1],d[k+2]]);
+  }
+  if(samples.length<16)return{canvas:trim(c),auto:0};
+
+  /* 2. k-means k=3（farthest-point init・決定論） */
+  const K=3;
+  let centers=[samples[0].slice()];
+  for(let kk=1;kk<K;kk++){
+    let best=0,bd=-1;
+    for(let i=0;i<samples.length;i+=3){
+      let dm=Infinity;for(const c2 of centers){const dd=redmean2(samples[i],c2);if(dd<dm)dm=dd;}
+      if(dm>bd){bd=dm;best=i;}
+    }
+    centers.push(samples[best].slice());
+  }
+  const assign=new Uint8Array(samples.length);
+  for(let it=0;it<10;it++){
+    const acc=Array.from({length:K},()=>[0,0,0,0]);
+    for(let i=0;i<samples.length;i++){
+      let bi=0,bd2=Infinity;
+      for(let c2=0;c2<K;c2++){const dd=redmean2(samples[i],centers[c2]);if(dd<bd2){bd2=dd;bi=c2;}}
+      assign[i]=bi;const a=acc[bi];a[0]+=samples[i][0];a[1]+=samples[i][1];a[2]+=samples[i][2];a[3]++;
+    }
+    for(let c2=0;c2<K;c2++)if(acc[c2][3]>0)centers[c2]=[acc[c2][0]/acc[c2][3],acc[c2][1]/acc[c2][3],acc[c2][2]/acc[c2][3]];
+  }
+  const counts=[0,0,0];for(let i=0;i<samples.length;i++)counts[assign[i]]++;
+  const keep=[];for(let c2=0;c2<K;c2++)if(counts[c2]>=samples.length*0.08)keep.push(centers[c2]);
+  if(!keep.length)keep.push(centers[counts.indexOf(Math.max(...counts))]);
+
+  /* 3. 自動しきい値: 縁サンプル距離の90パーセンタイル（外れ値にロバスト） */
+  const rs=new Float32Array(samples.length);
+  for(let i=0;i<samples.length;i++){let bd3=Infinity;for(const c2 of keep){const dd=redmean2(samples[i],c2);if(dd<bd3)bd3=dd;}rs[i]=Math.sqrt(bd3);}
+  rs.sort();
+  const p90=rs[Math.min(rs.length-1,(rs.length*0.90)|0)];
+  const base=Math.min(85,Math.max(26,p90*1.3));
+  const Tlo=base*tolMul,Thi=Tlo*1.55,Tlo2=Tlo*Tlo,Thi2=Thi*Thi;
+
+  /* 4. 全画素の背景距離 */
+  const distA=new Float32Array(N),px=[0,0,0];
+  for(let p=0;p<N;p++){const k=p*4;px[0]=d[k];px[1]=d[k+1];px[2]=d[k+2];
+    let bd4=Infinity;for(const c2 of keep){const dd=redmean2(px,c2);if(dd<bd4)bd4=dd;}
+    distA[p]=bd4;}
+
+  /* 5. 境界flood-fill: コアのみ拡張・ソフト帯は種にしない・4近傍 */
+  const bz=Math.max(3,Math.round(Math.min(w,h)*0.025));
+  const inBZ=(x,y)=>x<bz||y<bz||x>=w-bz||y>=h-bz;
+  const TcoreBZ2=Thi2*2.0;
+  const core=(p,x,y)=>distA[p]<(inBZ(x,y)?TcoreBZ2:Tlo2);
+  const bgMask=new Uint8Array(N);
+  const stack=new Int32Array(N);let sp=0;
+  for(let x=0;x<w;x++){for(const y of[0,h-1]){const p=y*w+x;if(!bgMask[p]&&core(p,x,y)){bgMask[p]=1;stack[sp++]=p;}}}
+  for(let y=0;y<h;y++){for(const x of[0,w-1]){const p=y*w+x;if(!bgMask[p]&&core(p,x,y)){bgMask[p]=1;stack[sp++]=p;}}}
+  while(sp>0){const p=stack[--sp],x=p%w,y=(p/w)|0;
+    for(let k2=0;k2<4;k2++){
+      const nx=x+(k2===0?1:k2===1?-1:0),ny=y+(k2===2?1:k2===3?-1:0);
+      if(nx<0||ny<0||nx>=w||ny>=h)continue;const np=ny*w+nx;
+      if(bgMask[np])continue;
+      if(core(np,nx,ny)){bgMask[np]=1;stack[sp++]=np;}
+      else if(distA[np]<Thi2){bgMask[np]=2;}
+    }}
+
+  /* 6. アルファ決定 */
+  const alpha=new Uint8ClampedArray(N);
+  for(let p=0;p<N;p++){
+    if(!bgMask[p]){alpha[p]=d[p*4+3];continue;}
+    if(bgMask[p]===1){alpha[p]=0;continue;}
+    alpha[p]=Math.round(255*(Math.sqrt(distA[p])-Tlo)/(Thi-Tlo));
+  }
+
+  /* 6.5 ソフト帯掃除: 前景近傍2px以外は完全透過 */
+  {
+    const near=new Uint8Array(N);
+    for(let p=0;p<N;p++)if(!bgMask[p])near[p]=1;
+    for(let pass=0;pass<2;pass++){
+      const s2=near.slice();
+      for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+        const p=y*w+x;if(s2[p])continue;
+        if((x>0&&s2[p-1])||(x<w-1&&s2[p+1])||(y>0&&s2[p-w])||(y<h-1&&s2[p+w]))near[p]=1;
+      }
+    }
+    for(let p=0;p<N;p++)if(bgMask[p]===2&&!near[p])alpha[p]=0;
+  }
+
+  /* 7. despeckle（小島除去）＋ 8. 穴埋め（背景非連結の小透明領域を復元） */
+  labelPass(alpha,w,h,60,true,Math.max(24,N*0.0008),p=>{alpha[p]=0;});
+  {
+    const holes=new Uint8Array(N);
+    for(let p=0;p<N;p++)holes[p]=(alpha[p]<128&&!bgMask[p])?1:0;
+    labelOn(holes,w,h,Math.max(24,N*0.001),p=>{alpha[p]=d[p*4+3];});
+  }
+
+  /* 9. defringe（縁の背景色被り除去） */
+  for(let p=0;p<N;p++){
+    const a=alpha[p];if(a===0||a>=250)continue;
+    const k=p*4;px[0]=d[k];px[1]=d[k+1];px[2]=d[k+2];
+    let bi=0,bd5=Infinity;
+    for(let i2=0;i2<keep.length;i2++){const dd=redmean2(px,keep[i2]);if(dd<bd5){bd5=dd;bi=i2;}}
+    const bgc=keep[bi],af=a/255;
+    for(let ch=0;ch<3;ch++){const v=(d[k+ch]-(1-af)*bgc[ch])/af;d[k+ch]=v<0?0:v>255?255:v;}
+  }
+
+  /* 10. feather（3x3 x2） */
+  const tmp=new Float32Array(N);
+  for(let pass=0;pass<2;pass++){
+    for(let y2=0;y2<h;y2++)for(let x2=0;x2<w;x2++){
+      let s=0,n2=0;
+      for(let dy=-1;dy<=1;dy++){const yy=y2+dy;if(yy<0||yy>=h)continue;
+        for(let dx=-1;dx<=1;dx++){const xx=x2+dx;if(xx<0||xx>=w)continue;s+=alpha[yy*w+xx];n2++;}}
+      tmp[y2*w+x2]=s/n2;}
+    for(let p=0;p<N;p++)alpha[p]=tmp[p];
+  }
+  for(let p=0;p<N;p++)d[p*4+3]=alpha[p];
+  cx.putImageData(img,0,0);
+  return{canvas:trim(c),auto:base};
+}
+function hasAlpha(c){ // 画像全体をストライドサンプリング（左上だけ見ると透過PNGを誤判定する）
+  const w=c.width,h=c.height,d=c.getContext('2d').getImageData(0,0,w,h).data,n=w*h;
+  const stride=Math.max(1,(n/4096)|0);
+  for(let p=0;p<n;p+=stride)if(d[p*4+3]<250)return true;
+  return false;
+}
+function labelPass(alpha,w,h,th,above,areaMin,cb){
+  const N=w*h,vis=new Uint8Array(N),stack=new Int32Array(N);
+  for(let p0=0;p0<N;p0++){
+    if(vis[p0])continue;
+    const on=above?alpha[p0]>=th:alpha[p0]<th;
+    if(!on){vis[p0]=1;continue;}
+    let sp=0;stack[sp++]=p0;vis[p0]=1;const comp=[];
+    while(sp>0){const p=stack[--sp];comp.push(p);const x=p%w,y=(p/w)|0;
+      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+        if(!dx&&!dy)continue;const nx=x+dx,ny=y+dy;
+        if(nx<0||ny<0||nx>=w||ny>=h)continue;const np=ny*w+nx;
+        if(vis[np])continue;
+        const on2=above?alpha[np]>=th:alpha[np]<th;
+        if(!on2)continue;vis[np]=1;stack[sp++]=np;}}
+    if(comp.length<areaMin)comp.forEach(cb);
+  }
+}
+function labelOn(mask,w,h,areaMin,cb){
+  const N=w*h,vis=new Uint8Array(N),stack=new Int32Array(N);
+  for(let p0=0;p0<N;p0++){
+    if(vis[p0]||!mask[p0]){vis[p0]=1;continue;}
+    let sp=0;stack[sp++]=p0;vis[p0]=1;const comp=[];
+    while(sp>0){const p=stack[--sp];comp.push(p);const x=p%w,y=(p/w)|0;
+      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+        if(!dx&&!dy)continue;const nx=x+dx,ny=y+dy;
+        if(nx<0||ny<0||nx>=w||ny>=h)continue;const np=ny*w+nx;
+        if(vis[np]||!mask[np])continue;vis[np]=1;stack[sp++]=np;}}
+    if(comp.length<areaMin)comp.forEach(cb);
+  }
+}
+function trim(c){
+  const w=c.width,h=c.height,x=c.getContext('2d'),d=x.getImageData(0,0,w,h).data;
+  let x0=w,y0=h,x1=0,y1=0,f=false;
+  for(let y=0;y<h;y++)for(let xx=0;xx<w;xx++){if(d[(y*w+xx)*4+3]>16){f=true;if(xx<x0)x0=xx;if(xx>x1)x1=xx;if(y<y0)y0=y;if(y>y1)y1=y;}}
+  if(!f)return c;
+  const pad=Math.round(Math.max(w,h)*0.02);
+  x0=Math.max(0,x0-pad);y0=Math.max(0,y0-pad);x1=Math.min(w-1,x1+pad);y1=Math.min(h-1,y1+pad);
+  const tw=x1-x0+1,th=y1-y0+1,o=makeCanvas(tw,th);
+  o.getContext('2d').drawImage(c,x0,y0,tw,th,0,0,tw,th);return o;
+}
+/* 連結成分でモチーフ分離 */
+function splitMotifs(cut,maxN){const w=cut.width,h=cut.height,a=cut.getContext('2d').getImageData(0,0,w,h).data;
+  const vis=new Uint8Array(w*h),comps=[],stack=new Int32Array(w*h),minA=Math.round(w*h*0.006),TH=40;
+  for(let p=0;p<w*h;p++){if(vis[p]||a[p*4+3]<TH)continue;let sp=0;stack[sp++]=p;vis[p]=1;let x0=w,y0=h,x1=0,y1=0,cnt=0;
+    while(sp>0){const q=stack[--sp],qx=q%w,qy=(q/w)|0;cnt++;if(qx<x0)x0=qx;if(qx>x1)x1=qx;if(qy<y0)y0=qy;if(qy>y1)y1=qy;
+      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){if(!dx&&!dy)continue;const nx=qx+dx,ny=qy+dy;if(nx<0||ny<0||nx>=w||ny>=h)continue;const np=ny*w+nx;if(vis[np]||a[np*4+3]<TH)continue;vis[np]=1;stack[sp++]=np;}}
+    if(cnt>=minA)comps.push({x0,y0,x1,y1,cnt});}
+  comps.sort((A,B)=>B.cnt-A.cnt);
+  return comps.slice(0,maxN||6).map(cp=>{const tw=cp.x1-cp.x0+1,th=cp.y1-cp.y0+1,o=makeCanvas(tw,th);o.getContext('2d').drawImage(cut,cp.x0,cp.y0,tw,th,0,0,tw,th);return{rect:cp,canvas:o};});
+}
+
+/* ============================================================
+   TIFFデコーダ（既存プリントデータの取り込み用・依存ゼロ）
+   対応: LE/BE・ストリップ/タイル・無圧縮/LZW/ZIP(DecompressionStream)/PackBits
+        Predictor2・8/16bit・RGB(+A)/グレー/パレット/CMYK(近似)
+   返値: {canvas, width, height, dpi|null, cmW|null, info}
+============================================================ */
+async function decodeTiff(buf){
+  const dv=new DataView(buf),u8=new Uint8Array(buf);
+  const m0=dv.getUint16(0,false);
+  const le=(m0===0x4949);
+  if(!le&&m0!==0x4D4D)throw new Error('TIFFファイルではありません');
+  if(dv.getUint16(2,le)!==42)throw new Error('BigTIFFは未対応です（通常のTIFFで保存し直してください）');
+  const u16=o=>dv.getUint16(o,le),u32=o=>dv.getUint32(o,le);
+  const SZ={1:1,2:1,3:2,4:4,5:8,6:1,7:1,8:2,9:4,10:8,11:4,12:8};
+  const ifd=u32(4),n=u16(ifd),T={};
+  /* 使うタグだけ展開（ICCプロファイル等の巨大タグの無駄コピーを防ぐ） */
+  const USED=new Set([256,257,258,259,262,273,277,278,279,282,283,284,296,317,320,322,323,324,325,338]);
+  for(let i=0;i<n;i++){
+    const e=ifd+2+i*12,tag=u16(e),type=u16(e+2),cnt=u32(e+4);
+    if(!USED.has(tag))continue;
+    const size=(SZ[type]||1)*cnt,vo=size<=4?e+8:u32(e+8);
+    const vals=new Array(cnt);
+    for(let k=0;k<cnt;k++){
+      if(type===3)vals[k]=u16(vo+k*2);
+      else if(type===4)vals[k]=u32(vo+k*4);
+      else if(type===5)vals[k]=u32(vo+k*8)/(u32(vo+k*8+4)||1);
+      else if(type===1||type===2||type===7)vals[k]=u8[vo+k];
+      else vals[k]=u32(vo);
+    }
+    T[tag]=vals;
+  }
+  const W=(T[256]||[0])[0],H=(T[257]||[0])[0];
+  if(!W||!H)throw new Error('画像サイズを読めませんでした');
+  if(W*H>45e6)throw new Error(`画像が大きすぎます（${W}×${H}px・上限45MP）`);
+  const bits=(T[258]||[8])[0],spp=(T[277]||[1])[0],comp=(T[259]||[1])[0];
+  const photo=(T[262]||[1])[0],planar=(T[284]||[1])[0],pred=(T[317]||[1])[0];
+  if(planar===2)throw new Error('Planar形式のTIFFは未対応です（Photoshopで「インターリーブ」保存を）');
+  if(bits!==8&&bits!==16)throw new Error(bits+'bit TIFFは未対応です（8/16bitのみ）');
+  if(![1,5,8,32946,32773].includes(comp))throw new Error('この圧縮形式は未対応です（無圧縮/LZW/ZIP/PackBits対応。JPEG圧縮TIFFはPNG等で保存し直してください）');
+  if(![0,1,2,3,5].includes(photo))throw new Error('このカラー形式のTIFFは未対応です');
+  if(pred!==1&&pred!==2)throw new Error('この予測子（Predictor='+pred+'）は未対応です（PNG等で保存し直してください）');
+  const bpp=bits/8,rowBytes=W*spp*bpp;
+
+  /* --- 展開器 --- */
+  const inflate=async(src)=>{
+    const ds=new DecompressionStream('deflate');
+    const out=await new Response(new Blob([src]).stream().pipeThrough(ds)).arrayBuffer();
+    return new Uint8Array(out);
+  };
+  const unpackBits=(src,dstLen)=>{
+    const dst=new Uint8Array(dstLen);let i=0,o=0;
+    while(o<dstLen&&i<src.length){
+      const h=src[i++]<<24>>24;
+      if(h>=0){for(let k=0;k<=h&&o<dstLen;k++)dst[o++]=src[i++];}
+      else if(h>-128){const v=src[i++];for(let k=0;k<1-h&&o<dstLen;k++)dst[o++]=v;}
+    }
+    return dst;
+  };
+  const lzw=(src,dstLen)=>{ // TIFF LZW（MSBファースト・early change）連結リスト辞書で高速展開
+    const dst=new Uint8Array(dstLen);
+    const prevOf=new Int32Array(4096).fill(-1),byteOf=new Uint8Array(4096),lenOf=new Int32Array(4096);
+    for(let i=0;i<256;i++){byteOf[i]=i;lenOf[i]=1;}
+    let dictLen=258,codeLen=9,bit=0,dp=0,prev=-1;
+    const maxBit=src.length*8;
+    const read=()=>{let v=0;for(let i=0;i<codeLen;i++){v=(v<<1)|((src[bit>>3]>>(7-(bit&7)))&1);bit++;}return v;};
+    const firstByte=c=>{while(prevOf[c]>=0)c=prevOf[c];return byteOf[c];};
+    const emit=c=>{
+      const l=lenOf[c];let p=c,i=dp+l-1;
+      if(i>=dstLen){let skip=i-(dstLen-1);i=dstLen-1;while(skip-->0)p=prevOf[p];}
+      for(;p>=0;p=prevOf[p])dst[i--]=byteOf[p];
+      dp=Math.min(dstLen,dp+l);
+    };
+    while(dp<dstLen&&bit+codeLen<=maxBit){
+      const code=read();
+      if(code===257)break;
+      if(code===256){dictLen=258;codeLen=9;prev=-1;continue;}
+      if(code<dictLen&&code!==256&&code!==257){
+        emit(code);
+        if(prev>=0&&dictLen<4096){prevOf[dictLen]=prev;byteOf[dictLen]=firstByte(code);lenOf[dictLen]=lenOf[prev]+1;dictLen++;}
+      }else if(code===dictLen&&prev>=0&&dictLen<4096){
+        prevOf[dictLen]=prev;byteOf[dictLen]=firstByte(prev);lenOf[dictLen]=lenOf[prev]+1;
+        emit(dictLen);dictLen++;
+      }else throw new Error('LZWデータが壊れています');
+      if(dictLen===(1<<codeLen)-1&&codeLen<12)codeLen++;
+      prev=code;
+    }
+    return dst;
+  };
+  const predict=(row)=>{ // Predictor=2（水平差分の復元）行単位
+    if(pred!==2)return;
+    if(bits===8){for(let i=spp;i<row.length;i++)row[i]=(row[i]+row[i-spp])&255;}
+    else{ // 16bit: チャンネルごとにワード差分
+      const step=spp*2;
+      for(let i=step;i<row.length;i+=2){
+        const cur=le?(row[i]|(row[i+1]<<8)):((row[i]<<8)|row[i+1]);
+        const pre=le?(row[i-step]|(row[i-step+1]<<8)):((row[i-step]<<8)|row[i-step+1]);
+        const v=(cur+pre)&0xFFFF;
+        if(le){row[i]=v&255;row[i+1]=v>>8;}else{row[i]=v>>8;row[i+1]=v&255;}
+      }
+    }
+  };
+  const decodeBlock=async(off,len,expect)=>{
+    const src=u8.subarray(off,off+len);
+    let out;
+    if(comp===1)out=src.length>=expect?src.subarray(0,expect):(()=>{const t=new Uint8Array(expect);t.set(src);return t;})();
+    else if(comp===5)out=lzw(src,expect);
+    else if(comp===32773)out=unpackBits(src,expect);
+    else out=await inflate(src); // 8 / 32946
+    if(out.length<expect){const t=new Uint8Array(expect);t.set(out);out=t;}
+    return out;
+  };
+
+  /* --- 全画素をrowBytes×Hのバッファへ（ストリップ/タイル両対応） --- */
+  const raw=new Uint8Array(rowBytes*H);
+  if(T[322]){ // タイルTIFF
+    const tw=T[322][0],th=T[323][0],offs=T[324],lens=T[325]||offs.map(()=>0);
+    const tRow=tw*spp*bpp,cols=Math.ceil(W/tw),rows=Math.ceil(H/th);
+    for(let ty=0;ty<rows;ty++)for(let tx=0;tx<cols;tx++){
+      const idx=ty*cols+tx;
+      const blk=await decodeBlock(offs[idx],lens[idx]||buf.byteLength-offs[idx],tRow*th);
+      for(let y=0;y<th;y++){
+        const gy=ty*th+y;if(gy>=H)break;
+        const rowSeg=blk.subarray(y*tRow,(y+1)*tRow);
+        predict(rowSeg);
+        const copy=Math.min(tRow,rowBytes-tx*tRow);
+        if(copy>0)raw.set(rowSeg.subarray(0,copy),gy*rowBytes+tx*tRow);
+      }
+    }
+  }else{
+    const offs=T[273],lens=T[279]||offs.map(()=>0);
+    if(!offs)throw new Error('画像データの位置を読めませんでした');
+    const rps=(T[278]||[H])[0];
+    let gy=0;
+    for(let s=0;s<offs.length&&gy<H;s++){
+      const rowsHere=Math.min(rps,H-gy);
+      const blk=await decodeBlock(offs[s],lens[s]||buf.byteLength-offs[s],rowBytes*rowsHere);
+      for(let y=0;y<rowsHere;y++){
+        const row=blk.subarray(y*rowBytes,(y+1)*rowBytes);
+        predict(row);
+        raw.set(row,(gy+y)*rowBytes);
+      }
+      gy+=rowsHere;
+    }
+  }
+
+  /* --- RGBA化 --- */
+  const c=makeCanvas(W,H),ctx=c.getContext('2d'),img=ctx.createImageData(W,H),d=img.data;
+  const rd=bits===8
+    ?(p)=>raw[p]
+    :(p)=>le?raw[p*2+1]:raw[p*2]; // 16bit→上位バイト
+  const extra=(T[338]||[])[0]; // 1/2=アルファ
+  const hasA=spp>=4&&photo===2&&(extra===1||extra===2||T[338]===undefined&&spp===4);
+  const cmap=T[320]; // パレット
+  const isAssoc=extra===1; // 事前乗算アルファ→straightへ割り戻す
+  for(let p=0,q=0;p<W*H;p++,q+=4){
+    const base=p*spp;
+    if(photo===2){
+      const a=hasA?rd(base+3):255;
+      if(isAssoc&&a>0&&a<255){
+        const s2=255/a;
+        d[q]=Math.min(255,Math.round(rd(base)*s2));
+        d[q+1]=Math.min(255,Math.round(rd(base+1)*s2));
+        d[q+2]=Math.min(255,Math.round(rd(base+2)*s2));
+      }else{
+        d[q]=rd(base);d[q+1]=rd(base+1);d[q+2]=rd(base+2);
+      }
+      d[q+3]=a;
+    }else if(photo===5){
+      const C=rd(base),M=rd(base+1),Y=rd(base+2),K=spp>3?rd(base+3):0;
+      d[q]=(255-C)*(255-K)/255;d[q+1]=(255-M)*(255-K)/255;d[q+2]=(255-Y)*(255-K)/255;d[q+3]=255;
+    }else if(photo===3&&cmap){
+      const v=rd(base),N2=1<<bits;
+      d[q]=cmap[v]>>8;d[q+1]=cmap[N2+v]>>8;d[q+2]=cmap[2*N2+v]>>8;d[q+3]=255;
+    }else{ // グレー（0=白黒反転）
+      const v=rd(base);const g=photo===0?255-v:v;
+      d[q]=d[q+1]=d[q+2]=g;d[q+3]=255;
+    }
+  }
+  ctx.putImageData(img,0,0);
+  /* 実寸: 解像度タグから自動算出 */
+  let dpi=null;
+  const xres=(T[282]||[0])[0],unit=(T[296]||[2])[0];
+  if(xres>1&&unit!==1)dpi=unit===3?xres*2.54:xres; // unit=1(絶対単位なし)はdpi扱いしない→実寸は手動指定へ
+  const cmW=dpi?W/dpi*2.54:null;
+  const compName={1:'無圧縮',5:'LZW',8:'ZIP',32946:'ZIP',32773:'PackBits'}[comp];
+  return{canvas:c,width:W,height:H,dpi,cmW,
+    info:`${W}×${H}px・${compName}${pred===2?'+差分':''}・${photo===5?'CMYK(近似変換)':photo===3?'パレット':photo===2?'RGB':'グレー'}${dpi?'・'+Math.round(dpi)+'dpi':''}`};
+}
+
+/* ============================================================
+   レイアウトエンジン（正規化座標: モチーフ長辺=1）
+   → プレビューも入稿も同一レイアウトからレンダ＝完全一致
+============================================================ */
+function poissonTor(W,H,r,rand,seeds){
+  const cs=r/Math.SQRT2,gw=Math.ceil(W/cs),gh=Math.ceil(H/cs),grid=new Int32Array(gw*gh).fill(-1),all=[],pts=[],act=[];
+  const mod=(a,n)=>((a%n)+n)%n;
+  const gi=(x,y)=>mod(Math.floor(y/cs),gh)*gw+mod(Math.floor(x/cs),gw);
+  const td2=(ax,ay,bx,by)=>{let dx=Math.abs(ax-bx);if(dx>W*0.5)dx=W-dx;let dy=Math.abs(ay-by);if(dy>H*0.5)dy=H-dy;return dx*dx+dy*dy;};
+  const reg=p=>{const id=all.length;all.push(p);grid[gi(p.x,p.y)]=id;return id;};
+  const fits=(x,y)=>{const gx=Math.floor(x/cs),gy=Math.floor(y/cs);for(let iy=-2;iy<=2;iy++)for(let ix=-2;ix<=2;ix++){const j=grid[mod(gy+iy,gh)*gw+mod(gx+ix,gw)];if(j<0)continue;const o=all[j],need=Math.max(r,o.exR||r);if(td2(o.x,o.y,x,y)<need*need)return false;}return true;};
+  (seeds||[]).forEach(reg);
+  /* 初期点は複数回試行（1回だと障害物seedsに当たって充填ゼロで終わることがある） */
+  for(let t0=0;t0<50&&!pts.length;t0++){
+    const p0={x:rand()*W,y:rand()*H,exR:r};
+    if(fits(p0.x,p0.y)){reg(p0);pts.push(p0);act.push(p0);}
+  }
+  let guard=0;
+  while(act.length&&guard++<20000){const i=(rand()*act.length)|0,p=act[i];let ok=false;
+    for(let t=0;t<30;t++){const a=rand()*TAU,rad=r*(1+rand()),x=mod(p.x+Math.cos(a)*rad,W),y=mod(p.y+Math.sin(a)*rad,H);
+      if(fits(x,y)){const q={x,y,exR:r};reg(q);pts.push(q);act.push(q);ok=true;break;}}
+    if(!ok){act[i]=act[act.length-1];act.pop();}}
+  return pts;
+}
+
+/* buildLayout: 正規化レイアウト {UW,UH,type,places[[x,y,mi,rot,flip,sc]],paws,pitch} */
+function buildLayout(){
+  /* リピートタイルモード: 取り込み画像そのものが1リピート。送りは矩形タイルに焼き込む */
+  if(state.mode==='tile'&&state.tileSrc){
+    const a=state.tileSrc.canvas.height/state.tileSrc.canvas.width;
+    const den=state.dropDen;
+    const rep=['full','half','brick','mirror'].includes(state.repeat)?state.repeat:'full';
+    let UW,UH;
+    if(rep==='half'){UW=den;UH=a;}
+    else if(rep==='brick'){UW=1;UH=a*den;}
+    else if(rep==='mirror'){UW=2;UH=2*a;}
+    else{UW=1;UH=a;}
+    return{type:'tile',UW,UH,rep,den,aspect:a};
+  }
+  const L=mainMotifs().length;if(!L)return null;
+  const repeat=state.repeat,den=state.dropDen,rotMax=state.rot*Math.PI/180;
+  const gap=lerp(1.15,0.04,state.density/100),pitch=1+gap;
+  const rand=mulberry32(state.seed);
+  const jit=()=>rotMax?(rand()*2-1)*rotMax:0;
+  let UW,UH,places=[],paws=null;
+
+  if(repeat==='full'||repeat==='half'||repeat==='brick'||repeat==='diamond'||repeat==='sateen'){
+    const V=4;let nCols,nRows,cond=null,offX=null,offY=null;
+    if(repeat==='half'){nCols=den*Math.max(1,Math.round(V/den));nRows=V;offY=c=>pitch*((c%den)/den);}
+    else if(repeat==='brick'){nRows=den*Math.max(1,Math.round(V/den));nCols=V;offX=r=>pitch*((r%den)/den);}
+    else if(repeat==='diamond'){nCols=V;nRows=V;offX=(r)=>((r&1)?pitch*0.5:0);}
+    else if(repeat==='sateen'){nCols=5;nRows=5;cond=(c,r)=>(r%5)===((c*2)%5);}
+    else{nCols=V;nRows=V;}
+    /* 複数モチーフの並び周期がタイル寸法を割り切るよう格子をLの倍数へ拡張
+       （でないとタイル境界で市松/交互の並びが破綻する） */
+    const arr=state.arrange||'checker';
+    const gcd=(a,b)=>b?gcd(b,a%b):a,lcmi=(a,b)=>a/gcd(a,b)*b;
+    if(L>1&&arr!=='random'){
+      if(arr==='checker'){nCols=lcmi(nCols,L);nRows=lcmi(nRows,L);}
+      else if(arr==='col'){nCols=lcmi(nCols,L);}
+      else if(arr==='row'){nRows=lcmi(nRows,L);}
+    }
+    UW=nCols*pitch;UH=nRows*pitch;
+    const pick=(c,r)=>{if(L<2)return 0;if(arr==='row')return r%L;if(arr==='col')return c%L;if(arr==='random')return(rand()*L)|0;return(c+r)%L;};
+    for(let r=0;r<nRows;r++)for(let c=0;c<nCols;c++){
+      const rot=jit(),mi=pick(c,r); // randはセル順で消費（cond前に呼び決定論維持）
+      if(cond&&!cond(c,r))continue;
+      let x=(c+0.5)*pitch,y=(r+0.5)*pitch;
+      if(offY)y+=offY(c);
+      if(offX)x+=offX(r);
+      places.push([x%UW===x?x:x-UW*Math.floor(x/UW),y%UH===y?y:y-UH*Math.floor(y/UH),mi,rot,1,1]);
+    }
+    return{type:'lattice',UW,UH,places,pitch};
+  }
+  if(repeat==='mirror'){
+    return{type:'mirror',UW:pitch*2,UH:pitch*2,pitch,places:[[pitch/2,pitch/2,0,0,1,1]]};
+  }
+  /* toss: トロイダルPoisson 大→小 */
+  UW=3.8;UH=3.8;
+  const rMain=lerp(1.55,0.92,state.density/100);
+  const main=poissonTor(UW,UH,rMain,rand);
+  /* モチーフ割当: i%Lを配ってシャッフル＝全モチーフの出現をバランス保証
+     （旧・市松区画方式は低密度で全点が同区画に落ち片方が消えることがあった） */
+  const order=main.map((_,i)=>i%L);
+  for(let i2=order.length-1;i2>0;i2--){const j2=(rand()*(i2+1))|0;const t2=order[i2];order[i2]=order[j2];order[j2]=t2;}
+  main.forEach((p,i)=>{
+    const sc=(1+(rand()-0.5)*0.24)*(rand()<0.12?0.72:1);
+    p.sc=sc;p.exR=0.5*sc;p.flip=rand()<0.5?-1:1;
+    const rr=(rand()*2-1);          // randは常に消費（決定論維持）
+    p.rot=rotMax?rr*rotMax:0;       // 0°=整列（スライダーと連続な挙動）
+    p.mi=order[i];
+  });
+  /* すき間の背景モチーフ（主役を障害物にして隙間だけ充填） */
+  let fillerType=null;
+  const isPaw=state.filler.type==='paw';
+  if(isPaw||fillerMotif()){
+    fillerType=isPaw?'paw':'img';
+    const seeds=main.map(p=>({x:p.x,y:p.y,exR:p.exR}));
+    const fs=isPaw?0.09:state.fillerScale/100;      // 名目サイズ（主役=1に対する比）
+    const spacing=isPaw?0.6:Math.max(0.3,fs*1.5);   // 充填間隔
+    const pts=poissonTor(UW,UH,spacing,rand,seeds);
+    paws=pts.map(p=>({x:p.x,y:p.y,
+      sc:fs*(1+(isPaw?0.35:0.25)*(rand()-0.5)),
+      ang:isPaw?rand()*TAU:(rand()*2-1)*Math.PI}));
+  }
+  places=main.map(p=>[p.x,p.y,p.mi,p.rot,p.flip,p.sc]);
+  return{type:'toss',UW,UH,places,paws,fillerType,pitch};
+}
+/* 主役モチーフ（背景係に回したモチーフを除く） */
+function mainMotifs(){
+  const f=state.filler;
+  if(state.repeat==='toss'&&f.type==='motif'&&f.motifIdx>=0&&f.motifIdx<state.motifs.length&&state.motifs.length>1)
+    return state.motifs.filter((_,i)=>i!==f.motifIdx);
+  return state.motifs;
+}
+/* 現在有効な背景モチーフ（画像のとき） */
+function fillerMotif(){
+  const f=state.filler;
+  if(f.type==='motif'&&f.motifIdx>=0&&f.motifIdx<state.motifs.length&&state.motifs.length>1)return state.motifs[f.motifIdx];
+  if(f.type==='upload'&&f.motif)return f.motif;
+  return null;
+}
+
+function pawPath(ctx,cx,cy,r){ctx.beginPath();ctx.ellipse(cx,cy+r*0.35,r*0.7,r*0.55,0,0,TAU);ctx.fill();[[-0.55,-0.5,0.32],[0.55,-0.5,0.32],[-0.15,-0.95,0.3],[0.15,-0.95,0.3]].forEach(t=>{ctx.beginPath();ctx.arc(cx+r*t[0],cy+r*t[1],r*t[2],0,TAU);ctx.fill();});}
+
+/* renderUnit: レイアウト×スケール(px/unit)→シームレスタイルcanvas */
+const unitCache={};
+let printCache={key:null,canvas:null}; // 印刷解像度の巨大canvasは1枠だけ保持（メモリ肥大防止）
+function renderUnit(pxPerU,opts){
+  const lay=state.layout;if(!lay)return null;
+  const isPrint=!!(opts&&opts.print);
+  const key=[Math.round(pxPerU*10),state.bg,(opts&&opts.flat)?1:0,isPrint?1:0].join('|');
+  if(isPrint){if(printCache.key===key)return printCache.canvas;}
+  else if(unitCache[key])return unitCache[key];
+  const UWpx=Math.max(2,Math.round(lay.UW*pxPerU)),UHpx=Math.max(2,Math.round(lay.UH*pxPerU));
+  if(UWpx>16000||UHpx>16000)return null;
+  const sx=UWpx/lay.UW,sy=UHpx/lay.UH;
+  const u=makeCanvas(UWpx,UHpx),uc=u.getContext('2d');
+  uc.imageSmoothingQuality='high';
+  const bg=state.bg;
+  if(bg!=='transparent'){uc.fillStyle=bg;uc.fillRect(0,0,UWpx,UHpx);}
+  else if(opts&&opts.flat){uc.fillStyle='#ffffff';uc.fillRect(0,0,UWpx,UHpx);}
+  /* リピートタイルモード: 取り込み画像を送り込みで焼き付け */
+  if(lay.type==='tile'){
+    const src=state.tileSrc.canvas;
+    if(lay.rep==='half'){
+      for(let c2=0;c2<lay.den;c2++){
+        const dx=Math.round(c2*UWpx/lay.den),cw=Math.round((c2+1)*UWpx/lay.den)-dx;
+        const dy=Math.round(UHpx*(c2/lay.den));
+        uc.drawImage(src,dx,dy,cw,UHpx);
+        if(dy>0)uc.drawImage(src,dx,dy-UHpx,cw,UHpx);
+      }
+    }else if(lay.rep==='brick'){
+      const th2=UHpx/lay.den;
+      for(let r2=0;r2<lay.den;r2++){
+        const dy=Math.round(r2*th2),hh=Math.round((r2+1)*th2)-dy;
+        const dx=Math.round(UWpx*(r2/lay.den));
+        uc.drawImage(src,dx,dy,UWpx,hh);
+        if(dx>0)uc.drawImage(src,dx-UWpx,dy,UWpx,hh);
+      }
+    }else if(lay.rep==='mirror'){
+      const hw=UWpx/2,hh=UHpx/2;
+      uc.drawImage(src,0,0,hw,hh);
+      uc.save();uc.translate(UWpx,0);uc.scale(-1,1);uc.drawImage(src,0,0,hw,hh);uc.restore();
+      uc.save();uc.translate(0,UHpx);uc.scale(1,-1);uc.drawImage(src,0,0,hw,hh);uc.restore();
+      uc.save();uc.translate(UWpx,UHpx);uc.scale(-1,-1);uc.drawImage(src,0,0,hw,hh);uc.restore();
+    }else{
+      uc.drawImage(src,0,0,UWpx,UHpx);
+    }
+    if(isPrint)printCache={key,canvas:u};else unitCache[key]=u;
+    return u;
+  }
+  const M=mainMotifs().map(m=>{
+    const c=motifCanvas(m,pxPerU*1.1,opts&&opts.print);
+    const lo=Math.max(c.width,c.height);
+    return{c,dw:c.width/lo,dh:c.height/lo};
+  });
+  if(lay.type==='mirror'){
+    const pitchPx=lay.pitch*sx,m0=M[0];
+    const cell=makeCanvas(Math.round(pitchPx),Math.round(lay.pitch*sy)),cc=cell.getContext('2d');
+    cc.imageSmoothingQuality='high';
+    cc.save();cc.translate(cell.width/2,cell.height/2);
+    cc.drawImage(m0.c,-m0.dw*pxPerU/2,-m0.dh*pxPerU/2,m0.dw*pxPerU,m0.dh*pxPerU);cc.restore();
+    uc.drawImage(cell,0,0);
+    uc.save();uc.translate(UWpx,0);uc.scale(-1,1);uc.drawImage(cell,0,0);uc.restore();
+    uc.save();uc.translate(0,UHpx);uc.scale(1,-1);uc.drawImage(cell,0,0);uc.restore();
+    uc.save();uc.translate(UWpx,UHpx);uc.scale(-1,-1);uc.drawImage(cell,0,0);uc.restore();
+    if(isPrint)printCache={key,canvas:u};else unitCache[key]=u;
+    return u;
+  }
+  /* 背景モチーフ（フィラー層・主役の下） */
+  if(lay.paws&&lay.fillerType){
+    if(lay.fillerType==='paw'){
+      uc.fillStyle='rgba(255,255,255,.5)';
+      for(const p of lay.paws){
+        const pr=p.sc*pxPerU;
+        const g2=pr*1.45; // 指先まで含めた実インク範囲（カリング余白）
+        for(let ox=-1;ox<=1;ox++)for(let oy=-1;oy<=1;oy++){
+          const px2=(p.x+ox*lay.UW)*sx,py2=(p.y+oy*lay.UH)*sy;
+          if(px2+g2<-2||px2-g2>UWpx+2||py2+g2<-2||py2-g2>UHpx+2)continue;
+          uc.save();uc.translate(px2,py2);uc.rotate(p.ang);pawPath(uc,0,0,pr);uc.restore();
+        }
+      }
+    }else{
+      const fm=fillerMotif();
+      if(fm){
+        const fc=motifCanvas(fm,pxPerU*(state.fillerScale/100)*1.3,opts&&opts.print);
+        const lo=Math.max(fc.width,fc.height),fdw=fc.width/lo,fdh=fc.height/lo;
+        for(const p of lay.paws){
+          const dw=fdw*pxPerU*p.sc,dh=fdh*pxPerU*p.sc;
+          const g2=Math.max(dw,dh)*0.75;
+          for(let ox=-1;ox<=1;ox++)for(let oy=-1;oy<=1;oy++){
+            const px2=(p.x+ox*lay.UW)*sx,py2=(p.y+oy*lay.UH)*sy;
+            if(px2+g2<-2||px2-g2>UWpx+2||py2+g2<-2||py2-g2>UHpx+2)continue;
+            uc.save();uc.translate(px2,py2);uc.rotate(p.ang);
+            uc.drawImage(fc,-dw/2,-dh/2,dw,dh);uc.restore();
+          }
+        }
+      }
+    }
+  }
+  for(const pl of places(lay)){
+    const mm=M[pl[2]%M.length],dw=mm.dw*pxPerU*pl[5],dh=mm.dh*pxPerU*pl[5];
+    const g=Math.max(dw,dh)*0.75;
+    for(let ox=-1;ox<=1;ox++)for(let oy=-1;oy<=1;oy++){
+      const px2=(pl[0]+ox*lay.UW)*sx,py2=(pl[1]+oy*lay.UH)*sy;
+      if(px2+g<-2||px2-g>UWpx+2||py2+g<-2||py2-g>UHpx+2)continue;
+      uc.save();uc.translate(px2,py2);uc.rotate(pl[3]);uc.scale(pl[4],1);
+      uc.drawImage(mm.c,-dw/2,-dh/2,dw,dh);uc.restore();
+    }
+  }
+  if(isPrint)printCache={key,canvas:u};else unitCache[key]=u;
+  return u;
+}
+function places(lay){return lay.places;}
+function clearUnitCache(){for(const k in unitCache)delete unitCache[k];printCache={key:null,canvas:null};}
+
+/* ============================================================
+   生地プレビュー
+============================================================ */
+function checker(ctx,w,h){const s=16;for(let y=0;y<h;y+=s)for(let x=0;x<w;x+=s){ctx.fillStyle=((x/s+y/s)&1)?'#e6dfd0':'#dcd4c3';ctx.fillRect(x,y,s,s);}}
+function renderPattern(){
+  const cv=$('#patternCv'),ctx=cv.getContext('2d'),w=cv.width,h=cv.height;
+  ctx.clearRect(0,0,w,h);
+  const lay=state.layout;if(!lay){$('#unitInfo').textContent='—';return;}
+  let ppu=state.sizeCm*PPCM*state.zoom; // px per unit
+  /* 高倍率×大タイルで内部canvas上限を超えないよう、レンダ解像度を抑えてパターン変換で拡大 */
+  let patScale=1;
+  const maxPpu=Math.min(12000/lay.UW,12000/lay.UH);
+  if(ppu>maxPpu){patScale=ppu/maxPpu;ppu=maxPpu;}
+  const u=renderUnit(ppu);
+  if(!u)return;
+  if(state.patTab==='unit'){
+    checker(ctx,w,h);
+    const s=Math.min((w*0.8)/u.width,(h*0.8)/u.height,1.6);
+    const dw=u.width*s,dh=u.height*s,ox=(w-dw)/2,oy=(h-dh)/2;
+    ctx.save();ctx.shadowColor='rgba(60,45,30,.25)';ctx.shadowBlur=24;ctx.shadowOffsetY=8;
+    if(state.bg!=='transparent'){ctx.fillStyle=state.bg;ctx.fillRect(ox,oy,dw,dh);}
+    ctx.restore();
+    ctx.drawImage(u,ox,oy,dw,dh);
+    ctx.save();ctx.strokeStyle='rgba(43,38,32,.5)';ctx.setLineDash([7,5]);ctx.lineWidth=1.5;ctx.strokeRect(ox+0.5,oy+0.5,dw,dh);ctx.restore();
+    ctx.save();ctx.font='11px ui-monospace,monospace';ctx.fillStyle='rgba(43,38,32,.62)';
+    const cmW=(lay.UW*state.sizeCm).toFixed(1),cmH=(lay.UH*state.sizeCm).toFixed(1);
+    ctx.fillText(cmW+'cm',ox+dw/2-14,oy-8>12?oy-8:oy+dh+16);
+    ctx.save();ctx.translate(ox-10>10?ox-10:ox+dw+12,oy+dh/2+14);ctx.rotate(-Math.PI/2);ctx.fillText(cmH+'cm',0,0);ctx.restore();
+    ctx.restore();
+  }else{
+    if(state.bg!=='transparent'){ctx.fillStyle=state.bg;ctx.fillRect(0,0,w,h);}else checker(ctx,w,h);
+    const p=ctx.createPattern(u,'repeat');
+    const offx=state.panCmX*PPCM*state.zoom,offy=state.panCmY*PPCM*state.zoom; // ドラッグでのスライド量
+    if(p.setTransform){try{p.setTransform(new DOMMatrix().translate(offx,offy).scale(patScale));}catch(e){}}
+    ctx.fillStyle=p;ctx.fillRect(0,0,w,h);
+    if(state.showSeams){
+      ctx.save();ctx.strokeStyle='rgba(43,38,32,.30)';ctx.setLineDash([6,5]);ctx.lineWidth=1;
+      const uw2=u.width*patScale,uh2=u.height*patScale;
+      const x0=((offx%uw2)+uw2)%uw2,y0=((offy%uh2)+uh2)%uh2;
+      for(let x=x0-uw2;x<=w;x+=uw2){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
+      for(let y=y0-uh2;y<=h;y+=uh2){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+      ctx.restore();
+    }
+    /* スケールバー: 10cm */
+    const bar=10*PPCM*state.zoom;
+    ctx.save();
+    ctx.fillStyle='rgba(252,250,245,.85)';ctx.fillRect(16,h-42,bar+24,28);
+    ctx.strokeStyle='rgba(43,38,32,.2)';ctx.strokeRect(16.5,h-41.5,bar+23,27);
+    ctx.strokeStyle='#2b2620';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(28,h-24);ctx.lineTo(28+bar,h-24);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(28,h-29);ctx.lineTo(28,h-19);ctx.moveTo(28+bar,h-29);ctx.lineTo(28+bar,h-19);ctx.stroke();
+    ctx.font='10px ui-monospace,monospace';ctx.fillStyle='#2b2620';ctx.fillText('10cm（実寸）',30,h-31);
+    ctx.restore();
+  }
+  const names={full:'ストレート',half:'ハーフドロップ',brick:'ブリック',diamond:'ダイヤモンド',sateen:'飛び柄（朱子配置）',mirror:'ミラー',toss:'トス（散らし）'};
+  const cmW=(lay.UW*state.sizeCm).toFixed(1),cmH=(lay.UH*state.sizeCm).toFixed(1);
+  const tail=state.mode==='tile'
+    ?`取り込みタイル ${state.tileSrc.width}×${state.tileSrc.height}px`
+    :`モチーフ ${state.motifs.length}点`;
+  $('#unitInfo').textContent=`リピート ${cmW}×${cmH}cm ｜ ${names[state.repeat]}${(state.repeat==='half'||state.repeat==='brick')?' 1/'+state.dropDen:''} ｜ ${tail}`;
+  updateExportInfo();
+}
+
+/* ============================================================
+   仕上がりイメージ（陰影つきベクターフラットレイ）
+   設計空間 900×1000。パネル別クリップ＋柄原点オフセット＝縫製の柄ズレ再現
+============================================================ */
+const DS_W=900,DS_H=1000;
+function patFor(ctx,ppcmProduct,offX,offY,rotRad){
+  /* 製品の実寸スケールで柄パターンを作る */
+  const ppu=state.sizeCm*ppcmProduct;
+  const u=renderUnit(ppu,{flat:true});
+  if(!u)return null;
+  const p=ctx.createPattern(u,'repeat');
+  if(p&&p.setTransform){
+    const m=new DOMMatrix();
+    p.setTransform(m.translate(offX||0,offY||0).rotate((rotRad||0)*180/Math.PI));
+  }
+  return p;
+}
+function stageBase(ctx){
+  /* スタジオ背景: オフホワイト＋床の落ち影 */
+  ctx.fillStyle='#f0ede6';ctx.fillRect(0,0,DS_W,DS_H);
+  const g=ctx.createRadialGradient(DS_W/2,DS_H*0.42,DS_W*0.1,DS_W/2,DS_H*0.46,DS_W*0.75);
+  g.addColorStop(0,'rgba(255,255,255,.5)');g.addColorStop(1,'rgba(190,180,162,.28)');
+  ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);
+}
+function softShadow(ctx,cx,cy,rx,ry,a){
+  const g=ctx.createRadialGradient(cx,cy,ry*0.2,cx,cy,rx);
+  g.addColorStop(0,'rgba(74,64,52,'+a+')');g.addColorStop(1,'rgba(74,64,52,0)');
+  ctx.save();ctx.translate(cx,cy);ctx.scale(1,ry/rx);ctx.translate(-cx,-cy);
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,rx,0,TAU);ctx.fill();ctx.restore();
+}
+const SH=a=>'rgba(58,47,35,'+a+')';
+/* 生地グレイン（ノイズタイル・キャッシュ） */
+let _grain=null;
+function grainTile(){
+  if(_grain)return _grain;
+  const s=96,c=makeCanvas(s,s),x=c.getContext('2d'),img=x.createImageData(s,s),d=img.data;
+  const rnd=mulberry32(777);
+  for(let i=0;i<d.length;i+=4){const v=128+(rnd()-0.5)*46;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255;}
+  x.putImageData(img,0,0);_grain=c;return c;
+}
+function applyGrain(ctx,clipFn,alpha){
+  ctx.save();ctx.beginPath();clipFn(ctx);ctx.clip();
+  ctx.globalAlpha=alpha;ctx.globalCompositeOperation='overlay';
+  ctx.fillStyle=ctx.createPattern(grainTile(),'repeat');ctx.fillRect(0,0,DS_W,DS_H);
+  ctx.restore();
+}
+
+/* ---- Tシャツ（S字シルエット・凹袖ぐり・リブ襟・4層シェーディング） ---- */
+const TS=(()=>{ // ジオメトリ定義（左半分、右はミラー）実物比: 身幅52cm×着丈70cm相当
+  const cx=450;
+  const mx=x=>2*cx-x;
+  const neckL={x:372,y:170},sh={x:232,y:236};
+  const svO={x:148,y:394},svI={x:248,y:438},pit={x:264,y:360};
+  const waist={x:252,y:600},hem={x:264,y:824},hemC={x:cx,y:840};
+  return{cx,mx,neckL,sh,svO,svI,pit,waist,hem,hemC,
+    neckR:{x:mx(neckL.x),y:neckL.y},neckRx:cx-neckL.x,neckRy:54,backRy:16};
+})();
+function tsOutline(ctx){ // 外形（身頃＋袖の輪郭）
+  const{cx,mx,neckL,sh,svO,svI,pit,waist,hem,hemC,neckRx,neckRy}=TS;
+  ctx.moveTo(neckL.x,neckL.y);
+  ctx.quadraticCurveTo(298,190,sh.x,sh.y);                    // 肩線
+  ctx.quadraticCurveTo(176,300,svO.x,svO.y);                  // 袖の外側（緩い凸）
+  ctx.quadraticCurveTo(190,428,svI.x,svI.y);                  // 袖口
+  ctx.quadraticCurveTo(246,404,pit.x,pit.y);                  // 袖ぐり（凹）
+  ctx.quadraticCurveTo(242,470,waist.x,waist.y);              // 脇S字（絞り）
+  ctx.quadraticCurveTo(246,730,hem.x,hem.y);                  // 裾へ（わずかに広がる）
+  ctx.quadraticCurveTo(350,842,hemC.x,hemC.y);                // 裾（軽い曲線）
+  ctx.quadraticCurveTo(mx(350),842,mx(hem.x),hem.y);
+  ctx.quadraticCurveTo(mx(246),730,mx(waist.x),waist.y);
+  ctx.quadraticCurveTo(mx(242),470,mx(pit.x),pit.y);
+  ctx.quadraticCurveTo(mx(246),404,mx(svI.x),svI.y);
+  ctx.quadraticCurveTo(mx(190),428,mx(svO.x),svO.y);
+  ctx.quadraticCurveTo(mx(176),300,mx(sh.x),sh.y);
+  ctx.quadraticCurveTo(mx(298),190,mx(neckL.x),neckL.y);
+  ctx.ellipse(TS.cx,neckL.y,neckRx,neckRy,0,0,Math.PI);       // 前襟ぐり
+  ctx.closePath();
+}
+function tsBody(ctx){ // 前身頃パネル（袖を除く）
+  const{cx,mx,neckL,sh,pit,waist,hem,hemC}=TS;
+  ctx.moveTo(neckL.x,neckL.y);
+  ctx.quadraticCurveTo(298,190,sh.x,sh.y);
+  ctx.quadraticCurveTo(258,300,pit.x,pit.y);                  // アームホール（身頃側・凹）
+  ctx.quadraticCurveTo(242,470,waist.x,waist.y);
+  ctx.quadraticCurveTo(246,730,hem.x,hem.y);
+  ctx.quadraticCurveTo(350,842,hemC.x,hemC.y);
+  ctx.quadraticCurveTo(mx(350),842,mx(hem.x),hem.y);
+  ctx.quadraticCurveTo(mx(246),730,mx(waist.x),waist.y);
+  ctx.quadraticCurveTo(mx(242),470,mx(pit.x),pit.y);
+  ctx.quadraticCurveTo(mx(258),300,mx(sh.x),sh.y);
+  ctx.quadraticCurveTo(mx(298),190,mx(neckL.x),neckL.y);
+  ctx.ellipse(TS.cx,neckL.y,TS.neckRx,TS.neckRy,0,0,Math.PI);
+  ctx.closePath();
+}
+function tsSleeve(ctx,side){ // 袖パネル（side=1:左, -1:右）
+  const{mx,sh,svO,svI,pit}=TS;
+  const M=side>0?(v=>v):(v=>mx(v));
+  ctx.moveTo(M(sh.x),sh.y);
+  ctx.quadraticCurveTo(M(176),300,M(svO.x),svO.y);
+  ctx.quadraticCurveTo(M(190),428,M(svI.x),svI.y);
+  ctx.quadraticCurveTo(M(246),404,M(pit.x),pit.y);
+  ctx.quadraticCurveTo(M(258),300,M(sh.x),sh.y);
+  ctx.closePath();
+}
+function drawTshirt(ctx,ppcm){
+  const bg=(state.bg!=='transparent')?state.bg:'#ffffff';
+  const{cx,mx,neckL,sh,svI,svO,pit,hem,hemC,neckRx,neckRy}=TS;
+  stageBase(ctx);
+  softShadow(ctx,cx,880,330,54,0.30);
+  ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+  /* 生地ベース（全体） */
+  ctx.save();ctx.beginPath();tsOutline(ctx);
+  ctx.shadowColor='rgba(74,64,52,.22)';ctx.shadowBlur=30;ctx.shadowOffsetY=14;
+  ctx.fillStyle=bg;ctx.fill();ctx.restore();
+  /* パネル別に柄（原点オフセット＋袖は微回転＝実物の柄ズレ） */
+  const panels=[
+    {clip:tsBody,off:[0,0],rot:0},
+    {clip:c2=>tsSleeve(c2,1),off:[130,64],rot:-0.06},
+    {clip:c2=>tsSleeve(c2,-1),off:[-118,52],rot:0.055},
+  ];
+  for(const pn of panels){
+    const pat=patFor(ctx,ppcm,pn.off[0],pn.off[1],pn.rot);
+    ctx.save();ctx.beginPath();pn.clip(ctx);ctx.clip();
+    ctx.fillStyle=bg;ctx.fillRect(0,0,DS_W,DS_H);
+    if(pat){ctx.fillStyle=pat;ctx.fillRect(0,0,DS_W,DS_H);}
+    ctx.restore();
+  }
+  /* 縫い目シャドウバンド（アームホール沿い） */
+  for(const side of[1,-1]){
+    const M=side>0?(v=>v):(v=>mx(v));
+    ctx.save();ctx.beginPath();tsOutline(ctx);ctx.clip();
+    ctx.strokeStyle=SH(0.20);ctx.lineWidth=7;ctx.filter='blur(3px)';
+    ctx.beginPath();ctx.moveTo(M(sh.x),sh.y);ctx.quadraticCurveTo(M(258),300,M(pit.x),pit.y);ctx.stroke();
+    ctx.filter='none';ctx.restore();
+  }
+  /* シェーディング（柄の上から乗算・ニュートラル系なので全色で自然） */
+  ctx.save();ctx.beginPath();tsOutline(ctx);ctx.clip();
+  ctx.globalCompositeOperation='multiply';
+  let g=ctx.createLinearGradient(150,0,750,0);
+  g.addColorStop(0,SH(0.16));g.addColorStop(0.3,SH(0));g.addColorStop(0.7,SH(0));g.addColorStop(1,SH(0.16));
+  ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);                          // 円筒（両脇）
+  g=ctx.createRadialGradient(cx,neckL.y+neckRy,8,cx,neckL.y+neckRy,150);
+  g.addColorStop(0,SH(0.10));g.addColorStop(1,SH(0));ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H); // 襟下
+  for(const px2 of[pit.x,mx(pit.x)]){
+    g=ctx.createRadialGradient(px2,pit.y,4,px2,pit.y,100);
+    g.addColorStop(0,SH(0.13));g.addColorStop(1,SH(0));ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H); // 脇下AO
+  }
+  /* ドレープ（布の流れ・淡い斜めバンド2本） */
+  for(const[dx0,dy0,dx1,dy1,al]of[[360,500,300,830,0.05],[560,470,610,820,0.045]]){
+    g=ctx.createLinearGradient(dx0,dy0,dx0+34,dy0);
+    g.addColorStop(0,SH(0));g.addColorStop(0.5,SH(al));g.addColorStop(1,SH(0));
+    ctx.save();ctx.translate(dx0,dy0);ctx.rotate(Math.atan2(dy1-dy0,dx1-dx0)-Math.PI/2);ctx.translate(-dx0,-dy0);
+    ctx.fillStyle=g;ctx.fillRect(dx0-40,dy0-60,80,460);ctx.restore();
+  }
+  ctx.globalCompositeOperation='source-over';
+  ctx.restore();
+  applyGrain(ctx,tsOutline,0.16);
+  /* 光源（左上ソフトライト） */
+  ctx.save();ctx.beginPath();tsOutline(ctx);ctx.clip();
+  ctx.globalCompositeOperation='soft-light';
+  g=ctx.createRadialGradient(340,240,60,450,520,620);
+  g.addColorStop(0,'rgba(255,255,255,.55)');g.addColorStop(1,'rgba(90,74,56,.35)');
+  ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);
+  ctx.globalCompositeOperation='source-over';ctx.restore();
+  /* 首の開口部: 下=前襟ぐり(深いアーチ)・上=後ろ襟ぐり(浅いアーチ) */
+  const backRy=TS.backRy;
+  const openPath=()=>{ctx.beginPath();
+    ctx.ellipse(cx,neckL.y,neckRx,backRy,0,Math.PI,0);        // 上辺（後ろ襟・上に浅く膨らむ）
+    ctx.ellipse(cx,neckL.y,neckRx,neckRy,0,0,Math.PI);         // 下辺（前襟・深い）
+    ctx.closePath();};
+  ctx.save();openPath();ctx.clip();
+  ctx.fillStyle=bg;ctx.fillRect(0,0,DS_W,DS_H);                // 開口部＝後ろ身頃の内側
+  g=ctx.createLinearGradient(0,neckL.y-backRy,0,neckL.y+neckRy);
+  g.addColorStop(0,SH(0.34));g.addColorStop(0.45,SH(0.10));g.addColorStop(1,SH(0.02));
+  ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);
+  /* 内側の後ろ襟リブ（上辺沿いの帯） */
+  ctx.beginPath();ctx.ellipse(cx,neckL.y+4,neckRx-10,backRy+6,0,Math.PI,0);
+  ctx.lineWidth=10;ctx.strokeStyle=bg;ctx.stroke();
+  ctx.beginPath();ctx.ellipse(cx,neckL.y+4,neckRx-10,backRy+6,0,Math.PI,0);
+  ctx.lineWidth=10;ctx.strokeStyle=SH(0.14);ctx.stroke();
+  ctx.restore();
+  /* リブ襟バンド（前襟ぐり沿い） */
+  (function(){
+    const bandW=15;
+    ctx.save();openPath();ctx.clip();
+    ctx.beginPath();ctx.ellipse(cx,neckL.y,neckRx-bandW/2,neckRy-bandW/2,0,-0.05*Math.PI,1.05*Math.PI);
+    ctx.lineWidth=bandW;ctx.strokeStyle=bg;ctx.stroke();
+    ctx.beginPath();ctx.ellipse(cx,neckL.y,neckRx-bandW/2,neckRy-bandW/2,0,-0.05*Math.PI,1.05*Math.PI);
+    ctx.lineWidth=bandW;ctx.strokeStyle='rgba(255,255,255,.14)';ctx.stroke();
+    /* リブの縦線 */
+    ctx.lineWidth=1;ctx.strokeStyle=SH(0.18);
+    for(let t=0.04;t<=0.96;t+=1/26){
+      const a=Math.PI*t;
+      const x1=cx+Math.cos(a)*(neckRx-bandW+1),y1=neckL.y+Math.sin(a)*(neckRy-bandW+1);
+      const x2=cx+Math.cos(a)*(neckRx-1),y2=neckL.y+Math.sin(a)*(neckRy-1);
+      ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    }
+    ctx.restore();
+    /* 襟の外周・内周の輪郭 */
+    ctx.save();
+    ctx.beginPath();ctx.ellipse(cx,neckL.y,neckRx,neckRy,0,0,Math.PI);
+    ctx.lineWidth=1.4;ctx.strokeStyle='rgba(58,47,35,.4)';ctx.stroke();
+    ctx.beginPath();ctx.ellipse(cx,neckL.y,neckRx-bandW,neckRy-bandW,0,0.03*Math.PI,0.97*Math.PI);
+    ctx.lineWidth=1.1;ctx.strokeStyle='rgba(58,47,35,.30)';ctx.stroke();
+    ctx.beginPath();ctx.ellipse(cx,neckL.y,neckRx,backRy,0,Math.PI,0);
+    ctx.lineWidth=1.4;ctx.strokeStyle='rgba(58,47,35,.4)';ctx.stroke();
+    ctx.restore();
+  })();
+  /* ステッチ（裾・袖口・襟ぐり内周＝二本針風の細破線） */
+  ctx.save();ctx.setLineDash([3,2.5]);ctx.lineWidth=1.1;ctx.strokeStyle=SH(0.35);
+  ctx.beginPath();ctx.moveTo(hem.x+4,hem.y-16);ctx.quadraticCurveTo(384,838,hemC.x,hemC.y-16);
+  ctx.quadraticCurveTo(mx(384),838,mx(hem.x)-4,hem.y-16);ctx.stroke();
+  for(const side of[1,-1]){
+    const M=side>0?(v=>v):(v=>mx(v));
+    ctx.beginPath();ctx.moveTo(M(svO.x)+(side>0?8:-8),svO.y-10);ctx.quadraticCurveTo(M(196),418,M(svI.x)+(side>0?-4:4),svI.y-9);ctx.stroke();
+  }
+  ctx.restore();
+  /* 輪郭（ソフトなエッジ・漫画的な硬い線は使わない） */
+  ctx.beginPath();tsOutline(ctx);
+  ctx.lineWidth=1.6;ctx.strokeStyle='rgba(58,47,35,.34)';ctx.stroke();
+  ctx.restore();
+}
+
+/* ---- トートバッグ ---- */
+function toteBody(ctx){
+  const x0=252,x1=648,y0=352,y1=872,r=16;
+  ctx.moveTo(x0+r,y0);ctx.lineTo(x1-r,y0);ctx.quadraticCurveTo(x1,y0,x1,y0+r);
+  ctx.lineTo(x1+10-10,y1-r);ctx.quadraticCurveTo(x1,y1,x1-r,y1);
+  ctx.lineTo(x0+r,y1);ctx.quadraticCurveTo(x0,y1,x0,y1-r);
+  ctx.lineTo(x0,y0+r);ctx.quadraticCurveTo(x0,y0,x0+r,y0);ctx.closePath();
+}
+function drawTote(ctx,ppcm){
+  const bg=(state.bg!=='transparent')?state.bg:'#ffffff';
+  stageBase(ctx);
+  softShadow(ctx,450,894,300,44,0.30);
+  const x0=252,x1=648,y0=352,y1=872;
+  ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+  /* 持ち手（本体の後ろ） */
+  for(const side of[0,1]){
+    const hx=side?566:334;
+    ctx.beginPath();ctx.moveTo(hx-36,y0+6);
+    ctx.bezierCurveTo(hx-40,y0-160,hx+40,y0-160,hx+36,y0+6);
+    ctx.lineWidth=26;ctx.strokeStyle='#d9cdb6';ctx.stroke();
+    ctx.lineWidth=26;ctx.strokeStyle=SH(0.06);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(hx-36,y0+6);
+    ctx.bezierCurveTo(hx-40,y0-160,hx+40,y0-160,hx+36,y0+6);
+    ctx.lineWidth=1.4;ctx.strokeStyle='rgba(58,47,35,.35)';ctx.stroke();
+  }
+  /* 本体 */
+  ctx.save();ctx.beginPath();toteBody(ctx);
+  ctx.shadowColor='rgba(74,64,52,.20)';ctx.shadowBlur=26;ctx.shadowOffsetY=12;
+  ctx.fillStyle=bg;ctx.fill();ctx.restore();
+  const pat=patFor(ctx,ppcm,0,0,0);
+  ctx.save();ctx.beginPath();toteBody(ctx);ctx.clip();
+  ctx.fillStyle=bg;ctx.fillRect(0,0,DS_W,DS_H);
+  if(pat){ctx.fillStyle=pat;ctx.fillRect(0,0,DS_W,DS_H);}
+  /* シェーディング */
+  ctx.globalCompositeOperation='multiply';
+  let g=ctx.createLinearGradient(x0,0,x1,0);
+  g.addColorStop(0,SH(0.15));g.addColorStop(0.22,SH(0));g.addColorStop(0.78,SH(0));g.addColorStop(1,SH(0.15));
+  ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);
+  g=ctx.createLinearGradient(0,y0,0,y0+70);
+  g.addColorStop(0,SH(0.13));g.addColorStop(1,SH(0));ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);
+  for(const f of[0.36,0.55,0.7]){
+    const fx=x0+(x1-x0)*f;
+    g=ctx.createLinearGradient(fx-26,0,fx+26,0);
+    g.addColorStop(0,SH(0));g.addColorStop(0.5,SH(0.055));g.addColorStop(1,SH(0));
+    ctx.fillStyle=g;ctx.fillRect(fx-30,y0,60,y1-y0);
+  }
+  ctx.globalCompositeOperation='source-over';
+  ctx.restore();
+  applyGrain(ctx,toteBody,0.15);
+  /* 光源 */
+  ctx.save();ctx.beginPath();toteBody(ctx);ctx.clip();
+  ctx.globalCompositeOperation='soft-light';
+  const g2=ctx.createRadialGradient(360,430,60,450,620,520);
+  g2.addColorStop(0,'rgba(255,255,255,.5)');g2.addColorStop(1,'rgba(90,74,56,.32)');
+  ctx.fillStyle=g2;ctx.fillRect(0,0,DS_W,DS_H);
+  ctx.globalCompositeOperation='source-over';ctx.restore();
+  /* 口布ステッチ＋持ち手取り付け */
+  ctx.save();ctx.setLineDash([3,2.5]);ctx.lineWidth=1.1;ctx.strokeStyle=SH(0.4);
+  ctx.beginPath();ctx.moveTo(x0+8,y0+24);ctx.lineTo(x1-8,y0+24);ctx.stroke();ctx.setLineDash([]);
+  for(const side of[0,1]){
+    const hx=side?566:334;
+    for(const dx of[-36,36]){
+      ctx.fillStyle='rgba(58,47,35,.10)';
+      ctx.fillRect(hx+dx-13,y0+8,26,30);
+      ctx.strokeStyle=SH(0.4);ctx.setLineDash([2.5,2]);ctx.lineWidth=1;
+      ctx.strokeRect(hx+dx-13,y0+8,26,30);ctx.setLineDash([]);
+    }
+  }
+  ctx.restore();
+  ctx.beginPath();toteBody(ctx);
+  ctx.lineWidth=1.6;ctx.strokeStyle='rgba(58,47,35,.34)';ctx.stroke();
+  ctx.restore();
+}
+
+/* ---- 反物（ロール＋平置きの垂れ） ---- */
+function drawBolt(ctx,ppcm){
+  const bg=(state.bg!=='transparent')?state.bg:'#ffffff';
+  stageBase(ctx);
+  const rx0=170,rx1=730,ry0=210,ry1=330,capR=(ry1-ry0)/2,cy=(ry0+ry1)/2;
+  const fx0=225,fx1=675,fy1=880;
+  softShadow(ctx,450,905,320,40,0.28);
+  const pat=patFor(ctx,ppcm,0,0,0);
+  ctx.save();ctx.lineJoin='round';
+  /* 垂れ（平置き） */
+  ctx.save();ctx.beginPath();ctx.rect(fx0,cy,fx1-fx0,fy1-cy);ctx.clip();
+  ctx.fillStyle=bg;ctx.fillRect(0,0,DS_W,DS_H);
+  if(pat){ctx.fillStyle=pat;ctx.fillRect(0,0,DS_W,DS_H);}
+  ctx.globalCompositeOperation='multiply';
+  /* 布の波（横方向のうねり2つ） */
+  for(const fy of[0.44,0.66]){
+    const yy=cy+(fy1-cy)*fy;
+    const g=ctx.createLinearGradient(0,yy-30,0,yy+30);
+    g.addColorStop(0,SH(0));g.addColorStop(0.45,SH(0.08));g.addColorStop(0.55,SH(0.02));g.addColorStop(1,SH(0));
+    ctx.fillStyle=g;ctx.fillRect(fx0,yy-34,fx1-fx0,68);
+  }
+  const g3=ctx.createLinearGradient(fx0,0,fx1,0);
+  g3.addColorStop(0,SH(0.10));g3.addColorStop(0.15,SH(0));g3.addColorStop(0.85,SH(0));g3.addColorStop(1,SH(0.10));
+  ctx.fillStyle=g3;ctx.fillRect(0,cy,DS_W,fy1-cy);
+  /* ロール直下の影 */
+  const g4=ctx.createLinearGradient(0,ry1-6,0,ry1+56);
+  g4.addColorStop(0,SH(0.22));g4.addColorStop(1,SH(0));ctx.fillStyle=g4;ctx.fillRect(fx0,ry1-6,fx1-fx0,62);
+  ctx.globalCompositeOperation='source-over';
+  /* 耳（セルビッジ・未プリント帯＋針穴） */
+  for(const ex of[[fx0,1],[fx1-13,0]]){
+    ctx.fillStyle='rgba(252,250,245,.92)';ctx.fillRect(ex[0],cy,13,fy1-cy);
+    ctx.fillStyle=SH(0.25);
+    for(let yy=cy+18;yy<fy1-8;yy+=26)ctx.beginPath(),ctx.arc(ex[0]+6.5,yy,1.3,0,TAU),ctx.fill();
+  }
+  ctx.restore();
+  applyGrain(ctx,c2=>c2.rect(fx0,cy,fx1-fx0,fy1-cy),0.14);
+  /* ロール（円筒） */
+  ctx.save();
+  ctx.beginPath();ctx.rect(rx0+capR,ry0,rx1-rx0-capR*2,ry1-ry0);
+  ctx.ellipse(rx1-capR,cy,capR*0.42,capR,0,-Math.PI/2,Math.PI/2);
+  ctx.save();ctx.clip();
+  ctx.fillStyle=bg;ctx.fillRect(0,0,DS_W,DS_H);
+  if(pat){ctx.fillStyle=pat;ctx.fillRect(0,0,DS_W,DS_H);}
+  ctx.globalCompositeOperation='multiply';
+  const g5=ctx.createLinearGradient(0,ry0,0,ry1);
+  g5.addColorStop(0,SH(0.24));g5.addColorStop(0.24,SH(0));g5.addColorStop(0.62,SH(0.04));g5.addColorStop(1,SH(0.30));
+  ctx.fillStyle=g5;ctx.fillRect(0,ry0-4,DS_W,ry1-ry0+8);
+  ctx.globalCompositeOperation='source-over';
+  ctx.restore();
+  /* 巻きの端面（渦） */
+  ctx.beginPath();ctx.ellipse(rx0+capR,cy,capR*0.42,capR,0,0,TAU);
+  ctx.fillStyle='#efe8da';ctx.fill();
+  ctx.lineWidth=1.2;ctx.strokeStyle=SH(0.3);
+  for(let rr=1;rr>0.12;rr-=0.22){
+    ctx.beginPath();ctx.ellipse(rx0+capR,cy,capR*0.42*rr,capR*rr,0,0,TAU);ctx.stroke();
+  }
+  ctx.fillStyle=SH(0.25);ctx.beginPath();ctx.ellipse(rx0+capR,cy,capR*0.42*0.12,capR*0.12,0,0,TAU);ctx.fill();
+  /* ロール輪郭 */
+  ctx.beginPath();ctx.rect(rx0+capR,ry0,rx1-rx0-capR*2,ry1-ry0);
+  ctx.lineWidth=1.5;ctx.strokeStyle='rgba(58,47,35,.35)';ctx.stroke();
+  ctx.beginPath();ctx.ellipse(rx1-capR,cy,capR*0.42,capR,0,-Math.PI/2,Math.PI/2);ctx.stroke();
+  ctx.restore();
+  /* 垂れ輪郭 */
+  ctx.beginPath();ctx.rect(fx0,cy,fx1-fx0,fy1-cy);
+  ctx.lineWidth=1.5;ctx.strokeStyle='rgba(58,47,35,.30)';ctx.stroke();
+  ctx.restore();
+}
+
+function renderProduct(){
+  const cv=$('#productCv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  if(!state.layout)return;
+  const off=makeCanvas(DS_W,DS_H),octx=off.getContext('2d');
+  octx.imageSmoothingQuality='high';
+  /* 製品ごとの px/cm（実寸感の基準: Tシャツ身幅52cm≒画面456px） */
+  const ppcm={tshirt:8.8,tote:9.2,bolt:5.6}[state.product];
+  if(state.product==='tshirt')drawTshirt(octx,ppcm);
+  else if(state.product==='tote')drawTote(octx,ppcm);
+  else drawBolt(octx,ppcm);
+  if(state.prodZoom==='zoom'){
+    /* プリント拡大（中心部2.4倍・生地グレインが見える） */
+    const z=2.4,cw=DS_W/z,ch=DS_H/z,cx0=(DS_W-cw)/2,cy0=(DS_H-ch)/2- (state.product==='tshirt'?90:40);
+    ctx.drawImage(off,cx0,cy0,cw,ch,0,0,W,H);
+    ctx.save();ctx.font='11px ui-monospace,monospace';
+    ctx.fillStyle='rgba(252,250,245,.85)';ctx.fillRect(14,14,132,24);
+    ctx.fillStyle='#2b2620';ctx.fillText('プリント部 ×2.4',22,30);ctx.restore();
+  }else{
+    const s=Math.min(W/DS_W,H/DS_H);
+    ctx.drawImage(off,(W-DS_W*s)/2,(H-DS_H*s)/2,DS_W*s,DS_H*s);
+  }
+}
+
+/* ============================================================
+   TIFFライター（Baseline TIFF 6.0 / II / RGB 8bit / PackBits自動）
+============================================================ */
+function packBitsRow(bytes){
+  const out=[];let i=0;const n=bytes.length;
+  while(i<n){
+    let run=1;
+    while(i+run<n&&bytes[i+run]===bytes[i]&&run<128)run++;
+    if(run>=2){out.push((256-(run-1))&0xFF);out.push(bytes[i]);i+=run;}
+    else{
+      const start=i;let len=1;i++;
+      while(i<n&&len<128){
+        if(i+1<n&&bytes[i]===bytes[i+1])break;
+        len++;i++;
+      }
+      out.push(len-1);
+      for(let k=0;k<len;k++)out.push(bytes[start+k]);
+    }
+  }
+  return Uint8Array.from(out);
+}
+function encodeTiff(w,h,rgb,dpi){
+  const rowLen=w*3;
+  /* PackBits試行（行ごと・TIFF仕様） */
+  const packedRows=[];let packedTotal=0;
+  for(let r=0;r<h;r++){
+    const row=rgb.subarray(r*rowLen,(r+1)*rowLen);
+    const p=packBitsRow(row);packedRows.push(p);packedTotal+=p.length;
+  }
+  const usePB=packedTotal<rgb.length;
+  const dataLen=usePB?packedTotal:rgb.length;
+  /* header(8)+IFD(2+13*12+4=162)→@170 bits(6) @176 XRes(8) @184 YRes(8) @192 data */
+  const head=new ArrayBuffer(192),dv=new DataView(head);
+  dv.setUint8(0,0x49);dv.setUint8(1,0x49);dv.setUint16(2,42,true);dv.setUint32(4,8,true);
+  dv.setUint16(8,13,true);
+  let e=10;
+  const ent=(tag,type,count,val)=>{dv.setUint16(e,tag,true);dv.setUint16(e+2,type,true);dv.setUint32(e+4,count,true);
+    if(type===3&&count===1){dv.setUint16(e+8,val,true);dv.setUint16(e+10,0,true);}else dv.setUint32(e+8,val,true);e+=12;};
+  ent(256,4,1,w);              // ImageWidth
+  ent(257,4,1,h);              // ImageLength
+  ent(258,3,3,170);            // BitsPerSample → offset
+  ent(259,3,1,usePB?32773:1);  // Compression
+  ent(262,3,1,2);              // Photometric RGB
+  ent(273,4,1,192);            // StripOffsets
+  ent(277,3,1,3);              // SamplesPerPixel
+  ent(278,4,1,h);              // RowsPerStrip（単一ストリップ）
+  ent(279,4,1,dataLen);        // StripByteCounts
+  ent(282,5,1,176);            // XResolution → RATIONAL
+  ent(283,5,1,184);            // YResolution
+  ent(284,3,1,1);              // PlanarConfiguration chunky
+  ent(296,3,1,2);              // ResolutionUnit inch
+  dv.setUint32(e,0,true);      // next IFD = none (e=166)
+  dv.setUint16(170,8,true);dv.setUint16(172,8,true);dv.setUint16(174,8,true);
+  dv.setUint32(176,dpi,true);dv.setUint32(180,1,true);
+  dv.setUint32(184,dpi,true);dv.setUint32(188,1,true);
+  const parts=[head];
+  if(usePB)for(const p of packedRows)parts.push(p);else parts.push(rgb);
+  return{blob:new Blob(parts,{type:'image/tiff'}),usePB,bytes:192+dataLen};
+}
+/* 入稿タイル生成（プレビューと同一レイアウト・白地に不透明合成） */
+function buildPrintTile(dpi){
+  const lay=state.layout;if(!lay)return null;
+  const ppu=state.sizeCm/2.54*dpi;
+  const u=renderUnit(ppu,{flat:true,print:true});
+  if(!u)return null;
+  const w=u.width,h=u.height;
+  const flat=makeCanvas(w,h),fc=flat.getContext('2d');
+  fc.fillStyle='#ffffff';fc.fillRect(0,0,w,h);
+  fc.drawImage(u,0,0);
+  const d=fc.getImageData(0,0,w,h).data;
+  const rgb=new Uint8Array(w*h*3);
+  for(let p=0,q=0;p<d.length;p+=4){rgb[q++]=d[p];rgb[q++]=d[p+1];rgb[q++]=d[p+2];}
+  return{rgb,w,h,cmW:lay.UW*state.sizeCm,cmH:lay.UH*state.sizeCm};
+}
+function download(blob,name){
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);
+}
+function tileName(ext){
+  const lay=state.layout;
+  return `kirutile_${state.repeat}${(state.repeat==='half'||state.repeat==='brick')?'1-'+state.dropDen:''}_${(lay.UW*state.sizeCm).toFixed(1)}x${(lay.UH*state.sizeCm).toFixed(1)}cm_${state.dpi}dpi.${ext}`;
+}
+function updateExportInfo(){
+  const lay=state.layout;if(!lay)return;
+  const dpi=state.dpi,ppu=state.sizeCm/2.54*dpi;
+  const w=Math.round(lay.UW*ppu),h=Math.round(lay.UH*ppu);
+  $('#exCm').textContent=`${(lay.UW*state.sizeCm).toFixed(1)} × ${(lay.UH*state.sizeCm).toFixed(1)} cm`;
+  $('#exPx').textContent=`${w} × ${h} px @ ${dpi}dpi`;
+  const mb=w*h*3/1048576;
+  $('#exMb').textContent=(mb<1?(mb*1024).toFixed(0)+' KB':mb.toFixed(1)+' MB')+'（無圧縮時・PackBitsで縮む場合あり）';
+  const over=w>16000||h>16000;
+  $('#exTif').disabled=over;$('#exTif').style.opacity=over?0.45:1;
+  $('#exPng').disabled=over;$('#exPng').style.opacity=over?0.45:1;
+  if(over)$('#exMsg').textContent='タイルが大きすぎます。解像度を下げるか柄を小さくしてください。';
+  else if($('#exMsg').textContent.startsWith('タイルが大きすぎます'))$('#exMsg').textContent='';
+  /* タイルモード: 元データ解像度を超える書き出しの注意 */
+  const sn=$('#exSrcNote');
+  if(state.mode==='tile'&&state.tileSrc){
+    const printW=Math.round(ppu); // タイル1枚ぶんの書き出し幅px
+    if(printW>state.tileSrc.width*1.02){
+      sn.style.display='block';
+      sn.textContent=`⚠ 元データ（${state.tileSrc.width}px幅${state.tileSrc.dpi?'・'+Math.round(state.tileSrc.dpi)+'dpi':''}）を超える解像度です。拡大しても画質は向上しません`;
+    }else sn.style.display='none';
+  }else sn.style.display='none';
+}
+
+/* ============================================================
+   切り抜き→モチーフ化
+============================================================ */
+function tolToMul(v){return lerp(0.45,2.1,v/100);} // スライダー→倍率
+function recut(){
+  if(!state.raw){return;}
+  const t0=performance.now();
+  const res=cutoutPro(state.raw,tolToMul(state.tol),state.skipCut);
+  state.autoBase=res.auto;
+  const parts=splitMotifs(res.canvas,6);
+  const pw=res.canvas.width,ph=res.canvas.height;
+  /* 入稿用の原寸切り抜きは「全モチーフ共有の遅延メモ化」＝書き出し時に1回だけ実行。
+     tol/skipCut変更のたびに recut() が走りクロージャごと作り直される＝自動で無効化 */
+  let hiShared=null;
+  const hiFull=()=>{
+    if(!hiShared){
+      if(!state.rawFull||Math.max(state.rawFull.width,state.rawFull.height)<=Math.max(pw,ph)){
+        hiShared={parts,W:pw,H:ph,whole:res.canvas}; // 原寸=解析解像度なら再計算しない
+      }else{
+        const resF=cutoutPro(state.rawFull,tolToMul(state.tol),state.skipCut);
+        const partsF=splitMotifs(resF.canvas,6);
+        hiShared={parts:partsF,W:resF.canvas.width,H:resF.canvas.height,whole:resF.canvas};
+      }
+    }
+    return hiShared;
+  };
+  /* プレビュー側モチーフ→原寸側は「正規化中心座標の最近傍」で対応付け（面積順ズレ対策） */
+  const mk=(canvas,rect)=>{
+    const m={pv:canvas,_expensive:true};
+    m.hi=()=>{
+      if(m._fullCanvas)return m._fullCanvas;
+      const F=hiFull();
+      if(!rect||!F.parts.length){m._fullCanvas=F.whole;return m._fullCanvas;}
+      const cx=((rect.x0+rect.x1)/2)/pw,cy=((rect.y0+rect.y1)/2)/ph;
+      let best=null,bd=Infinity;
+      for(const p of F.parts){
+        const px2=((p.rect.x0+p.rect.x1)/2)/F.W,py2=((p.rect.y0+p.rect.y1)/2)/F.H;
+        const dd=(px2-cx)*(px2-cx)+(py2-cy)*(py2-cy);
+        if(dd<bd){bd=dd;best=p;}
+      }
+      m._fullCanvas=best?best.canvas:canvas;
+      return m._fullCanvas;
+    };
+    return m;
+  };
+  state.motifs=parts.length?parts.map(p=>mk(p.canvas,p.rect)):[mk(res.canvas,null)];
+  const cc=$('#cutCv'),x=cc.getContext('2d');
+  x.clearRect(0,0,cc.width,cc.height);
+  const cut=res.canvas,s=Math.min(cc.width/cut.width,cc.height/cut.height)*0.92,dw=cut.width*s,dh=cut.height*s;
+  x.drawImage(cut,(cc.width-dw)/2,(cc.height-dh)/2,dw,dh);
+  /* 空検出: 何も残らなかったら警告 */
+  let empty=false;
+  if(!parts.length){
+    const ad=cut.getContext('2d').getImageData(0,0,cut.width,cut.height).data;
+    empty=true;
+    const stride=Math.max(1,((cut.width*cut.height/4096)|0));
+    for(let p=0;p<cut.width*cut.height;p+=stride){if(ad[p*4+3]>16){empty=false;break;}}
+  }
+  $('#motifCount').textContent=empty
+    ?'⚠ モチーフを検出できません。微調整を左へ／「切り抜かない」をお試しください'
+    :`モチーフ ${state.motifs.length}点を検出（${Math.round(performance.now()-t0)}ms）`;
+  /* 背景モチーフの参照がズレたらリセット（切り抜き直しで点数が変わる） */
+  if(state.filler.type==='motif'&&(state.motifs.length<2||state.filler.motifIdx>=state.motifs.length)){
+    state.filler={type:'none',motifIdx:-1,motif:null};
+  }
+  syncFillerUI();
+  updateArrange();rebuild();
+}
+function setRaw(full){
+  if(Math.max(full.width,full.height)>HI_MAX){ // TIFF経路等の巨大画像もHI_MAXに揃える
+    const sc0=HI_MAX/Math.max(full.width,full.height);
+    const c0=makeCanvas(Math.round(full.width*sc0),Math.round(full.height*sc0));
+    c0.getContext('2d').drawImage(full,0,0,c0.width,c0.height);
+    full=c0;
+  }
+  state.mode='motif';state.tileSrc=null;
+  state.rawFull=full;state.sample=null;
+  const sc=Math.min(1,CUT_MAX/Math.max(full.width,full.height));
+  const c=makeCanvas(Math.round(full.width*sc),Math.round(full.height*sc));
+  c.getContext('2d').drawImage(full,0,0,c.width,c.height);
+  state.raw=c;
+  $$('.samp').forEach(s=>s.classList.remove('on'));
+  updateModeUI();
+  recut();
+}
+
+/* ---- リピートタイルモード（既存プリントデータの取り込み） ---- */
+function enterTileMode(dec){
+  state.mode='tile';state.tileSrc=dec;
+  state.sample=null;state.rawFull=null;state.raw=null;
+  state.motifs=[{pv:dec.canvas}]; // 空ガード用（描画はtile分岐）
+  /* 既存データは「そのまま敷き詰め」が正: 初期値はストレート（送りは後から選べる） */
+  state.repeat='full';
+  $$('#repeatSeg button').forEach(b=>b.classList.toggle('on',b.dataset.id==='full'));
+  /* 実寸: 解像度タグから自動。無ければ25cmを仮置き */
+  const cm=dec.cmW?Math.round(Math.min(120,Math.max(2,dec.cmW))*10)/10:25;
+  state.sizeCm=cm;
+  $$('.samp').forEach(s=>s.classList.remove('on'));
+  /* タイルプレビュー */
+  const cv=$('#tileCv'),x=cv.getContext('2d');
+  x.clearRect(0,0,cv.width,cv.height);
+  const s=Math.min(cv.width/dec.width,cv.height/dec.height);
+  x.drawImage(dec.canvas,(cv.width-dec.width*s)/2,(cv.height-dec.height*s)/2,dec.width*s,dec.height*s);
+  $('#tileInfo').innerHTML=`${dec.info}<br>実寸 ${dec.cmW?dec.cmW.toFixed(1)+'cm幅（解像度タグから自動設定）':'不明 → 下の「タイルの実寸幅」で指定してください'}`;
+  updateModeUI();
+  /* サイズUI同期 */
+  $('#size').value=cm;$('#sizeN').value=cm;
+  $('#sizeV').innerHTML=cm+'<small>cm・タイル幅</small>';
+  $$('input[type=range]').forEach(fill);
+  $('#dropRow').style.display=(state.repeat==='half'||state.repeat==='brick')?'block':'none';
+  updateArrange();rebuild();
+}
+function updateModeUI(){
+  const tile=state.mode==='tile';
+  $('#cutNormal').style.display=tile?'none':'block';
+  $('#cutTile').style.display=tile?'block':'none';
+  $$('#repeatSeg button').forEach(b=>{
+    const dis=tile&&!['full','half','brick','mirror'].includes(b.dataset.id);
+    b.classList.toggle('dis',dis);
+    b.disabled=dis; // キーボード操作(Tab+Enter)も塞ぐ
+  });
+  for(const id of['dens','rot']){
+    $('#'+id).disabled=tile;
+    $('#'+id).closest('.c').style.opacity=tile?0.42:1;
+  }
+  $('#size').max=tile?120:20;$('#sizeN').max=tile?120:20;
+  if(!tile&&state.sizeCm>20){ // タイルモードの大きなcmを持ち越さない
+    state.sizeCm=20;$('#size').value=20;$('#sizeN').value=20;
+    $('#sizeV').innerHTML='20<small>cm・大柄</small>';fill($('#size'));
+  }
+  $('#sizeLb').textContent=tile?'タイルの実寸幅':'柄の大きさ（実寸）';
+  $('#tossOpts').style.display=(!tile&&state.repeat==='toss')?'block':'none';
+}
+/* ---- 背景モチーフのUI同期・アップロード ---- */
+function syncFillerUI(){
+  const f=state.filler;
+  $$('#fillerSeg button').forEach(b=>b.classList.toggle('on',b.dataset.f===f.type));
+  $('#fillerPick').style.display=f.type==='motif'?'block':'none';
+  $('#fillerScaleRow').style.display=(f.type==='motif'||f.type==='upload')?'block':'none';
+  if(f.type==='motif'){
+    const g=$('#fillerPickGrid');g.innerHTML='';
+    state.motifs.forEach((m,i)=>{
+      const b=document.createElement('button');b.className='samp'+(i===f.motifIdx?' on':'');
+      const cv=makeCanvas(64,64),x=cv.getContext('2d');
+      const s=Math.min(56/m.pv.width,56/m.pv.height);
+      x.drawImage(m.pv,(64-m.pv.width*s)/2,(64-m.pv.height*s)/2,m.pv.width*s,m.pv.height*s);
+      b.appendChild(cv);
+      b.onclick=()=>{state.filler.motifIdx=i;syncFillerUI();rebuild();};
+      g.appendChild(b);
+    });
+  }
+}
+async function loadFillerFile(f){
+  try{
+    let src2;
+    if(isTiffFile(f)){src2=(await decodeTiff(await f.arrayBuffer())).canvas;}
+    else{
+      src2=await new Promise((res,rej)=>{
+        const url=URL.createObjectURL(f),img=new Image();
+        img.onload=()=>{URL.revokeObjectURL(url);res(img);};
+        img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error('画像を読み込めません'));};
+        img.src=url;
+      });
+    }
+    const mx=520,sc=Math.min(1,mx/Math.max(src2.width,src2.height));
+    const c=makeCanvas(Math.round(src2.width*sc),Math.round(src2.height*sc));
+    c.getContext('2d').drawImage(src2,0,0,c.width,c.height);
+    const res=cutoutPro(c,tolToMul(50),false); // 自動しきい値で切り抜き
+    const parts=splitMotifs(res.canvas,1);
+    state.filler={type:'upload',motifIdx:-1,motif:{pv:parts.length?parts[0].canvas:res.canvas}};
+    syncFillerUI();rebuild();
+  }catch(e){alert('背景モチーフを読み込めませんでした：'+e.message);}
+}
+
+/* TIFF/画像の取り込み分岐 */
+let pendingTiff=null,importing=false;
+function isTiffFile(f){return /\.tiff?$/i.test(f.name||'')||f.type==='image/tiff';}
+async function importTiff(getBuf,autoMode){
+  if(importing)return; // デコード中の多重取り込みを防ぐ
+  importing=true;
+  try{
+    const dec=await decodeTiff(await getBuf());
+    if(autoMode==='tile'){enterTileMode(dec);return;}
+    if(autoMode==='motif'){setRaw(dec.canvas);return;}
+    pendingTiff=dec;
+    $('#tiffDlgInfo').textContent=dec.info+(dec.cmW?`・実寸 ${dec.cmW.toFixed(1)}cm幅`:'');
+    $('#tiffDlg').classList.add('open');
+  }catch(e){alert('TIFFを読み込めませんでした：'+e.message);}
+  finally{importing=false;}
+}
+function importFile(f){
+  if(isTiffFile(f)){importTiff(()=>f.arrayBuffer());}
+  else loadImage(URL.createObjectURL(f));
+}
+function loadImage(src){
+  const img=new Image();
+  const done=()=>{if(src.startsWith('blob:'))URL.revokeObjectURL(src);};
+  img.onload=()=>{
+    const mx=HI_MAX,sc=Math.min(1,mx/Math.max(img.width,img.height));
+    const c=makeCanvas(Math.round(img.width*sc),Math.round(img.height*sc));
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    done();setRaw(c);
+  };
+  img.onerror=()=>{done();alert('画像を読み込めませんでした');};
+  img.src=src;
+}
+function applyPreset(key){
+  const P=PRESETS[key];if(!P)return;
+  state.sample=key;state.rawFull=null;state.raw=null;
+  state.mode='motif';state.tileSrc=null;updateModeUI();
+  state.motifs=P.make().map(m=>({pv:m.hi(240),hi:m.hi}));
+  state.repeat=P.repeat;state.dropDen=P.dropDen||2;
+  state.sizeCm=P.sizeCm;state.density=P.density;state.rot=P.rot;
+  state.bg=P.bg;state.filler={type:'none',motifIdx:-1,motif:null};
+  if(P.arrange)state.arrange=P.arrange;
+  /* UI同期 */
+  $('#size').value=P.sizeCm;$('#sizeN').value=P.sizeCm;
+  $('#dens').value=P.density;$('#rot').value=P.rot;
+  $('#sizeV').innerHTML=P.sizeCm+'<small>cm・'+sizeLabel(P.sizeCm)+'</small>';
+  $('#densV').textContent=P.density+'%';$('#rotV').textContent=P.rot+'°';
+  $$('input[type=range]').forEach(fill);
+  $$('#repeatSeg button').forEach(b=>b.classList.toggle('on',b.dataset.id===P.repeat));
+  $$('#dropSeg button').forEach(b=>b.classList.toggle('on',+b.dataset.d===state.dropDen));
+  $$('#arrangeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.a===state.arrange));
+  $('#dropRow').style.display=(P.repeat==='half'||P.repeat==='brick')?'block':'none';
+  $('#tossOpts').style.display=P.repeat==='toss'?'block':'none';
+  syncFillerUI();
+  $('#bgColor').value=P.bg;
+  buildSwatchUI();
+  $$('.samp').forEach(s=>s.classList.toggle('on',s.dataset.sample===key));
+  /* 切り抜きプレビューにはモチーフ1を表示 */
+  const cc=$('#cutCv'),x=cc.getContext('2d');x.clearRect(0,0,cc.width,cc.height);
+  const m0=state.motifs[0].pv,s=Math.min(cc.width/m0.width,cc.height/m0.height)*0.85;
+  x.drawImage(m0,(cc.width-m0.width*s)/2,(cc.height-m0.height*s)/2,m0.width*s,m0.height*s);
+  $('#motifCount').textContent=`サンプル「${P.name}」 モチーフ ${state.motifs.length}点`;
+  updateArrange();rebuild();
+}
+
+/* ============================================================
+   UI
+============================================================ */
+function rebuild(){ // レイアウト再計算＋再描画
+  state.layout=buildLayout();clearUnitCache();rerender();
+  /* 検証フック: 初回レイアウト完成時に登録順で実行 */
+  if(window.__ktReadyQ&&window.__ktReadyQ.length&&state.layout&&state.motifs.length){
+    const q=window.__ktReadyQ.splice(0);
+    setTimeout(()=>q.forEach(fn=>fn()),0);
+  }
+}
+let raf=false;
+function rerender(){if(raf)return;raf=true;requestAnimationFrame(()=>{raf=false;renderPattern();renderProduct();});}
+
+function sizeLabel(v){return v<5?'小柄':v<15?'中柄':'大柄';} // 業界目安: 小〜5cm/中5-15cm/大15cm〜
+function fill(el){const mn=+el.min||0,mx=+el.max||100;el.style.setProperty('--f',((el.value-mn)/(mx-mn)*100)+'%');}
+function updateArrange(){
+  const lattice=['full','half','brick','diamond','sateen'].includes(state.repeat);
+  $('#arrangeRow').style.display=(lattice&&state.motifs.length>1)?'block':'none';
+}
+const REPEATS=[
+  {id:'full',name:'ストレート'},
+  {id:'half',name:'ハーフドロップ'},
+  {id:'brick',name:'ブリック'},
+  {id:'diamond',name:'ダイヤ'},
+  {id:'sateen',name:'飛び柄（朱子配置）'},
+  {id:'mirror',name:'ミラー'},
+  {id:'toss',name:'トス（散らし）'},
+];
+/* リピート方式チップ: ミニプレビューを実描画（葉の粒で図解） */
+function repeatThumb(id){
+  const c=makeCanvas(80,80),x=c.getContext('2d');
+  x.fillStyle='#faf6ee';x.fillRect(0,0,80,80);
+  const dot=(cx,cy,r,rot,fl)=>{x.save();x.translate(cx,cy);x.rotate(rot||0);x.scale(fl||1,1);
+    x.fillStyle='#b0673f';x.beginPath();x.ellipse(0,0,r*1.15,r*0.75,0.5,0,TAU);x.fill();x.restore();};
+  const P=20,r=5.4;
+  if(id==='full'){for(let ry=0;ry<4;ry++)for(let cx2=0;cx2<4;cx2++)dot(10+cx2*P,10+ry*P,r);}
+  else if(id==='half'){for(let cx2=0;cx2<4;cx2++)for(let ry=-1;ry<5;ry++)dot(10+cx2*P,10+ry*P+(cx2%2)*P/2,r);}
+  else if(id==='brick'){for(let ry=0;ry<5;ry++)for(let cx2=-1;cx2<5;cx2++)dot(10+cx2*P+(ry%2)*P/2,10+ry*P,r);}
+  else if(id==='diamond'){for(let ry=-1;ry<5;ry++)for(let cx2=-1;cx2<5;cx2++)dot(10+cx2*P+(ry%2)*P/2,10+ry*P*0.72,r);}
+  else if(id==='sateen'){for(let cx2=0;cx2<5;cx2++)for(let ry=0;ry<5;ry++){if((ry%5)===((cx2*2)%5))dot(8+cx2*16,8+ry*16,r);}}
+  else if(id==='mirror'){const rnd=mulberry32(5);for(const[qx,qy,fx,fy]of[[20,20,1,1],[60,20,-1,1],[20,60,1,-1],[60,60,-1,-1]]){
+    x.save();x.translate(qx,qy);x.scale(fx,fy);x.fillStyle='#b0673f';
+    x.beginPath();x.moveTo(-8,6);x.quadraticCurveTo(0,-12,9,4);x.quadraticCurveTo(0,10,-8,6);x.fill();x.restore();}}
+  else{const rnd=mulberry32(9);for(let i=0;i<9;i++)dot(8+rnd()*64,8+rnd()*64,r*(0.8+rnd()*0.5),rnd()*3,rnd()<0.5?-1:1);}
+  return c;
+}
+function buildRepeatSeg(){
+  const seg=$('#repeatSeg');seg.innerHTML='';
+  REPEATS.forEach(r=>{
+    const b=document.createElement('button');b.dataset.id=r.id;
+    const cv=repeatThumb(r.id);cv.style.width='40px';cv.style.height='40px';
+    b.appendChild(cv);
+    b.appendChild(document.createTextNode(r.name));
+    if(r.id===state.repeat)b.classList.add('on');
+    b.onclick=()=>{
+      state.repeat=r.id;
+      $$('#repeatSeg button').forEach(x2=>x2.classList.toggle('on',x2.dataset.id===r.id));
+      $('#dropRow').style.display=(r.id==='half'||r.id==='brick')?'block':'none';
+      $('#tossOpts').style.display=r.id==='toss'?'block':'none';
+      updateArrange();rebuild();
+    };
+    seg.appendChild(b);
+  });
+}
+const BG=['transparent','#ffffff','#f2ebdc','#f6efe6','#f4eee1','#e7ded0','#c7bce6','#a7c1b4','#7e93a7','#d98b8b','#c9a27a','#2b2620','#33506b'];
+function buildSwatchUI(){
+  const w=$('#swatches');w.innerHTML='';
+  BG.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='sw'+(c==='transparent'?' tp':'')+(c===state.bg?' on':'');
+    if(c!=='transparent')d.style.background=c;
+    d.title=c==='transparent'?'透過（生地の地色）':c;
+    d.onclick=()=>{state.bg=c;$$('#swatches .sw').forEach(s=>s.classList.remove('on'));d.classList.add('on');
+      if(c!=='transparent')$('#bgColor').value=c;clearUnitCache();rerender();};
+    w.appendChild(d);
+  });
+}
+function buildFabricSeg(){
+  const seg=$('#fabSeg');seg.innerHTML='';
+  Object.entries(FABRICS).forEach(([k,f])=>{
+    const b=document.createElement('button');b.dataset.k=k;
+    b.innerHTML=`<span class="nm">${f.name}</span><span class="mt">${f.comp}・<span class="num">¥${f.price.toLocaleString()}</span>/m</span>`;
+    if(k===state.fabric)b.classList.add('on');
+    b.onclick=()=>{state.fabric=k;$$('#fabSeg button').forEach(x=>x.classList.toggle('on',x.dataset.k===k));updatePrice();};
+    seg.appendChild(b);
+  });
+}
+function buildSamples(){
+  const g=$('#sampGrid');g.innerHTML='';
+  Object.entries(PRESETS).forEach(([k,P])=>{
+    const d=document.createElement('button');d.className='samp';d.dataset.sample=k;
+    const cv=makeCanvas(120,120);
+    d.appendChild(cv);
+    const nm=document.createElement('span');nm.className='nm';nm.textContent=P.name;d.appendChild(nm);
+    d.onclick=()=>applyPreset(k);
+    g.appendChild(d);
+    /* サムネ: プリセットの敷き詰めミニレンダ */
+    setTimeout(()=>{
+      const save={...state};
+      const motifs=P.make().map(m=>({pv:m.hi(120),hi:m.hi}));
+      const x=cv.getContext('2d');
+      x.fillStyle=P.bg;x.fillRect(0,0,120,120);
+      /* 簡易敷き詰め（プリセットのリピートで正確に） */
+      const tmpState={motifs,repeat:P.repeat,dropDen:P.dropDen||2,arrange:P.arrange||'checker',
+        density:P.density,rot:P.rot,seed:20260710,filler:{type:'none',motifIdx:-1,motif:null},bg:P.bg,sizeCm:P.sizeCm};
+      const lay=(function(){const bak={};for(const kk of['motifs','repeat','dropDen','arrange','density','rot','seed','filler','bg','sizeCm'])
+        {bak[kk]=state[kk];state[kk]=tmpState[kk];}
+        const l=buildLayout();
+        for(const kk in bak)state[kk]=bak[kk];return l;})();
+      if(!lay)return;
+      const ppu=26; /* サムネスケール */
+      const UWpx=lay.UW*ppu,UHpx=lay.UH*ppu;
+      const u=makeCanvas(Math.round(UWpx),Math.round(UHpx)),uc=u.getContext('2d');
+      uc.fillStyle=P.bg;uc.fillRect(0,0,u.width,u.height);
+      const M=motifs.map(m=>{const c2=m.hi(96);const lo=Math.max(c2.width,c2.height);return{c:c2,dw:c2.width/lo,dh:c2.height/lo};});
+      for(const pl of lay.places){
+        const mm=M[pl[2]%M.length],dw=mm.dw*ppu*pl[5],dh=mm.dh*ppu*pl[5];
+        for(let ox=-1;ox<=1;ox++)for(let oy=-1;oy<=1;oy++){
+          const px2=(pl[0]+ox*lay.UW)*ppu,py2=(pl[1]+oy*lay.UH)*ppu;
+          uc.save();uc.translate(px2,py2);uc.rotate(pl[3]);uc.scale(pl[4],1);
+          uc.drawImage(mm.c,-dw/2,-dh/2,dw,dh);uc.restore();
+        }
+      }
+      const p=x.createPattern(u,'repeat');x.fillStyle=p;x.fillRect(0,0,120,120);
+    },0);
+  });
+}
+function updatePrice(){
+  const f=FABRICS[state.fabric],t=f.price*state.meters;
+  $('#price').textContent='¥'+t.toLocaleString();
+  $('#lenLabel').textContent=`${f.name} × ${state.meters}m`;
+  $('#fabNote').innerHTML=`<b>${f.name}</b>（${f.comp}）：${f.note}<br>印刷：自社Mimaki・テキスタイル顔料　単価：¥${f.price.toLocaleString()}/m`;
+}
+
+function wire(){
+  const drop=$('#drop'),file=$('#file');
+  drop.onclick=()=>file.click();
+  file.onchange=e=>{const f=e.target.files[0];if(f)importFile(f);e.target.value='';};
+  ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.style.borderColor='var(--accent)';}));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.style.borderColor='';}));
+  drop.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f&&(f.type.startsWith('image/')||isTiffFile(f)))importFile(f);});
+  /* TIFF取り込みダイアログ */
+  $('#dlgTile').onclick=()=>{$('#tiffDlg').classList.remove('open');if(pendingTiff){enterTileMode(pendingTiff);pendingTiff=null;}};
+  $('#dlgMotif').onclick=()=>{$('#tiffDlg').classList.remove('open');if(pendingTiff){setRaw(pendingTiff.canvas);pendingTiff=null;}};
+  $('#dlgCancel').onclick=()=>{$('#tiffDlg').classList.remove('open');pendingTiff=null;};
+  $('#tileToMotif').onclick=()=>{if(state.tileSrc)setRaw(state.tileSrc.canvas);};
+  $('#tol').oninput=e=>{state.tol=+e.target.value;$('#tolV').textContent=(state.tol===50?'±0':(state.tol>50?'+':'')+(state.tol-50));fill(e.target);if(state.raw)recut();};
+  $('#skipCut').onchange=e=>{state.skipCut=e.target.checked;if(state.raw)recut();};
+  $('#dropSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    state.dropDen=+b.dataset.d;$('#dropSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));rebuild();});
+  $('#arrangeSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    state.arrange=b.dataset.a;$('#arrangeSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));rebuild();});
+  $('#shuffle').onclick=()=>{state.seed=(state.seed*1103515245+12345)&0x7fffffff;rebuild();};
+  /* 背景モチーフ */
+  $$('#fillerSeg button').forEach(b=>b.onclick=()=>{
+    const t=b.dataset.f;
+    if(t==='upload'){$('#fillerFile').click();return;} // 確定はロード成功後
+    if(t==='motif'){
+      if(state.motifs.length<2){alert('「モチーフから」はモチーフが2点以上のときに使えます。\n（1枚の絵に複数の要素があると自動で分かれます）');return;}
+      state.filler={type:'motif',motifIdx:state.motifs.length-1,motif:null}; // 既定=いちばん小さいモチーフ
+    }else state.filler={type:t,motifIdx:-1,motif:null};
+    syncFillerUI();rebuild();
+  });
+  $('#fillerFile').onchange=e=>{const f2=e.target.files[0];if(f2)loadFillerFile(f2);e.target.value='';};
+  $('#fillerScale').oninput=e=>{state.fillerScale=+e.target.value;$('#fillerScaleV').textContent=e.target.value+'%';fill(e.target);rebuild();};
+  const syncSize=v=>{
+    const mx2=state.mode==='tile'?120:20;
+    v=Math.min(mx2,Math.max(2,v));state.sizeCm=v;
+    $('#size').value=v;$('#sizeN').value=v;
+    $('#sizeV').innerHTML=v+'<small>cm・'+(state.mode==='tile'?'タイル幅':sizeLabel(v))+'</small>';fill($('#size'));rebuild();
+  };
+  $('#size').oninput=e=>syncSize(+e.target.value);
+  $('#sizeN').onchange=e=>syncSize(+e.target.value);
+  $('#dens').oninput=e=>{state.density=+e.target.value;$('#densV').textContent=e.target.value+'%';fill(e.target);rebuild();};
+  $('#rot').oninput=e=>{state.rot=+e.target.value;$('#rotV').textContent=e.target.value+'°';fill(e.target);rebuild();};
+  $('#bgColor').oninput=e=>{state.bg=e.target.value;$$('#swatches .sw').forEach(s=>s.classList.remove('on'));clearUnitCache();rerender();};
+  $('#seams').onchange=e=>{state.showSeams=e.target.checked;renderPattern();};
+  /* 生地プレビューのドラッグスライド（柄は無限リピート＝原点をずらす） */
+  (function(){
+    const cv=$('#patternCv');
+    let dragging=false,lx=0,ly=0,rafP=false;
+    const paint=()=>{if(rafP)return;rafP=true;requestAnimationFrame(()=>{rafP=false;renderPattern();});};
+    cv.addEventListener('pointerdown',e=>{
+      if(state.patTab!=='surface')return;
+      dragging=true;lx=e.clientX;ly=e.clientY;
+      cv.classList.add('panning');cv.setPointerCapture(e.pointerId);
+    });
+    cv.addEventListener('pointermove',e=>{
+      if(!dragging)return;
+      const f=cv.width/cv.clientWidth; // 表示px→キャンバスpx
+      const k=PPCM*state.zoom;
+      state.panCmX+=(e.clientX-lx)*f/k;
+      state.panCmY+=(e.clientY-ly)*f/k;
+      lx=e.clientX;ly=e.clientY;
+      paint();
+    });
+    const end=e=>{if(!dragging)return;dragging=false;cv.classList.remove('panning');};
+    cv.addEventListener('pointerup',end);
+    cv.addEventListener('pointercancel',end);
+    cv.addEventListener('dblclick',()=>{state.panCmX=0;state.panCmY=0;renderPattern();}); // 位置リセット
+  })();
+  $$('#patTabs button').forEach(b=>b.onclick=()=>{state.patTab=b.dataset.t;$$('#patTabs button').forEach(x=>x.classList.toggle('on',x===b));renderPattern();});
+  $$('#zoomSeg button').forEach(b=>b.onclick=()=>{state.zoom=+b.dataset.z;$$('#zoomSeg button').forEach(x=>x.classList.toggle('on',x===b));
+    $('#patternCv').classList.toggle('zoomed',state.zoom>1); // ズーム時のみタッチスクロールを奪う
+    renderPattern();});
+  $$('#prodTabs button').forEach(b=>b.onclick=()=>{state.product=b.dataset.prod;$$('#prodTabs button').forEach(x=>x.classList.toggle('on',x===b));renderProduct();});
+  $$('#prodZoomSeg button').forEach(b=>b.onclick=()=>{state.prodZoom=b.dataset.z;$$('#prodZoomSeg button').forEach(x=>x.classList.toggle('on',x===b));renderProduct();});
+  $('#meters').oninput=e=>{state.meters=+e.target.value;$('#metersV').textContent=e.target.value+'m';fill(e.target);updatePrice();};
+  $$('#dpiSeg button').forEach(b=>b.onclick=()=>{state.dpi=+b.dataset.dpi;$$('#dpiSeg button').forEach(x=>x.classList.toggle('on',x===b));updateExportInfo();});
+  $('#exTif').onclick=()=>{
+    $('#exMsg').textContent='生成中…（高解像度のため数秒かかることがあります）';
+    setTimeout(()=>{
+      try{
+        const t=buildPrintTile(state.dpi);
+        if(!t){$('#exMsg').textContent='生成できませんでした（サイズ超過）';return;}
+        const r=encodeTiff(t.w,t.h,t.rgb,state.dpi);
+        download(r.blob,tileName('tif'));
+        $('#exMsg').textContent=`✓ 書き出しました ${t.w}×${t.h}px ${(r.bytes/1048576).toFixed(1)}MB（${r.usePB?'PackBits圧縮':'無圧縮'}）`;
+      }catch(err){$('#exMsg').textContent='エラー: '+err.message;}
+    },30);
+  };
+  $('#exPng').onclick=()=>{
+    $('#exMsg').textContent='生成中…';
+    setTimeout(()=>{
+      const t=buildPrintTile(state.dpi);
+      if(!t){$('#exMsg').textContent='生成できませんでした（サイズ超過）';return;}
+      const c=makeCanvas(t.w,t.h),x=c.getContext('2d'),im=x.createImageData(t.w,t.h);
+      for(let p=0,q=0;q<t.rgb.length;p+=4,q+=3){im.data[p]=t.rgb[q];im.data[p+1]=t.rgb[q+1];im.data[p+2]=t.rgb[q+2];im.data[p+3]=255;}
+      x.putImageData(im,0,0);
+      c.toBlob(b=>{
+        if(!b){$('#exMsg').textContent='PNG生成に失敗しました（タイルが大きすぎる可能性）';return;}
+        download(b,tileName('png'));$('#exMsg').textContent='✓ PNGを書き出しました';
+      },'image/png');
+    },30);
+  };
+  $('#cart').onclick=()=>{
+    const f=FABRICS[state.fabric],lay=state.layout;
+    alert(`【カートに追加（デモ）】\n生地：${f.name}（${f.comp}）\nリピート：${REPEATS.find(r=>r.id===state.repeat).name}\nリピート実寸：${(lay.UW*state.sizeCm).toFixed(1)}×${(lay.UH*state.sizeCm).toFixed(1)}cm\n長さ：${state.meters}m\n金額：¥${(f.price*state.meters).toLocaleString()}\n\n本番はここでShopifyカートへ（入稿タイルは受注後に自動生成）。`);
+  };
+  $('#save').onclick=()=>alert('【保存（デモ）】設定を保存し、いつでも再編集・再注文できます。');
+  $$('input[type=range]').forEach(fill);
+}
+
+/* ============================================================
+   init ＋ 検証フック（?shot= / ?export= / ?art=）
+============================================================ */
+function init(){
+  buildRepeatSeg();buildSwatchUI();buildFabricSeg();buildSamples();wire();updatePrice();
+  const Q=new URLSearchParams(location.search);
+
+  /* 検証フック（rebuild完了時に発火するため、art/preset適用より先に登録） */
+  const shot=Q.get('shot');
+  if(shot){
+    setTimeout(()=>{
+      if(shot.startsWith('product-')){state.product=shot.slice(8);renderProduct();}
+      if(shot==='zoom'){state.prodZoom='zoom';renderProduct();}
+      if(shot==='unit'){state.patTab='unit';renderPattern();}
+      if(shot.startsWith('repeat-')){state.repeat=shot.slice(7);updateArrange();rebuild();}
+    },400);
+  }
+  if(Q.get('zoom')||Q.get('pan')){ // 検証用
+    setTimeout(()=>{
+      if(Q.get('zoom')){
+        state.zoom=+Q.get('zoom');
+        $$('#zoomSeg button').forEach(b=>b.classList.toggle('on',+b.dataset.z===state.zoom));
+      }
+      if(Q.get('pan')){const[px2,py2]=Q.get('pan').split(',').map(Number);state.panCmX=px2||0;state.panCmY=py2||0;}
+      renderPattern();
+    },500);
+  }
+  const fl=Q.get('filler'); // 検証用: paw / motif / motif:N（トス配置に自動切替）
+  if(fl){
+    (window.__ktReadyQ=window.__ktReadyQ||[]).push(()=>{
+      state.repeat='toss';
+      $$('#repeatSeg button').forEach(b=>b.classList.toggle('on',b.dataset.id==='toss'));
+      $('#tossOpts').style.display='block';$('#dropRow').style.display='none';
+      if(fl==='paw')state.filler={type:'paw',motifIdx:-1,motif:null};
+      else if(fl.startsWith('motif')&&state.motifs.length>1){
+        const idx=+(fl.split(':')[1]??(state.motifs.length-1));
+        state.filler={type:'motif',motifIdx:Math.min(idx,state.motifs.length-1),motif:null};
+      }
+      syncFillerUI();updateArrange();rebuild();
+    });
+  }
+  if(Q.get('export')==='tiff'){
+    (window.__ktReadyQ=window.__ktReadyQ||[]).push(()=>{
+      try{
+        state.dpi=+(Q.get('dpi')||150);
+        const t=buildPrintTile(state.dpi);
+        if(!t){$('#testout').textContent='KT_ERRX tile null';return;}
+        const r=encodeTiff(t.w,t.h,t.rgb,state.dpi);
+        const fr=new FileReader();
+        fr.onload=()=>{
+          $('#testout').textContent=`KT_META tiff ${t.w}x${t.h}px ${t.cmW.toFixed(1)}x${t.cmH.toFixed(1)}cm ${r.usePB?'packbits':'raw'} ${r.bytes}B `+fr.result;
+        };
+        fr.readAsDataURL(r.blob);
+      }catch(e){$('#testout').textContent='KT_ERRX '+e.message;}
+    });
+  }
+
+  const art=Q.get('art');
+  if(art){
+    if(/\.tiff?($|\?)/i.test(art)){
+      // fetchはfile://不可のためXHR（検証用経路。実運用はfile input→arrayBuffer）
+      importTiff(()=>new Promise((res,rej)=>{
+        const x=new XMLHttpRequest();x.open('GET',art);x.responseType='arraybuffer';
+        x.onload=()=>(x.status===200||x.status===0)&&x.response?res(x.response):rej(new Error('取得失敗'));
+        x.onerror=()=>rej(new Error('取得失敗'));x.send();
+      }),Q.get('mode')==='ask'?undefined:(Q.get('mode')||'tile'));
+    }else loadImage(art);
+  }
+  else applyPreset(Q.get('preset')||'matisse');
+}
+init();
+</script>
+</body>
+</html>
