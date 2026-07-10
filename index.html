@@ -512,7 +512,7 @@ const state={
   tileSrc:null,                  // tileモード: decodeTiff結果 {canvas,width,height,dpi,cmW,info}
   sample:null,                   // 選択中サンプルキー
   repeat:'half', dropDen:2, arrange:'checker',
-  sizeCm:7, density:45, rot:0, bg:'#f2ebdc',
+  sizeCm:7, density:45, rot:0, bg:'#f2ecdf',
   tol:50, skipCut:false, seed:20260710,
   filler:{type:'none',motifIdx:-1,motif:null}, // すき間の背景モチーフ: none/paw/motif/upload
   fillerScale:30,                              // 主役に対する大きさ%（15-50）
@@ -654,22 +654,22 @@ function drawStampRing(size,color,seed){
 }
 
 const PRESETS={
-  matisse:{name:'マティスリーフ', bg:'#f2ebdc', repeat:'toss', dropDen:2, sizeCm:7, density:52, rot:180,
+  matisse:{name:'マティスリーフ', bg:'#f2ecdf', repeat:'toss', dropDen:2, sizeCm:7, density:52, rot:180,
     make:px=>[
       {hi:p=>drawMatisseLeaf(p,'#c96f4a',11)},
       {hi:p=>drawMatisseLeaf(p,'#8fa98f',12)},
       {hi:p=>drawPebble(p,'#2f3a4a',13)},
     ]},
-  daisy:{name:'レトロデイジー', bg:'#f6efe6', repeat:'half', dropDen:2, sizeCm:6, density:58, rot:12, arrange:'checker',
+  daisy:{name:'レトロデイジー', bg:'#f2ecdf', repeat:'half', dropDen:2, sizeCm:6, density:58, rot:12, arrange:'checker',
     make:px=>[
       {hi:p=>drawDaisy(p,'#e8b4a8','#8a5a44',21)},
       {hi:p=>drawDaisy(p,'#ebcb7c','#8a5a44',22)},
     ]},
-  swag:{name:'北欧スワッグ', bg:'#f4eee1', repeat:'half', dropDen:2, sizeCm:8, density:66, rot:5,
+  swag:{name:'北欧スワッグ', bg:'#f2ecdf', repeat:'half', dropDen:2, sizeCm:8, density:66, rot:5,
     make:px=>[
       {hi:p=>drawSwag(p,31)},
     ]},
-  block:{name:'木版スタンプ', bg:'#f2ebdc', repeat:'full', dropDen:2, sizeCm:4.5, density:62, rot:0, arrange:'checker',
+  block:{name:'木版スタンプ', bg:'#f2ecdf', repeat:'full', dropDen:2, sizeCm:4.5, density:62, rot:0, arrange:'checker',
     make:px=>[
       {hi:p=>drawStampCross(p,'#33506b',41)},
       {hi:p=>drawStampRing(p,'#c98d7e',42)},
