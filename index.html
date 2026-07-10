@@ -39,7 +39,7 @@
   svg.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
 
   /* ===== topbar ===== */
-  .topbar{height:56px;display:flex;align-items:center;gap:22px;padding:0 22px;background:var(--surface);border-bottom:1px solid var(--line)}
+  .topbar{position:sticky;top:0;z-index:80;height:56px;display:flex;align-items:center;gap:22px;padding:0 22px;background:var(--surface);border-bottom:1px solid var(--line)}
   .brand{display:flex;align-items:center;gap:10px}
   .brand .mark{height:36px;width:auto;flex:none}
   .brandtext{display:flex;flex-direction:column;line-height:1}
@@ -173,7 +173,7 @@
   .bottom{margin-top:20px;display:grid;grid-template-columns:1fr;gap:20px;align-items:start}
   .bottomwrap{padding:0 22px 48px}
   .bottomwrap .bottom{max-width:1100px;margin:8px auto 0}
-  @media(min-width:921px){.previews{position:sticky;top:16px}}
+  @media(min-width:921px){.previews{position:sticky;top:72px;height:calc(100vh - 88px);min-height:520px}.previews .pv .cv{flex:1;min-height:0;overflow:hidden}#patternCv{height:100%}#productCv{max-width:none;height:100%}}
   @media(max-width:920px){.bottomwrap{padding:0 12px 40px}}
   .bottom .card,.pv{min-width:0;max-width:100%}
   @media(max-width:1020px){.bottom{grid-template-columns:1fr}}
@@ -280,7 +280,7 @@
 
   /* ===== スマホ最適化 ===== */
   /* 固定ミニプレビュー: 本体プレビューが画面外に出たら上部に出る（タップで戻る） */
-  #miniPv{display:none;position:fixed;top:0;left:0;right:0;z-index:60;background:var(--paper);
+  #miniPv{display:none;position:fixed;top:56px;left:0;right:0;z-index:60;background:var(--paper);
     border-bottom:1px solid var(--line);box-shadow:0 10px 24px -14px rgba(43,38,32,.5);cursor:pointer}
   #miniPv.show{display:block}
   #miniPv .mrow{display:flex}
@@ -2006,12 +2006,19 @@ function renderProduct(){
   const P=drawProduct(octx);
   if(state.prodZoom==='zoom'){
     /* プリント拡大（中心部2.4倍・生地グレインが見える） */
-    const z=2.4,cw=DS_W/z,ch=DS_H/z,cx0=(DS_W-cw)/2,cy0=(DS_H-ch)/2-P.zoomOff;
+    const z=2.4;let cw=DS_W/z,ch=cw*H/W;
+    if(ch>DS_H){ch=DS_H;cw=ch*W/H;}
+    const cx0=(DS_W-cw)/2,cy0=Math.max(0,Math.min(DS_H-ch,(DS_H-ch)/2-P.zoomOff));
     ctx.drawImage(off,cx0,cy0,cw,ch,0,0,W,H);
     ctx.save();ctx.font='11px ui-monospace,monospace';
     ctx.fillStyle='rgba(252,250,245,.85)';ctx.fillRect(14,14,132,24);
     ctx.fillStyle='#2b2620';ctx.fillText('プリント部 ×2.4',22,30);ctx.restore();
   }else{
+    /* 余白帯もスタジオ背景で埋める（stageBaseと同じ配色） */
+    ctx.fillStyle='#f0ede6';ctx.fillRect(0,0,W,H);
+    const gbg=ctx.createRadialGradient(W/2,H*0.42,W*0.1,W/2,H*0.46,W*0.75);
+    gbg.addColorStop(0,'rgba(255,255,255,.5)');gbg.addColorStop(1,'rgba(190,180,162,.28)');
+    ctx.fillStyle=gbg;ctx.fillRect(0,0,W,H);
     const s=Math.min(W/DS_W,H/DS_H);
     ctx.drawImage(off,(W-DS_W*s)/2,(H-DS_H*s)/2,DS_W*s,DS_H*s);
   }
@@ -3036,7 +3043,7 @@ function wire(){
     const mini=$('#miniPv'),card=$('#patCard'),top=document.querySelector('.topbar');
     if(!mini||!card||!('IntersectionObserver' in window))return;
     let patVis=true,topVis=true;
-    const upd=()=>mini.classList.toggle('show',!patVis&&!topVis);
+    const upd=()=>mini.classList.toggle('show',!patVis);
     /* カード枠でなくプレビュー本体(canvas)を監視: 1/4以上見えている時だけ「見えている」扱い */
     const cv=document.getElementById('patternCv')||card;
     new IntersectionObserver(es=>{patVis=es[0].intersectionRatio>=0.25;upd();},{threshold:[0,0.25,0.5]}).observe(cv);
@@ -3130,6 +3137,29 @@ function init(){
   }
   else applyPreset(Q.get('preset')||'matisse');
 }
+/* PCではプレビューcanvasのバッファを表示ボックス実寸(×dpr)に合わせ、枠いっぱいに描画 */
+function fitPvCanvases(){
+  const pc=window.matchMedia('(min-width:921px)').matches;
+  const fit=(cv,defW,defH)=>{
+    const box=cv.parentElement;let w=defW,h=defH;
+    if(pc){
+      const r=box.getBoundingClientRect();
+      if(r.width<50||r.height<50)return false;
+      const dpr=Math.min(window.devicePixelRatio||1,2);
+      w=Math.round(r.width*dpr);h=Math.round(r.height*dpr);
+    }
+    if(Math.abs(cv.width-w)>2||Math.abs(cv.height-h)>2){cv.width=w;cv.height=h;return true;}
+    return false;
+  };
+  const a=fit($('#patternCv'),980,600),b=fit($('#productCv'),860,900);
+  if(a)renderPattern();
+  if(b)renderProduct();
+}
+window.addEventListener('resize',()=>{clearTimeout(window.__pvFitT);window.__pvFitT=setTimeout(fitPvCanvases,150);});
+/* フォント読込でヘッダー高が変わるため、確定後に再フィット */
+window.addEventListener('load',()=>setTimeout(fitPvCanvases,100));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>setTimeout(fitPvCanvases,0));
+fitPvCanvases();
 init();
 </script>
 </body>
