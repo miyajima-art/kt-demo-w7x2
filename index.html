@@ -209,8 +209,11 @@
   #miniPv{display:none;position:fixed;top:0;left:0;right:0;z-index:60;background:var(--paper);
     border-bottom:1px solid var(--line);box-shadow:0 10px 24px -14px rgba(43,38,32,.5);cursor:pointer}
   #miniPv.show{display:block}
-  #miniPv canvas{width:100%;height:140px;display:block}
+  #miniPv .mrow{display:flex}
+  #miniPv #miniCv{flex:1;min-width:0;width:100%;height:140px;display:block;object-fit:cover}
+  #miniPv #miniProdCv{flex:0 0 140px;width:140px;height:140px;display:block;object-fit:cover;border-left:1px solid var(--line);background:var(--canvas)}
   #miniPv .mi{display:flex;align-items:center;gap:8px;padding:3px 12px 5px;font-family:var(--mono);font-size:9.5px;color:var(--faint)}
+  #miniPv .mi .sep{color:var(--line2)}
   #miniPv .mi b{color:var(--sec);font-family:var(--sans);font-weight:700;font-size:10.5px}
   #miniPv .mi .up{margin-left:auto;color:var(--accent)}
   @media(min-width:921px){#miniPv{display:none!important}}
@@ -416,7 +419,7 @@
         <div class="cv"><canvas id="patternCv" width="980" height="600"></canvas></div>
         <div class="foot"><span id="unitInfo">—</span><span id="seamlessInfo" style="color:var(--ok)">継ぎ目なし保証（トーラス配置）</span></div>
       </div>
-      <div class="pv">
+      <div class="pv" id="prodCard">
         <div class="h"><span class="no">07</span><span class="t">仕上がりイメージ</span>
           <div class="htools">
             <div class="tabs" id="prodTabs">
@@ -481,10 +484,13 @@
   </main>
 </div>
 
-<!-- スマホ用 固定ミニプレビュー -->
+<!-- スマホ用 固定ミニプレビュー（左=生地・右=完成形の並置） -->
 <div id="miniPv">
-  <canvas id="miniCv" width="800" height="280"></canvas>
-  <div class="mi"><b>生地プレビュー</b><span id="miniInfo">—</span><span class="up">プレビューを開く ▸</span></div>
+  <div class="mrow">
+    <canvas id="miniCv" width="720" height="280"></canvas>
+    <canvas id="miniProdCv" width="280" height="280"></canvas>
+  </div>
+  <div class="mi"><b>生地</b><span id="miniInfo">—</span><span class="sep">｜</span><b id="miniProdLb">Tシャツ</b><span class="up">プレビューを開く ▸</span></div>
 </div>
 
 <!-- TIFF取り込みモード選択 -->
@@ -1390,7 +1396,7 @@ function renderPattern(){
     ?`取り込みタイル ${state.tileSrc.width}×${state.tileSrc.height}px`
     :`モチーフ ${state.motifs.length}点`;
   $('#unitInfo').textContent=`リピート ${cmW}×${cmH}cm ｜ ${names[state.repeat]}${(state.repeat==='half'||state.repeat==='brick')?' 1/'+state.dropDen:''} ｜ ${tail}`;
-  /* スマホ用の固定ミニプレビューへ複写 */
+  /* スマホ用の固定ミニプレビューへ複写（左=生地） */
   const mc=$('#miniCv');
   if(mc){
     const mx2=mc.getContext('2d');
@@ -1787,6 +1793,16 @@ function renderProduct(){
   }else{
     const s=Math.min(W/DS_W,H/DS_H);
     ctx.drawImage(off,(W-DS_W*s)/2,(H-DS_H*s)/2,DS_W*s,DS_H*s);
+  }
+  /* スマホ用の固定ミニプレビューへ複写（右=完成形・中央正方形を切り出し） */
+  const mp=$('#miniProdCv');
+  if(mp){
+    const mx3=mp.getContext('2d');
+    mx3.clearRect(0,0,mp.width,mp.height);
+    const s2=Math.min(DS_W,DS_H)*0.86; // 余白を詰めて主役を大きく
+    mx3.drawImage(off,(DS_W-s2)/2,(DS_H-s2)/2,s2,s2,0,0,mp.width,mp.height);
+    const lb=$('#miniProdLb');
+    if(lb)lb.textContent={tshirt:'Tシャツ',tote:'トート',bolt:'反物'}[state.product];
   }
 }
 
@@ -2385,6 +2401,9 @@ function wire(){
     const upd=()=>mini.classList.toggle('show',window.innerWidth<=920&&!patVis&&!topVis);
     new IntersectionObserver(es=>{patVis=es[0].isIntersecting;upd();},{threshold:0.05}).observe(card);
     new IntersectionObserver(es=>{topVis=es[0].isIntersecting;upd();},{threshold:0.1}).observe(top);
+    /* タップ先を分離: 左=生地プレビューへ／右=仕上がりイメージへ */
+    $('#miniCv').onclick=e=>{e.stopPropagation();card.scrollIntoView({behavior:'smooth',block:'start'});};
+    $('#miniProdCv').onclick=e=>{e.stopPropagation();(document.getElementById('prodCard')||card).scrollIntoView({behavior:'smooth',block:'start'});};
     mini.onclick=()=>card.scrollIntoView({behavior:'smooth',block:'start'});
   })();
 }
