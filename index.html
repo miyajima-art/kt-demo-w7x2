@@ -440,46 +440,44 @@
 
     <div class="bottom">
       <div class="card">
-        <h2><span class="no">08</span><span class="t">生地をえらんで注文</span></h2>
-        <div class="demo">数値・生地はダミー（プロトタイプ）</div>
-        <div id="fabSeg"></div>
-        <div class="orow">
-          <label class="lb">長さ</label>
-          <div class="range" style="flex:1"><input type="range" id="meters" min="1" max="10" value="1"></div>
-          <span class="val num" id="metersV">1m</span>
+        <h2><span class="no">08</span><span class="t">保存する（無料）</span></h2>
+        <div class="demo">見た目の確認・SNS共有用。印刷には使えません（透かし・低解像度）</div>
+        <div class="exbtns" style="margin-top:4px">
+          <button class="png" id="dlPattern" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5"/><circle cx="8.5" cy="10" r="1.6"/><path d="M4 17l4.5-4 3 2.4L15 12l5 5"/></svg>柄イメージ（JPG）</button>
+          <button class="png" id="dlMock" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><path d="M7 4l3-1 2 2 2-2 3 1 3 4-3 2v11H7V10L4 8z"/></svg>仕上がりイメージ（JPG）</button>
         </div>
-        <div class="priceRow"><span class="lab" id="lenLabel">—</span><span class="price num" id="price">¥—</span></div>
-        <div class="cta">
-          <button class="cart" id="cart"><svg class="ic" viewBox="0 0 24 24"><path d="M6 2 3 6v13a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>カートに入れる</button>
-          <button class="save" id="save"><svg class="ic" viewBox="0 0 24 24"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>保存</button>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--n3)">
+          <label class="lb">デザインレシピ<span style="color:var(--faint)">（このデザインの設計図・いつでも完全復元できます）</span></label>
+          <div class="exbtns" style="margin-top:6px">
+            <button class="png" id="dlRecipe" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>レシピを保存</button>
+            <button class="png" id="ldRecipe" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21V9M8 13l4-4 4 4"/><path d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"/></svg>レシピを読み込む</button>
+            <input type="file" id="recipeFile" accept=".gararie,application/json" hidden>
+          </div>
+          <div class="mini">レシピ（.gararieファイル）を保存しておけば、次に来たとき読み込むだけで続き・再購入ができます。</div>
         </div>
-        <div class="note" id="fabNote">—</div>
+        <div class="exmsg" id="freeMsg"></div>
       </div>
 
       <div class="card">
-        <h2><span class="no">09</span><span class="t">入稿データ（自社プリント用）</span></h2>
-        <div class="demo">Mimaki RIP（TxLink/RasterLink）へそのまま入稿できる1リピートタイル</div>
-        <label class="lb">解像度</label>
-        <div class="segline" id="dpiSeg" style="max-width:280px">
-          <button data-dpi="150">150dpi</button>
-          <button data-dpi="200">200dpi</button>
-          <button data-dpi="300" class="on">300dpi</button>
+        <h2><span class="no">09</span><span class="t">印刷データを購入</span></h2>
+        <div class="demo">プロ用の入稿データ（実寸TIFF）をお届け。ご自身の作品づくり・販売にも使えます</div>
+        <div class="priceRow" style="margin-top:6px">
+          <span class="lab">1デザイン・買い切り</span>
+          <span class="price num" id="buyPrice">¥1,000</span>
         </div>
-        <div class="exgrid">
-          <span class="k">リピートタイル実寸</span><span class="v" id="exCm">—</span>
-          <span class="k">ピクセル</span><span class="v" id="exPx">—</span>
-          <span class="k">推定ファイルサイズ</span><span class="v" id="exMb">—</span>
-          <span class="k">形式</span><span class="v">TIFF 6.0（RGB 8bit・アルファ無し・PackBits/無圧縮 自動）</span>
+        <div class="exgrid" style="margin-top:12px">
+          <span class="k">内容</span><span class="v" style="font-family:var(--sans)">実寸・シームレスの印刷用データ（TIFF）</span>
+          <span class="k">つかいみち</span><span class="v" style="font-family:var(--sans)">生地プリント入稿・自作品の制作/販売 OK</span>
+          <span class="k">おやくそく</span><span class="v" style="font-family:var(--sans)">データそのものの再配布・転売はNG</span>
         </div>
-        <div class="exbtns">
-          <button class="tif" id="exTif"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>TIFFを書き出す（入稿用）</button>
-          <button class="png" id="exPng">PNG</button>
+        <div class="cta">
+          <button class="cart" id="buyBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M6 2 3 6v13a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>購入する</button>
         </div>
-        <div class="exmsg" id="exMsg"></div>
-        <div class="mini" id="exSrcNote" style="display:none;color:var(--warn)"></div>
-        <div class="note">透過背景は白地に合成して書き出します。画面の色は参考表示（実発色はRIPプロファイル＋物理スワッチ色校正が基準）。</div>
+        <div class="exmsg" id="buyMsg"></div>
+        <div class="note">アップロードした絵の権利はお客様自身が持つものに限ります。購入後、ガラリエで生地を注文する際は¥1,000を割引予定。</div>
       </div>
     </div>
+
     <div id="testout"></div>
   </main>
 </div>
@@ -543,21 +541,12 @@ const state={
   patTab:'surface', zoom:1, showSeams:false,
   panCmX:0, panCmY:0,            // 生地プレビューのスライド位置（実寸cm・ズーム非依存）
   product:'tshirt', prodZoom:'full',
-  fabric:'sheeting', meters:1, dpi:300,
+  dpi:300,
   layout:null, autoBase:0,
 };
 const PPCM=7;               // プレビュー基準スケール(px/cm・zoom=1)
 const CUT_MAX=700;          // 解析解像度
 const HI_MAX=2200;          // 入稿用切り抜きの上限解像度
-
-const FABRICS={
-  sheeting:{name:'シーチング',comp:'綿100%',price:1200,note:'薄手で扱いやすく初心者に。用途が広い定番。'},
-  oxford:{name:'オックス',comp:'綿100%',price:1500,note:'しっかりした厚みでバッグや小物に。'},
-  tenjiku:{name:'天竺ニット',comp:'綿100%',price:1900,note:'伸縮性があり、Tシャツや子供服に。'},
-  canvas:{name:'キャンバス',comp:'綿100%',price:2200,note:'厚手で丈夫。トートやインテリアに。'},
-  linen:{name:'リネン混',comp:'綿麻',price:2400,note:'ナチュラルな風合いで大人の作品に。'},
-  gauze:{name:'ダブルガーゼ',comp:'綿100%',price:2000,note:'柔らかくベビー・スタイに人気。'}
-};
 
 /* ============================================================
    サンプル柄（2026トレンド準拠・シード固定・Canvas 2Dのみ）
@@ -2229,15 +2218,133 @@ function buildSwatchUI(){
     w.appendChild(d);
   });
 }
-function buildFabricSeg(){
-  const seg=$('#fabSeg');seg.innerHTML='';
-  Object.entries(FABRICS).forEach(([k,f])=>{
-    const b=document.createElement('button');b.dataset.k=k;
-    b.innerHTML=`<span class="nm">${f.name}</span><span class="mt">${f.comp}・<span class="num">¥${f.price.toLocaleString()}</span>/m</span>`;
-    if(k===state.fabric)b.classList.add('on');
-    b.onclick=()=>{state.fabric=k;$$('#fabSeg button').forEach(x=>x.classList.toggle('on',x.dataset.k===k));updatePrice();};
-    seg.appendChild(b);
-  });
+/* ============================================================
+   販売MVP: 無料保存（透かしJPG・レシピ）と 印刷データ購入
+============================================================ */
+const PRICE_JPY=1000;        // 印刷データ価格（Shopify移行後は商品側が正）
+const PURCHASE_URL='';       // Shopify商品URL（設定すると購入ボタンが有効化）
+
+/* 透かし（斜め繰り返しロゴ＋右下クレジット） */
+function watermark(ctx,w,h,strength){
+  ctx.save();
+  ctx.globalAlpha=strength||0.10;
+  ctx.fillStyle='#2b2620';
+  ctx.font='700 26px "Hiragino Sans","Yu Gothic",sans-serif';
+  ctx.translate(w/2,h/2);ctx.rotate(-0.35);
+  for(let y=-h;y<h;y+=170)for(let x=-w;x<w;x+=300)ctx.fillText('GARARIE  SAMPLE',x,y);
+  ctx.restore();
+  ctx.save();
+  ctx.globalAlpha=0.75;ctx.fillStyle='rgba(252,250,245,.9)';
+  ctx.fillRect(w-236,h-40,228,30);
+  ctx.fillStyle='#564d3e';ctx.font='11px ui-monospace,monospace';
+  ctx.fillText('GARARIE ｜ REKUREDOOL',w-224,h-21);
+  ctx.restore();
+}
+/* 無料: 柄イメージJPG（リピート境界を渡さない非整数切り出し＋透かし＋低解像度） */
+function dlPatternJpg(){
+  const lay=state.layout;if(!lay)return;
+  const W2=1200,H2=1200,c=makeCanvas(W2,H2),x=c.getContext('2d');
+  const ppu=state.sizeCm*PPCM*1.35;
+  const u=renderUnit(ppu,{flat:true});
+  if(!u)return;
+  x.fillStyle=(state.bg!=='transparent')?state.bg:'#ffffff';x.fillRect(0,0,W2,H2);
+  const p=x.createPattern(u,'repeat');
+  if(p.setTransform){try{p.setTransform(new DOMMatrix().translate(u.width*0.37,u.height*0.61));}catch(e){}}
+  x.fillStyle=p;x.fillRect(0,0,W2,H2);
+  watermark(x,W2,H2,0.10);
+  c.toBlob(b=>{if(b){download(b,'gararie_pattern_sample.jpg');$('#freeMsg').textContent='✓ 柄イメージを保存しました（印刷用ではありません）';}},'image/jpeg',0.82);
+}
+/* 無料: 仕上がりモックJPG（現在の製品タブ・控えめ透かし） */
+function dlMockJpg(){
+  if(!state.layout)return;
+  const off=makeCanvas(DS_W,DS_H),octx=off.getContext('2d');
+  octx.imageSmoothingQuality='high';
+  const ppcm={tshirt:8.8,tote:9.2,bolt:5.6}[state.product];
+  if(state.product==='tshirt')drawTshirt(octx,ppcm);
+  else if(state.product==='tote')drawTote(octx,ppcm);
+  else drawBolt(octx,ppcm);
+  watermark(octx,DS_W,DS_H,0.05);
+  off.toBlob(b=>{if(b){download(b,'gararie_mock_'+state.product+'.jpg');$('#freeMsg').textContent='✓ 仕上がりイメージを保存しました（SNS共有OK）';}},'image/jpeg',0.86);
+}
+/* デザインレシピ（.gararie）: 完全復元用の設計図。モチーフは原寸で持つ */
+function buildRecipe(){
+  const r={v:1,app:'gararie',saved:new Date().toISOString(),
+    mode:state.mode,sample:state.sample,
+    params:{repeat:state.repeat,dropDen:state.dropDen,arrange:state.arrange,
+      sizeCm:state.sizeCm,density:state.density,rot:state.rot,bg:state.bg,seed:state.seed,
+      filler:{type:state.filler.type,motifIdx:state.filler.motifIdx},fillerScale:state.fillerScale,
+      product:state.product}};
+  if(state.mode==='tile'&&state.tileSrc){
+    r.tile={img:state.tileSrc.canvas.toDataURL('image/png'),cmW:state.tileSrc.cmW,dpi:state.tileSrc.dpi,info:state.tileSrc.info};
+  }else if(!state.sample){
+    r.motifs=state.motifs.map(m=>(m.hi?m.hi(2048):m.pv).toDataURL('image/png'));
+  }
+  if(state.filler.type==='upload'&&state.filler.motif)r.fillerImg=state.filler.motif.pv.toDataURL('image/png');
+  return r;
+}
+function dlRecipe(){
+  try{
+    const r=buildRecipe();
+    download(new Blob([JSON.stringify(r)],{type:'application/json'}),'gararie_design_'+new Date().toISOString().slice(0,10)+'.gararie');
+    $('#freeMsg').textContent='✓ レシピを保存しました。読み込めばいつでも完全復元できます';
+  }catch(e){$('#freeMsg').textContent='レシピ保存に失敗: '+e.message;}
+}
+const dataUrlToCanvas=src=>new Promise((res,rej)=>{
+  const img=new Image();
+  img.onload=()=>{const c=makeCanvas(img.width,img.height);c.getContext('2d').drawImage(img,0,0);res(c);};
+  img.onerror=()=>rej(new Error('画像復元に失敗'));img.src=src;
+});
+async function loadRecipe(obj){
+  if(!obj||obj.app!=='gararie')throw new Error('ガラリエのレシピファイルではありません');
+  const p=obj.params||{};
+  if(obj.mode==='tile'&&obj.tile){
+    const c=await dataUrlToCanvas(obj.tile.img);
+    enterTileMode({canvas:c,width:c.width,height:c.height,dpi:obj.tile.dpi,cmW:obj.tile.cmW,info:obj.tile.info||'レシピから復元'});
+  }else if(obj.sample&&PRESETS[obj.sample]){
+    applyPreset(obj.sample);
+  }else if(obj.motifs&&obj.motifs.length){
+    state.mode='motif';state.tileSrc=null;state.sample=null;
+    state.rawFull=null;state.raw=null;
+    const cs=await Promise.all(obj.motifs.map(dataUrlToCanvas));
+    state.motifs=cs.map(c=>{
+      const sc=Math.min(1,CUT_MAX/Math.max(c.width,c.height));
+      const pv=makeCanvas(Math.round(c.width*sc),Math.round(c.height*sc));
+      pv.getContext('2d').drawImage(c,0,0,pv.width,pv.height);
+      return{pv,_expensive:true,hi:()=>c};
+    });
+    $$('.samp').forEach(s=>s.classList.remove('on'));
+    updateModeUI();
+    const cc=$('#cutCv'),x=cc.getContext('2d');x.clearRect(0,0,cc.width,cc.height);
+    const m0=state.motifs[0].pv,s=Math.min(cc.width/m0.width,cc.height/m0.height)*0.85;
+    x.drawImage(m0,(cc.width-m0.width*s)/2,(cc.height-m0.height*s)/2,m0.width*s,m0.height*s);
+    $('#motifCount').textContent=`レシピから復元（モチーフ ${state.motifs.length}点）`;
+  }else throw new Error('レシピにデザインデータがありません');
+  /* パラメータ上書き（applyPreset/enterTileModeの既定値の後に適用） */
+  Object.assign(state,{repeat:p.repeat??state.repeat,dropDen:p.dropDen??2,arrange:p.arrange??'checker',
+    sizeCm:p.sizeCm??state.sizeCm,density:p.density??state.density,rot:p.rot??state.rot,
+    bg:p.bg??state.bg,seed:p.seed??state.seed,fillerScale:p.fillerScale??30,product:p.product??'tshirt'});
+  if(p.filler){
+    state.filler={type:p.filler.type||'none',motifIdx:p.filler.motifIdx??-1,motif:null};
+    if(p.filler.type==='upload'&&obj.fillerImg){state.filler.motif={pv:await dataUrlToCanvas(obj.fillerImg)};}
+    if(p.filler.type==='upload'&&!obj.fillerImg)state.filler={type:'none',motifIdx:-1,motif:null};
+  }
+  /* UI同期 */
+  $$('#repeatSeg button').forEach(b=>b.classList.toggle('on',b.dataset.id===state.repeat));
+  $$('#dropSeg button').forEach(b=>b.classList.toggle('on',+b.dataset.d===state.dropDen));
+  $$('#arrangeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.a===state.arrange));
+  $$('#prodTabs button').forEach(b=>b.classList.toggle('on',b.dataset.prod===state.product));
+  $('#dropRow').style.display=(state.repeat==='half'||state.repeat==='brick')?'block':'none';
+  $('#tossOpts').style.display=(state.mode!=='tile'&&state.repeat==='toss')?'block':'none';
+  $('#size').value=state.sizeCm;$('#sizeN').value=state.sizeCm;
+  $('#sizeV').innerHTML=state.sizeCm+'<small>cm・'+(state.mode==='tile'?'タイル幅':sizeLabel(state.sizeCm))+'</small>';
+  $('#dens').value=state.density;$('#densV').textContent=state.density+'%';
+  $('#rot').value=state.rot;$('#rotV').textContent=state.rot+'°';
+  $('#fillerScale').value=state.fillerScale;$('#fillerScaleV').textContent=state.fillerScale+'%';
+  if(state.bg&&state.bg!=='transparent')$('#bgColor').value=state.bg;
+  buildSwatchUI();syncFillerUI();updateModeUI();updateArrange();
+  $$('input[type=range]').forEach(fill);
+  rebuild();
+  $('#freeMsg').textContent='✓ レシピを読み込みました';
 }
 function buildSamples(){
   const g=$('#sampGrid');g.innerHTML='';
@@ -2279,13 +2386,6 @@ function buildSamples(){
     },0);
   });
 }
-function updatePrice(){
-  const f=FABRICS[state.fabric],t=f.price*state.meters;
-  $('#price').textContent='¥'+t.toLocaleString();
-  $('#lenLabel').textContent=`${f.name} × ${state.meters}m`;
-  $('#fabNote').innerHTML=`<b>${f.name}</b>（${f.comp}）：${f.note}<br>印刷：自社Mimaki・テキスタイル顔料　単価：¥${f.price.toLocaleString()}/m`;
-}
-
 function wire(){
   const drop=$('#drop'),file=$('#file');
   drop.onclick=()=>file.click();
@@ -2359,7 +2459,6 @@ function wire(){
     renderPattern();});
   $$('#prodTabs button').forEach(b=>b.onclick=()=>{state.product=b.dataset.prod;$$('#prodTabs button').forEach(x=>x.classList.toggle('on',x===b));renderProduct();});
   $$('#prodZoomSeg button').forEach(b=>b.onclick=()=>{state.prodZoom=b.dataset.z;$$('#prodZoomSeg button').forEach(x=>x.classList.toggle('on',x===b));renderProduct();});
-  $('#meters').oninput=e=>{state.meters=+e.target.value;$('#metersV').textContent=e.target.value+'m';fill(e.target);updatePrice();};
   $$('#dpiSeg button').forEach(b=>b.onclick=()=>{state.dpi=+b.dataset.dpi;$$('#dpiSeg button').forEach(x=>x.classList.toggle('on',x===b));updateExportInfo();});
   $('#exTif').onclick=()=>{
     $('#exMsg').textContent='生成中…（高解像度のため数秒かかることがあります）';
@@ -2387,11 +2486,23 @@ function wire(){
       },'image/png');
     },30);
   };
-  $('#cart').onclick=()=>{
-    const f=FABRICS[state.fabric],lay=state.layout;
-    alert(`【カートに追加（デモ）】\n生地：${f.name}（${f.comp}）\nリピート：${REPEATS.find(r=>r.id===state.repeat).name}\nリピート実寸：${(lay.UW*state.sizeCm).toFixed(1)}×${(lay.UH*state.sizeCm).toFixed(1)}cm\n長さ：${state.meters}m\n金額：¥${(f.price*state.meters).toLocaleString()}\n\n本番はここでShopifyカートへ（入稿タイルは受注後に自動生成）。`);
+  /* 販売MVP: 無料保存・レシピ・購入 */
+  $('#dlPattern').onclick=dlPatternJpg;
+  $('#dlMock').onclick=dlMockJpg;
+  $('#dlRecipe').onclick=dlRecipe;
+  $('#ldRecipe').onclick=()=>$('#recipeFile').click();
+  $('#recipeFile').onchange=async e=>{
+    const f=e.target.files[0];e.target.value='';
+    if(!f)return;
+    try{await loadRecipe(JSON.parse(await f.text()));}
+    catch(err){alert('レシピを読み込めませんでした：'+err.message);}
   };
-  $('#save').onclick=()=>alert('【保存（デモ）】設定を保存し、いつでも再編集・再注文できます。');
+  $('#buyPrice').textContent='¥'+PRICE_JPY.toLocaleString();
+  $('#buyBtn').onclick=()=>{
+    if(PURCHASE_URL){window.open(PURCHASE_URL,'_blank');return;}
+    $('#buyMsg').textContent='オンライン決済は準備中です。「レシピを保存」してお待ちください（オープン時にそのまま購入できます）';
+    dlRecipe();
+  };
   $$('input[type=range]').forEach(fill);
   /* スマホ: 本体プレビューもヘッダーも見えていない間だけ固定ミニバーを表示（タップで移動） */
   (function(){
@@ -2412,7 +2523,7 @@ function wire(){
    init ＋ 検証フック（?shot= / ?export= / ?art=）
 ============================================================ */
 function init(){
-  buildRepeatSeg();buildSwatchUI();buildFabricSeg();buildSamples();wire();updatePrice();
+  buildRepeatSeg();buildSwatchUI();buildSamples();wire();
   const Q=new URLSearchParams(location.search);
 
   /* 検証フック（rebuild完了時に発火するため、art/preset適用より先に登録） */
@@ -2436,6 +2547,32 @@ function init(){
       renderPattern();
     },500);
   }
+  if(Q.get('export')==='jpg'){ // 検証用: 透かしJPGをDOMへ
+    (window.__ktReadyQ=window.__ktReadyQ||[]).push(()=>{
+      const lay=state.layout;if(!lay)return;
+      const W2=1200,H2=1200,c=makeCanvas(W2,H2),x=c.getContext('2d');
+      const u=renderUnit(state.sizeCm*PPCM*1.35,{flat:true});
+      x.fillStyle=(state.bg!=='transparent')?state.bg:'#ffffff';x.fillRect(0,0,W2,H2);
+      const p=x.createPattern(u,'repeat');
+      if(p.setTransform){try{p.setTransform(new DOMMatrix().translate(u.width*0.37,u.height*0.61));}catch(e){}}
+      x.fillStyle=p;x.fillRect(0,0,W2,H2);
+      watermark(x,W2,H2,0.10);
+      $('#testout').textContent='KT_META jpg '+c.toDataURL('image/jpeg',0.82);
+    });
+  }
+  if(Q.get('export')==='recipe'){ // 検証用: レシピJSONをDOMへ
+    (window.__ktReadyQ=window.__ktReadyQ||[]).push(()=>{
+      try{const r=buildRecipe();$('#testout').textContent='KT_RECIPE '+JSON.stringify(r);}
+      catch(e){$('#testout').textContent='KT_ERRX '+e.message;}
+    });
+  }
+  if(Q.get('recipe')){ // 検証用: URLからレシピ読込
+    (window.__ktReadyQ=window.__ktReadyQ||[]).push(()=>{
+      const x=new XMLHttpRequest();x.open('GET',Q.get('recipe'));
+      x.onload=async()=>{try{await loadRecipe(JSON.parse(x.responseText));$('#testout').textContent='KT_RECIPE_LOADED';}catch(e){$('#testout').textContent='KT_ERRX '+e.message;}};
+      x.send();
+    });
+  }
   const fl=Q.get('filler'); // 検証用: paw / motif / motif:N（トス配置に自動切替）
   if(fl){
     (window.__ktReadyQ=window.__ktReadyQ||[]).push(()=>{
@@ -2448,21 +2585,6 @@ function init(){
         state.filler={type:'motif',motifIdx:Math.min(idx,state.motifs.length-1),motif:null};
       }
       syncFillerUI();updateArrange();rebuild();
-    });
-  }
-  if(Q.get('export')==='tiff'){
-    (window.__ktReadyQ=window.__ktReadyQ||[]).push(()=>{
-      try{
-        state.dpi=+(Q.get('dpi')||150);
-        const t=buildPrintTile(state.dpi);
-        if(!t){$('#testout').textContent='KT_ERRX tile null';return;}
-        const r=encodeTiff(t.w,t.h,t.rgb,state.dpi);
-        const fr=new FileReader();
-        fr.onload=()=>{
-          $('#testout').textContent=`KT_META tiff ${t.w}x${t.h}px ${t.cmW.toFixed(1)}x${t.cmH.toFixed(1)}cm ${r.usePB?'packbits':'raw'} ${r.bytes}B `+fr.result;
-        };
-        fr.readAsDataURL(r.blob);
-      }catch(e){$('#testout').textContent='KT_ERRX '+e.message;}
     });
   }
 
