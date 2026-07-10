@@ -2731,14 +2731,19 @@ function buildRepeatSeg(){
     seg.appendChild(b);
   });
 }
-const BG=['transparent','#ffffff','#f2ebdc','#f6efe6','#f4eee1','#e7ded0','#c7bce6','#a7c1b4','#7e93a7','#d98b8b','#c9a27a','#2b2620','#33506b'];
+/* 定番順: 無地系→ベージュ/カーキ（上品・重厚の定番）→くすみ暖色→アース→ブルー系→濃色
+   （需要根拠: 黒・ネイビー・ベージュ・カーキ=大人の定番／彩度を抑えたアースカラー=25-26トレンド） */
+const BG=['transparent','#ffffff','#f4eee1','#e3d7c3','#b7a98e','#8a8259','#e3c2bc','#d98b8b','#c07856','#d9a94e','#a7c1b4','#a9c3d4','#7e93a7','#c7bce6','#33506b','#2b2620'];
+const BG_NAMES={'#ffffff':'ホワイト','#f4eee1':'生成り','#e3d7c3':'ライトベージュ','#b7a98e':'グレージュ','#8a8259':'カーキ',
+  '#e3c2bc':'くすみピンク','#d98b8b':'ローズ','#c07856':'テラコッタ','#d9a94e':'マスタード','#a7c1b4':'セージ',
+  '#a9c3d4':'サックス','#7e93a7':'ダスティブルー','#c7bce6':'ラベンダー','#33506b':'ネイビー','#2b2620':'スミクロ'};
 function buildSwatchUI(){
   const w=$('#swatches');w.innerHTML='';
   BG.forEach(c=>{
     const d=document.createElement('div');
     d.className='sw'+(c==='transparent'?' tp':'')+(c===state.bg?' on':'');
     if(c!=='transparent')d.style.background=c;
-    d.title=c==='transparent'?'透過（生地の地色）':c;
+    d.title=c==='transparent'?'透過（生地の地色）':(BG_NAMES[c]||c);
     d.onclick=()=>{state.bg=c;$$('#swatches .sw').forEach(s=>s.classList.remove('on'));d.classList.add('on');
       if(c!=='transparent')$('#bgColor').value=c;clearUnitCache();rerender();};
     w.appendChild(d);
