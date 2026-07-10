@@ -47,6 +47,7 @@
   .credit{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:var(--faint);white-space:nowrap}
   .credit b{color:var(--accent);font-size:12px;letter-spacing:0}
   @media(max-width:760px){.tagline{display:none}}
+  @media(max-width:560px){.chip{display:none}} /* スマホはクレジット(PRODUCED BY M)を優先 */
 
   /* ===== workspace ===== */
   .ws{display:grid;grid-template-columns:318px minmax(0,1fr);gap:0}
@@ -207,6 +208,36 @@
   .exmsg{font-family:var(--mono);font-size:10.5px;color:var(--ok);margin-top:10px;min-height:15px}
   #testout{word-break:break-all;font-size:8px;color:transparent;max-height:8px;overflow:hidden}
 
+  /* ===== スマホ最適化 ===== */
+  /* 固定ミニプレビュー: 本体プレビューが画面外に出たら上部に出る（タップで戻る） */
+  #miniPv{display:none;position:fixed;top:0;left:0;right:0;z-index:60;background:var(--paper);
+    border-bottom:1px solid var(--line);box-shadow:0 10px 24px -14px rgba(43,38,32,.5);cursor:pointer}
+  #miniPv.show{display:block}
+  #miniPv canvas{width:100%;height:76px;display:block}
+  #miniPv .mi{display:flex;align-items:center;gap:8px;padding:3px 12px 5px;font-family:var(--mono);font-size:9.5px;color:var(--faint)}
+  #miniPv .mi b{color:var(--sec);font-family:var(--sans);font-weight:700;font-size:10.5px}
+  #miniPv .mi .up{margin-left:auto;color:var(--accent)}
+  @media(min-width:921px){#miniPv{display:none!important}}
+  @media(max-width:920px){
+    .stage{padding:12px}
+    .previews{gap:14px}
+    .strip{margin-top:14px;padding:14px 16px}
+    .bottom{margin-top:14px;gap:14px}
+    .card{padding:16px 16px}
+    .topbar{padding:0 14px;gap:12px}
+  }
+  /* タッチ端末: つまみ・入力を指サイズに／iOSのフォーカスズーム防止(16px) */
+  @media(pointer:coarse){
+    input[type=range]{height:6px}
+    input[type=range]::-webkit-slider-thumb{width:26px;height:26px}
+    input[type=range]::-moz-range-thumb{width:24px;height:24px}
+    .numin input[type=number]{font-size:16px;width:70px;padding:7px 8px}
+    input[type=color]{width:46px;height:34px}
+    .sw{width:32px;height:32px}
+    .zoomseg button{padding:5px 10px;font-size:11.5px}
+    .tabs button{padding:7px 11px 8px}
+  }
+
   /* TIFF取り込みダイアログ */
   #tiffDlg{display:none;position:fixed;inset:0;background:rgba(43,38,32,.42);z-index:100;align-items:center;justify-content:center;padding:20px}
   #tiffDlg.open{display:flex}
@@ -349,7 +380,7 @@
   <!-- ===== STAGE ===== -->
   <main class="stage">
     <div class="previews">
-      <div class="pv">
+      <div class="pv" id="patCard">
         <div class="h"><span class="no">05</span><span class="t">生地プレビュー</span>
           <div class="htools">
             <div class="tabs" id="patTabs">
@@ -453,6 +484,12 @@
     </div>
     <div id="testout"></div>
   </main>
+</div>
+
+<!-- スマホ用 固定ミニプレビュー -->
+<div id="miniPv">
+  <canvas id="miniCv" width="800" height="152"></canvas>
+  <div class="mi"><b>生地プレビュー</b><span id="miniInfo">—</span><span class="up">▲ 戻る</span></div>
 </div>
 
 <!-- TIFF取り込みモード選択 -->
@@ -1358,6 +1395,15 @@ function renderPattern(){
     ?`取り込みタイル ${state.tileSrc.width}×${state.tileSrc.height}px`
     :`モチーフ ${state.motifs.length}点`;
   $('#unitInfo').textContent=`リピート ${cmW}×${cmH}cm ｜ ${names[state.repeat]}${(state.repeat==='half'||state.repeat==='brick')?' 1/'+state.dropDen:''} ｜ ${tail}`;
+  /* スマホ用の固定ミニプレビューへ複写 */
+  const mc=$('#miniCv');
+  if(mc){
+    const mx2=mc.getContext('2d');
+    const sh=Math.round(cv.width*mc.height/mc.width);
+    mx2.clearRect(0,0,mc.width,mc.height);
+    mx2.drawImage(cv,0,0,cv.width,sh,0,0,mc.width,mc.height);
+    $('#miniInfo').textContent=`${cmW}×${cmH}cm`;
+  }
   updateExportInfo();
 }
 
@@ -2336,6 +2382,16 @@ function wire(){
   };
   $('#save').onclick=()=>alert('【保存（デモ）】設定を保存し、いつでも再編集・再注文できます。');
   $$('input[type=range]').forEach(fill);
+  /* スマホ: 本体プレビューが画面外に出たら固定ミニバーを表示（タップで戻る） */
+  (function(){
+    const mini=$('#miniPv'),card=$('#patCard');
+    if(!mini||!card||!('IntersectionObserver' in window))return;
+    const io=new IntersectionObserver(es=>{
+      mini.classList.toggle('show',window.innerWidth<=920&&!es[0].isIntersecting);
+    },{threshold:0.05});
+    io.observe(card);
+    mini.onclick=()=>card.scrollIntoView({behavior:'smooth',block:'start'});
+  })();
 }
 
 /* ============================================================
@@ -2352,6 +2408,7 @@ function init(){
       if(shot.startsWith('product-')){state.product=shot.slice(8);renderProduct();}
       if(shot==='zoom'){state.prodZoom='zoom';renderProduct();}
       if(shot==='unit'){state.patTab='unit';renderPattern();}
+      if(shot==='mini'){$('#miniPv').classList.add('show');}
       if(shot.startsWith('repeat-')){state.repeat=shot.slice(7);updateArrange();rebuild();}
     },400);
   }
