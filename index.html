@@ -7,23 +7,25 @@
 <title>ガラリエ デザイナー v3｜レクレドール</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Old+Mincho:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   /* ===== Étoffe tokens v3 : 生成りアトリエ ＋ 茜1色 ===== */
   :root{
-    --n1:#fcfaf5; --n2:#f8f4ed; --n3:#f0eadf; --n4:#e8e1d2; --n5:#ded5c3;
-    --n6:#d5cab4; --n7:#c3b79d; --n8:#a89b83; --n9:#8a7e68; --n10:#6f6553;
-    --n11:#564d3e; --n12:#2b2620;
-    --bg:#ece5d7; --surface:#f8f4ed; --canvas:#e6dfd0; --paper:#fcfaf5;
-    --ink:#2b2620; --sec:#564d3e; --muted:#7c715c; --faint:#9a8e77;
-    --line:#ded5c3; --line2:#cabfa6;
-    --accent:#b0673f; --accent-h:#985335; --accent-wash:#f2e8de; --ring:rgba(176,103,63,.30);
-    --ok:#4f7a52; --warn:#8a6a1f; --ng:#9e2e24;
-    --mincho:"Zen Old Mincho","Hiragino Mincho ProN","Yu Mincho",serif;
-    --sans:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
-    --mono:ui-monospace,"SF Mono","Roboto Mono","DejaVu Sans Mono",monospace;
-    --r-xs:7px; --r-sm:11px; --r-md:14px;
-    --sh-card:0 0 0 1px rgba(43,38,32,.05), 0 10px 26px -14px rgba(120,85,50,.45);
+    /* マレファブ準拠パレット（marefab.com 2026-07-10）: 温白×深緑#263a34×ミント#5accab */
+    --n1:#fdfcf8; --n2:#f9f6ef; --n3:#f2eee3; --n4:#e9e4d8; --n5:#e0dcd2;
+    --n6:#cfcabb; --n7:#b8b3a3; --n8:#9a988b; --n9:#7d8078; --n10:#5d675f;
+    --n11:#3d4c44; --n12:#263a34;
+    --bg:#f7f3ed; --surface:#fdfbf6; --canvas:#efece3; --paper:#ffffff;
+    --ink:#263a34; --sec:#3d534a; --muted:#6e7d75; --faint:#96a39b;
+    --line:#e2e0da; --line2:#c8cbc2;
+    --accent:#2fa285; --accent-h:#268a71; --accent-wash:#dff7f0; --ring:rgba(90,204,171,.35);
+    --mint:#5accab;
+    --ok:#2fa285; --warn:#8a6a1f; --ng:#e51010;
+    --mincho:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+    --sans:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+    --mono:"Montserrat",ui-monospace,"SF Mono",monospace;
+    --r-xs:9px; --r-sm:12px; --r-md:16px;
+    --sh-card:0 0 0 1px rgba(38,58,52,.05), 0 10px 26px -14px rgba(38,58,52,.35);
   }
   *{box-sizing:border-box}
   html,body{margin:0}
@@ -185,8 +187,8 @@
   .priceRow .price{font-family:var(--mono);font-size:28px;font-weight:500;color:var(--ink);letter-spacing:-.01em;line-height:1}
   .cta{display:flex;gap:10px;margin-top:16px}
   .cart{flex:1;display:flex;align-items:center;justify-content:center;gap:9px;height:46px;border:0;border-radius:var(--r-xs);
-    background:var(--accent);color:#fff;font-size:14px;font-weight:700;transition:.14s}
-  .cart:hover{background:var(--accent-h)}
+    background:var(--ink);color:#fff;font-size:14px;font-weight:700;transition:.14s}
+  .cart:hover{background:#1d2d28}
   .cart .ic{stroke:#fff;width:17px}
   .save{display:flex;align-items:center;justify-content:center;gap:7px;height:46px;padding:0 16px;border:1px solid var(--line2);border-radius:var(--r-xs);background:var(--n1);color:var(--sec);font-size:12.5px;font-weight:500}
   .save:hover{background:var(--n3)}
@@ -2203,12 +2205,14 @@ function buildRepeatSeg(){
     seg.appendChild(b);
   });
 }
-/* 定番順: 無地系→ベージュ/カーキ（上品・重厚の定番）→くすみ暖色→アース→ブルー系→濃色
-   （需要根拠: 黒・ネイビー・ベージュ・カーキ=大人の定番／彩度を抑えたアースカラー=25-26トレンド） */
-const BG=['transparent','#ffffff','#f4eee1','#e3d7c3','#b7a98e','#8a8259','#e3c2bc','#d98b8b','#c07856','#d9a94e','#a7c1b4','#a9c3d4','#7e93a7','#c7bce6','#33506b','#2b2620'];
-const BG_NAMES={'#ffffff':'ホワイト','#f4eee1':'生成り','#e3d7c3':'ライトベージュ','#b7a98e':'グレージュ','#8a8259':'カーキ',
-  '#e3c2bc':'くすみピンク','#d98b8b':'ローズ','#c07856':'テラコッタ','#d9a94e':'マスタード','#a7c1b4':'セージ',
-  '#a9c3d4':'サックス','#7e93a7':'ダスティブルー','#c7bce6':'ラベンダー','#33506b':'ネイビー','#2b2620':'スミクロ'};
+/* アパレル定番・人気カラー順: 無地系→ベージュ/グレー→カーキ/オリーブ/ブラウン→
+   くすみ暖色（ピンク/テラコッタ/ボルドー/マスタード）→ミント/サックス/ラベンダー→濃色 */
+const BG=['transparent','#ffffff','#f2ecdf','#e3d4b9','#b9b9b9','#4a4a4a','#8a8259','#5b6247','#6b4a35',
+  '#e6c3bc','#c07856','#7b2d3b','#d9a94e','#9fd4c0','#a9c3d4','#b9aed3','#2e3a54','#26221e'];
+const BG_NAMES={'#ffffff':'ホワイト','#f2ecdf':'アイボリー（生成り）','#e3d4b9':'ベージュ','#b9b9b9':'杢グレー','#4a4a4a':'チャコール',
+  '#8a8259':'カーキ','#5b6247':'オリーブ','#6b4a35':'ブラウン','#e6c3bc':'くすみピンク','#c07856':'テラコッタ',
+  '#7b2d3b':'ボルドー','#d9a94e':'マスタード','#9fd4c0':'ミント','#a9c3d4':'サックスブルー','#b9aed3':'ラベンダー',
+  '#2e3a54':'ネイビー','#26221e':'ブラック'};
 function buildSwatchUI(){
   const w=$('#swatches');w.innerHTML='';
   BG.forEach(c=>{
