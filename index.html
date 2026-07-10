@@ -2475,7 +2475,7 @@ function wire(){
     renderPattern();});
   $$('#prodTabs button').forEach(b=>b.onclick=()=>{state.product=b.dataset.prod;$$('#prodTabs button').forEach(x=>x.classList.toggle('on',x===b));renderProduct();});
   $$('#prodZoomSeg button').forEach(b=>b.onclick=()=>{state.prodZoom=b.dataset.z;$$('#prodZoomSeg button').forEach(x=>x.classList.toggle('on',x===b));renderProduct();});
-  if(document.getElementById('exTif')){ // 社内スタジオ（公開版には存在しない）
+  if(document.getElementById('exTif')){ // 入稿ツールUIがある場合のみ（公開版には存在しない）
     $$('#dpiSeg button').forEach(b=>b.onclick=()=>{state.dpi=+b.dataset.dpi;$$('#dpiSeg button').forEach(x=>x.classList.toggle('on',x===b));updateExportInfo();});
     $('#exTif').onclick=()=>{
       $('#exMsg').textContent='生成中…（高解像度のため数秒かかることがあります）';
