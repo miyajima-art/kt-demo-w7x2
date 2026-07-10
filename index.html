@@ -223,16 +223,27 @@
 </style>
 </head>
 <body>
+<div id="ktGate" style="position:fixed;inset:0;z-index:9999;background:#ece5d7;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fcfaf5;border:1px solid #ded5c3;border-radius:14px;padding:28px;max-width:340px;width:100%;box-shadow:0 20px 50px -20px rgba(43,38,32,.4);font-family:'Hiragino Sans','Yu Gothic',sans-serif">
+    <div style="font-size:9px;letter-spacing:.3em;color:#9a8e77">L E C R E D O R</div>
+    <div style="font-family:'Hiragino Mincho ProN',serif;font-size:19px;margin:4px 0 14px;color:#2b2620">着るタイル デザイナー</div>
+    <label style="display:block;font-size:12px;color:#7c715c;margin-bottom:6px">合言葉を入力してください</label>
+    <input id="ktGateIn" type="text" autocomplete="off" style="width:100%;box-sizing:border-box;border:1px solid #cabfa6;border-radius:7px;padding:10px 12px;font-size:16px;background:#fff">
+    <button id="ktGateBtn" style="width:100%;margin-top:10px;height:42px;border:0;border-radius:7px;background:#b0673f;color:#fff;font-size:14px;font-weight:700;cursor:pointer">開く</button>
+    <div id="ktGateMsg" style="font-size:11px;color:#9e2e24;margin-top:8px;min-height:14px"></div>
+  </div>
+</div>
 <script>
 (function(){
-  var KEY='kt_gate_ok',PASS='きるたいる';
-  if(sessionStorage.getItem(KEY)==='1')return;
-  for(var i=0;i<3;i++){
-    var v=prompt('合言葉を入力してください');
-    if(v===null)break;
-    if(v&&v.trim()===PASS){sessionStorage.setItem(KEY,'1');return;}
-  }
-  document.write('<style>body *{display:none!important}</style><p style="font-family:sans-serif;padding:40px;display:block!important">このページの閲覧には合言葉が必要です。再読み込みしてやり直してください。</p>');
+  var KEY='kt_gate_ok',PASS='きるたいる',g=document.getElementById('ktGate');
+  if(sessionStorage.getItem(KEY)==='1'){g.remove();return;}
+  var ok=function(){
+    var v=(document.getElementById('ktGateIn').value||'').trim();
+    if(v===PASS){sessionStorage.setItem(KEY,'1');g.remove();}
+    else document.getElementById('ktGateMsg').textContent='合言葉が違います';
+  };
+  document.getElementById('ktGateBtn').addEventListener('click',ok);
+  document.getElementById('ktGateIn').addEventListener('keydown',function(e){if(e.key==='Enter')ok();});
 })();
 </script>
 
