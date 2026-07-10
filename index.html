@@ -1763,8 +1763,7 @@ function drawBolt(ctx,ppcm){
 
 function renderProduct(){
   const cv=$('#productCv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
-  ctx.clearRect(0,0,W,H);
-  if(!state.layout)return;
+  ctx.clearRect(0,0,W,H); // レイアウト未定でも無地の製品を描く（patFor→renderUnitがnullを返し柄なしになる）
   const off=makeCanvas(DS_W,DS_H),octx=off.getContext('2d');
   octx.imageSmoothingQuality='high';
   /* 製品ごとの px/cm（実寸感の基準: Tシャツ身幅52cm≒画面456px） */
@@ -1879,6 +1878,7 @@ function tileName(ext){
   return `gararie_${state.repeat}${(state.repeat==='half'||state.repeat==='brick')?'1-'+state.dropDen:''}_${(lay.UW*state.sizeCm).toFixed(1)}x${(lay.UH*state.sizeCm).toFixed(1)}cm_${state.dpi}dpi.${ext}`;
 }
 function updateExportInfo(){
+  if(!document.getElementById('exTif'))return; // 公開版はスタジオUIなし
   const lay=state.layout;if(!lay)return;
   const dpi=state.dpi,ppu=state.sizeCm/2.54*dpi;
   const w=Math.round(lay.UW*ppu),h=Math.round(lay.UH*ppu);
@@ -2459,33 +2459,35 @@ function wire(){
     renderPattern();});
   $$('#prodTabs button').forEach(b=>b.onclick=()=>{state.product=b.dataset.prod;$$('#prodTabs button').forEach(x=>x.classList.toggle('on',x===b));renderProduct();});
   $$('#prodZoomSeg button').forEach(b=>b.onclick=()=>{state.prodZoom=b.dataset.z;$$('#prodZoomSeg button').forEach(x=>x.classList.toggle('on',x===b));renderProduct();});
-  $$('#dpiSeg button').forEach(b=>b.onclick=()=>{state.dpi=+b.dataset.dpi;$$('#dpiSeg button').forEach(x=>x.classList.toggle('on',x===b));updateExportInfo();});
-  $('#exTif').onclick=()=>{
-    $('#exMsg').textContent='生成中…（高解像度のため数秒かかることがあります）';
-    setTimeout(()=>{
-      try{
+  if(document.getElementById('exTif')){ // 社内スタジオ（公開版には存在しない）
+    $$('#dpiSeg button').forEach(b=>b.onclick=()=>{state.dpi=+b.dataset.dpi;$$('#dpiSeg button').forEach(x=>x.classList.toggle('on',x===b));updateExportInfo();});
+    $('#exTif').onclick=()=>{
+      $('#exMsg').textContent='生成中…（高解像度のため数秒かかることがあります）';
+      setTimeout(()=>{
+        try{
+          const t=buildPrintTile(state.dpi);
+          if(!t){$('#exMsg').textContent='生成できませんでした（サイズ超過）';return;}
+          const r=encodeTiff(t.w,t.h,t.rgb,state.dpi);
+          download(r.blob,tileName('tif'));
+          $('#exMsg').textContent=`✓ 書き出しました ${t.w}×${t.h}px ${(r.bytes/1048576).toFixed(1)}MB（${r.usePB?'PackBits圧縮':'無圧縮'}）`;
+        }catch(err){$('#exMsg').textContent='エラー: '+err.message;}
+      },30);
+    };
+    $('#exPng').onclick=()=>{
+      $('#exMsg').textContent='生成中…';
+      setTimeout(()=>{
         const t=buildPrintTile(state.dpi);
         if(!t){$('#exMsg').textContent='生成できませんでした（サイズ超過）';return;}
-        const r=encodeTiff(t.w,t.h,t.rgb,state.dpi);
-        download(r.blob,tileName('tif'));
-        $('#exMsg').textContent=`✓ 書き出しました ${t.w}×${t.h}px ${(r.bytes/1048576).toFixed(1)}MB（${r.usePB?'PackBits圧縮':'無圧縮'}）`;
-      }catch(err){$('#exMsg').textContent='エラー: '+err.message;}
-    },30);
-  };
-  $('#exPng').onclick=()=>{
-    $('#exMsg').textContent='生成中…';
-    setTimeout(()=>{
-      const t=buildPrintTile(state.dpi);
-      if(!t){$('#exMsg').textContent='生成できませんでした（サイズ超過）';return;}
-      const c=makeCanvas(t.w,t.h),x=c.getContext('2d'),im=x.createImageData(t.w,t.h);
-      for(let p=0,q=0;q<t.rgb.length;p+=4,q+=3){im.data[p]=t.rgb[q];im.data[p+1]=t.rgb[q+1];im.data[p+2]=t.rgb[q+2];im.data[p+3]=255;}
-      x.putImageData(im,0,0);
-      c.toBlob(b=>{
-        if(!b){$('#exMsg').textContent='PNG生成に失敗しました（タイルが大きすぎる可能性）';return;}
-        download(b,tileName('png'));$('#exMsg').textContent='✓ PNGを書き出しました';
-      },'image/png');
-    },30);
-  };
+        const c=makeCanvas(t.w,t.h),x=c.getContext('2d'),im=x.createImageData(t.w,t.h);
+        for(let p=0,q=0;q<t.rgb.length;p+=4,q+=3){im.data[p]=t.rgb[q];im.data[p+1]=t.rgb[q+1];im.data[p+2]=t.rgb[q+2];im.data[p+3]=255;}
+        x.putImageData(im,0,0);
+        c.toBlob(b=>{
+          if(!b){$('#exMsg').textContent='PNG生成に失敗しました（タイルが大きすぎる可能性）';return;}
+          download(b,tileName('png'));$('#exMsg').textContent='✓ PNGを書き出しました';
+        },'image/png');
+      },30);
+    };
+  }
   /* 販売MVP: 無料保存・レシピ・購入 */
   $('#dlPattern').onclick=dlPatternJpg;
   $('#dlMock').onclick=dlMockJpg;
