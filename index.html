@@ -377,7 +377,6 @@
         <label class="lb" style="margin-top:13px">すき間に散らす背景モチーフ</label>
         <div class="segline" id="fillerSeg">
           <button data-f="none" class="on"><span class="sans">なし</span></button>
-          <button data-f="paw"><span class="sans">肉球</span></button>
           <button data-f="motif"><span class="sans">モチーフから</span></button>
           <button data-f="upload"><span class="sans">絵をアップ</span></button>
         </div>
@@ -401,6 +400,7 @@
           <div class="range"><input type="range" id="size" min="2" max="20" step="0.5" value="7"></div>
           <div class="sub"><span class="val num" id="sizeV" style="text-align:left">7<small>cm・中</small></span>
             <span class="numin"><input type="number" id="sizeN" min="2" max="20" step="0.5" value="7"><span class="unit">cm</span></span></div>
+          <div class="mini" id="sizeGuard" style="display:none;color:var(--warn);margin-top:4px"></div>
         </div>
         <div class="c">
           <label class="lb"><svg class="ic" viewBox="0 0 24 24"><circle cx="6" cy="6" r="1"/><circle cx="12" cy="6" r="1"/><circle cx="18" cy="6" r="1"/><circle cx="6" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="18" cy="12" r="1"/><circle cx="6" cy="18" r="1"/><circle cx="12" cy="18" r="1"/><circle cx="18" cy="18" r="1"/></svg>密度（詰まり具合）</label>
@@ -743,6 +743,83 @@ function drawStampRing(size,color,seed){
   return c;
 }
 
+/* レトロチェリー: さくらんぼ2粒＋茎＋葉 */
+function drawCherry(size,seed){
+  const c=makeCanvas(size,size),x=c.getContext('2d'),rnd=mulberry32(seed);
+  x.translate(size/2,size*0.06);x.lineCap='round';
+  x.strokeStyle='#5b6247';x.lineWidth=size*0.045;
+  x.beginPath();x.moveTo(0,size*0.06);x.quadraticCurveTo(-size*0.16,size*0.34,-size*0.20,size*0.58);x.stroke();
+  x.beginPath();x.moveTo(0,size*0.06);x.quadraticCurveTo(size*0.19,size*0.30,size*0.22,size*0.52);x.stroke();
+  x.save();x.translate(size*0.05,size*0.10);x.rotate(0.55);
+  x.fillStyle='#8fa98f';x.beginPath();x.ellipse(0,size*0.10,size*0.075,size*0.16,0,0,TAU);x.fill();x.restore();
+  const berry=(bx,by,r)=>{
+    x.fillStyle='#b5495b';wobblyPath(x,bx,by,r,8,0.06,rnd);x.fill();
+    x.fillStyle='rgba(255,255,255,.35)';x.beginPath();x.arc(bx-r*0.3,by-r*0.32,r*0.2,0,TAU);x.fill();
+  };
+  berry(-size*0.20,size*0.66,size*0.155);
+  berry(size*0.22,size*0.60,size*0.14);
+  return c;
+}
+/* ツバメ（シルエット・翼と燕尾） */
+function drawSwallow(size,color,seed){
+  const c=makeCanvas(size,size),x=c.getContext('2d');
+  x.translate(size*0.5,size*0.52);x.scale(size/100,size/100);
+  x.fillStyle=color;
+  x.beginPath();
+  x.moveTo(-44,-2);
+  x.quadraticCurveTo(-36,-14,-20,-16);
+  x.quadraticCurveTo(-2,-18,10,-30);
+  x.quadraticCurveTo(24,-42,40,-44);
+  x.quadraticCurveTo(26,-26,20,-12);
+  x.quadraticCurveTo(32,-2,46,16);
+  x.quadraticCurveTo(30,10,18,10);
+  x.quadraticCurveTo(24,22,22,34);
+  x.quadraticCurveTo(12,20,2,14);
+  x.quadraticCurveTo(-18,8,-32,4);
+  x.quadraticCurveTo(-40,2,-44,-2);
+  x.closePath();x.fill();
+  /* 目（地色の点） */
+  x.globalCompositeOperation='destination-out';
+  x.beginPath();x.arc(-33,-7,2.4,0,TAU);x.fill();
+  x.globalCompositeOperation='source-over';
+  return c;
+}
+/* ミモザの枝（黄のポンポン＋細葉） */
+function drawMimosa(size,seed){
+  const c=makeCanvas(size,size),x=c.getContext('2d'),rnd=mulberry32(seed);
+  x.lineCap='round';
+  x.strokeStyle='#7a8a6f';x.lineWidth=size*0.022;
+  x.beginPath();x.moveTo(size*0.14,size*0.88);x.quadraticCurveTo(size*0.42,size*0.60,size*0.82,size*0.16);x.stroke();
+  for(const[u,v,du,dv] of [[0.34,0.68,0.10,-0.14],[0.46,0.55,0.12,-0.10],[0.58,0.42,0.10,-0.13],[0.70,0.30,0.11,-0.08]]){
+    x.beginPath();x.moveTo(size*u,size*v);x.quadraticCurveTo(size*(u+du*0.5),size*(v+dv*0.8),size*(u+du),size*(v+dv));x.stroke();
+  }
+  x.strokeStyle='#8fa98f';x.lineWidth=size*0.013;
+  for(const[u,v,a] of [[0.30,0.74,-0.9],[0.52,0.52,-1.0],[0.72,0.34,-0.8]]){
+    x.save();x.translate(size*u,size*v);x.rotate(a);
+    for(let i=-3;i<=3;i++){x.beginPath();x.moveTo(0,i*size*0.022);x.lineTo(size*0.07,i*size*0.022+size*0.012*Math.sign(i));x.stroke();}
+    x.restore();
+  }
+  x.fillStyle='#d9a94e';
+  for(const[u,v] of [[0.40,0.50],[0.47,0.60],[0.52,0.40],[0.60,0.48],[0.63,0.30],[0.70,0.40],[0.76,0.20],[0.82,0.30],[0.88,0.22],[0.33,0.60]]){
+    const r=size*(0.05+rnd()*0.022);
+    x.globalAlpha=0.92;wobblyPath(x,size*u,size*v,r,7,0.16,rnd);x.fill();
+    x.globalAlpha=0.45;x.beginPath();x.arc(size*u+r*0.25,size*v-r*0.25,r*0.5,0,TAU);x.fill();
+  }
+  x.globalAlpha=1;
+  return c;
+}
+/* 絞りドット（藍・中心が白く抜ける鹿の子風） */
+function drawMame(size,seed){
+  const c=makeCanvas(size,size),x=c.getContext('2d'),rnd=mulberry32(seed);
+  x.translate(size/2,size/2);
+  x.fillStyle='#2e3a54';
+  wobblyPath(x,0,0,size*0.36,10,0.09,rnd);x.fill();
+  x.globalCompositeOperation='destination-out';
+  x.globalAlpha=0.9;wobblyPath(x,0,0,size*0.12,8,0.35,rnd);x.fill();
+  x.globalAlpha=1;x.globalCompositeOperation='source-over';
+  return c;
+}
+
 const PRESETS={
   matisse:{name:'マティスリーフ', bg:'#f2ecdf', repeat:'toss', dropDen:2, sizeCm:7, density:52, rot:180,
     make:px=>[
@@ -764,6 +841,23 @@ const PRESETS={
       {hi:p=>drawStampCross(p,'#33506b',41)},
       {hi:p=>drawStampRing(p,'#c98d7e',42)},
     ]},
+  cherry:{name:'レトロチェリー', bg:'#f2ecdf', repeat:'toss', dropDen:2, sizeCm:5, density:50, rot:160,
+    make:px=>[
+      {hi:p=>drawCherry(p,51)},
+    ]},
+  swallow:{name:'ツバメ', bg:'#f2ecdf', repeat:'half', dropDen:2, sizeCm:6.5, density:52, rot:6, arrange:'checker',
+    make:px=>[
+      {hi:p=>drawSwallow(p,'#33506b',61)},
+      {hi:p=>drawSwallow(p,'#c98d7e',62)},
+    ]},
+  mimosa:{name:'ミモザ', bg:'#f2ecdf', repeat:'brick', dropDen:2, sizeCm:9, density:62, rot:5,
+    make:px=>[
+      {hi:p=>drawMimosa(p,71)},
+    ]},
+  mame:{name:'絞りドット', bg:'#f2ecdf', repeat:'full', dropDen:2, sizeCm:2.5, density:52, rot:0,
+    make:px=>[
+      {hi:p=>drawMame(p,81)},
+    ]},
 };
 
 /* モチーフ取得（hiキャッシュ付き）。_expensive(アップ画像の原寸切り抜き)は印刷時のみhiを使う */
@@ -774,6 +868,32 @@ function motifCanvas(m,px,forPrint){
   m._hiCache=m._hiCache||{};
   if(!m._hiCache[key])m._hiCache[key]=m.hi(key);
   return m._hiCache[key];
+}
+
+/* ---- プリント解像度ガード ----
+   拡大しすぎ＝印刷でぼやける事故を構造的に防ぐ。基準: 実寸150dpi以上。
+   ベクター見本柄は無制限（描き直せる）／アップ絵・TIFFは元データの画素数が上限 */
+const PRINT_MIN_DPI=150;
+function applySizeGuard(){
+  const tile=state.mode==='tile';
+  const hard=tile?120:20;
+  const px=tile?(state.tileSrc?Math.max(state.tileSrc.canvas.width,state.tileSrc.canvas.height):Infinity)
+               :(state.srcPxMax||Infinity);
+  let cap=hard;
+  if(isFinite(px))cap=Math.max(2,Math.min(hard,Math.floor(px*2.54/PRINT_MIN_DPI*2)/2));
+  $('#size').max=cap;$('#sizeN').max=cap;
+  const g=$('#sizeGuard');
+  if(g){
+    g.style.display=cap<hard?'block':'none';
+    if(cap<hard)g.textContent='この絵の解像度では最大 '+cap+'cm まで（プリント品質150dpiを守るための上限です）';
+  }
+  if(state.sizeCm>cap){
+    state.sizeCm=cap;
+    $('#size').value=cap;$('#sizeN').value=cap;
+    $('#sizeV').innerHTML=cap+'<small>cm・'+(tile?'タイル幅':sizeLabel(cap))+'</small>';
+    clearUnitCache();rebuild();
+  }
+  fill($('#size'));
 }
 
 /* ============================================================
@@ -2037,6 +2157,13 @@ function recut(){
     return m;
   };
   state.motifs=parts.length?parts.map(p=>mk(p.canvas,p.rect)):[mk(res.canvas,null)];
+  /* 解像度ガード用: 最大モチーフの原寸換算px（レイアウトはsizeCm=最大モチーフの長辺） */
+  {
+    const scaleF=(state.rawFull&&state.raw)?Math.max(state.rawFull.width,state.rawFull.height)/Math.max(state.raw.width,state.raw.height):1;
+    const longest=parts.length?Math.max(...parts.map(pp=>Math.max(pp.rect.x1-pp.rect.x0,pp.rect.y1-pp.rect.y0))):Math.max(res.canvas.width,res.canvas.height);
+    state.srcPxMax=Math.round(longest*scaleF);
+    applySizeGuard();
+  }
   const cc=$('#cutCv'),x=cc.getContext('2d');
   x.clearRect(0,0,cc.width,cc.height);
   const cut=res.canvas,s=Math.min(cc.width/cut.width,cc.height/cut.height)*0.92,dw=cut.width*s,dh=cut.height*s;
@@ -2117,6 +2244,7 @@ function updateModeUI(){
     $('#'+id).closest('.c').style.opacity=tile?0.42:1;
   }
   $('#size').max=tile?120:20;$('#sizeN').max=tile?120:20;
+  applySizeGuard();
   if(!tile&&state.sizeCm>20){ // タイルモードの大きなcmを持ち越さない
     state.sizeCm=20;$('#size').value=20;$('#sizeN').value=20;
     $('#sizeV').innerHTML='20<small>cm・大柄</small>';fill($('#size'));
@@ -2202,6 +2330,7 @@ function applyPreset(key){
   state.sample=key;state.rawFull=null;state.raw=null;
   state.mode='motif';state.tileSrc=null;updateModeUI();
   state.motifs=P.make().map(m=>({pv:m.hi(240),hi:m.hi}));
+  state.srcPxMax=Infinity;applySizeGuard();
   state.repeat=P.repeat;state.dropDen=P.dropDen||2;
   state.sizeCm=P.sizeCm;state.density=P.density;state.rot=P.rot;
   state.bg=P.bg;state.filler={type:'none',motifIdx:-1,motif:null};
@@ -2430,7 +2559,7 @@ async function loadRecipe(obj){
     bg:p.bg??state.bg,seed:p.seed??state.seed,fillerScale:p.fillerScale??30,
     product:(p.product in PRODUCTS)?p.product:'tshirt'});
   if(p.filler){
-    state.filler={type:p.filler.type||'none',motifIdx:p.filler.motifIdx??-1,motif:null};
+    state.filler={type:(p.filler.type==='paw'?'none':p.filler.type)||'none',motifIdx:p.filler.motifIdx??-1,motif:null};
     if(p.filler.type==='upload'&&obj.fillerImg){state.filler.motif={pv:await dataUrlToCanvas(obj.fillerImg)};}
     if(p.filler.type==='upload'&&!obj.fillerImg)state.filler={type:'none',motifIdx:-1,motif:null};
   }
@@ -2809,8 +2938,7 @@ function init(){
       state.repeat='toss';
       $$('#repeatSeg button').forEach(b=>b.classList.toggle('on',b.dataset.id==='toss'));
       $('#tossOpts').style.display='block';$('#dropRow').style.display='none';
-      if(fl==='paw')state.filler={type:'paw',motifIdx:-1,motif:null};
-      else if(fl.startsWith('motif')&&state.motifs.length>1){
+      if(fl.startsWith('motif')&&state.motifs.length>1){
         const idx=+(fl.split(':')[1]??(state.motifs.length-1));
         state.filler={type:'motif',motifIdx:Math.min(idx,state.motifs.length-1),motif:null};
       }
