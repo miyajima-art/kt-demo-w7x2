@@ -190,6 +190,21 @@
     background:var(--ink);color:#fff;font-size:14px;font-weight:700;transition:.14s}
   .cart:hover{background:#1d2d28}
   .cart .ic{stroke:#fff;width:17px}
+  /* 購入カード: 2択セグメント＋生地セレクタ */
+  .buyseg{display:flex;gap:6px;margin:4px 0 12px}
+  .buyseg button{flex:1;height:38px;border:1.5px solid var(--line);border-radius:var(--r-xs);background:var(--n1);font-size:13px;color:var(--muted);font-weight:600;transition:.13s}
+  .buyseg button.on{border-color:var(--accent);background:var(--accent-wash);color:var(--ink)}
+  .buyrow{display:flex;align-items:center;gap:12px;margin-top:10px}
+  .buyrow .k2{font-size:12px;color:var(--muted);min-width:34px}
+  .fabsel{flex:1;height:40px;border:1px solid var(--line2);border-radius:var(--r-xs);background:var(--paper);padding:0 10px;font-size:13px;color:var(--ink)}
+  .mqty{display:flex;align-items:center;gap:4px}
+  .mqty button{width:36px;height:36px;border:1px solid var(--line2);background:var(--n1);border-radius:var(--r-xs);font-size:17px;color:var(--ink)}
+  .mqty button:hover{border-color:var(--accent)}
+  .mqty #mVal{min-width:40px;text-align:center;font-size:16px}
+  .munit{font-size:12px;color:var(--muted)}
+  .rep{cursor:pointer}
+  .rep span{font-size:12px;color:var(--muted);line-height:1.5}
+  .rep input{accent-color:var(--accent);width:16px;height:16px;flex:none}
   .save{display:flex;align-items:center;justify-content:center;gap:7px;height:46px;padding:0 16px;border:1px solid var(--line2);border-radius:var(--r-xs);background:var(--n1);color:var(--sec);font-size:12.5px;font-weight:500}
   .save:hover{background:var(--n3)}
   .save .ic{width:15px;stroke:var(--muted)}
@@ -437,22 +452,54 @@
       </div>
 
       <div class="card">
-        <h2><span class="no">09</span><span class="t">印刷データを購入</span></h2>
-        <div class="demo">プロ用の入稿データ（実寸TIFF）をお届け。ご自身の作品づくり・販売にも使えます</div>
-        <div class="priceRow" style="margin-top:6px">
-          <span class="lab">1デザイン・買い切り</span>
-          <span class="price num" id="buyPrice">¥1,000</span>
+        <h2><span class="no">09</span><span class="t">購入する</span></h2>
+        <div class="buyseg" id="buySeg">
+          <button data-mode="print" class="on">生地にプリント</button>
+          <button data-mode="data">データのみ</button>
         </div>
-        <div class="exgrid" style="margin-top:12px">
-          <span class="k">内容</span><span class="v" style="font-family:var(--sans)">実寸・シームレスの印刷用データ（TIFF）</span>
-          <span class="k">つかいみち</span><span class="v" style="font-family:var(--sans)">生地プリント入稿・自作品の制作/販売 OK</span>
-          <span class="k">おやくそく</span><span class="v" style="font-family:var(--sans)">データそのものの再配布・転売はNG</span>
+        <!-- 生地にプリント -->
+        <div id="buyPrint">
+          <div class="demo">あなたのデザインを生地にプリントしてお届け。ご注文は<b>5m以上・1m単位</b>（生地幅150cm／プリント有効幅130cm）</div>
+          <div class="buyrow">
+            <span class="k2">生地</span>
+            <select id="fabSel" class="fabsel"></select>
+          </div>
+          <div class="buyrow">
+            <span class="k2">長さ</span>
+            <div class="mqty">
+              <button id="mMinus" type="button">−</button>
+              <span class="num" id="mVal">5</span><span class="munit">m</span>
+              <button id="mPlus" type="button">＋</button>
+            </div>
+          </div>
+          <label class="buyrow rep"><input type="checkbox" id="repChk"><span>このデザインは注文したことがある（2回目以降＝データ登録費なし）</span></label>
+          <div class="priceRow" style="margin-top:10px">
+            <span class="lab" id="printCalc">生地 ¥1,580×5m ＋ データ登録 ¥500</span>
+            <span class="price num" id="printTotal">¥8,400</span>
+          </div>
+          <div class="note" style="margin-top:2px">送料 全国一律¥700（カートで加算）。アパレル残反使用のため生地耳等に汚れがある場合がありますが、プリント部分に問題がないものをお届けします。</div>
+          <div class="cta">
+            <button class="cart" id="buyPrintBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M6 2 3 6v13a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>生地プリントを注文</button>
+          </div>
         </div>
-        <div class="cta">
-          <button class="cart" id="buyBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M6 2 3 6v13a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>購入する</button>
+        <!-- データのみ -->
+        <div id="buyData" style="display:none">
+          <div class="demo">プロ用の入稿データ（実寸TIFF）をお届け。ご自身の作品づくり・販売にも使えます</div>
+          <div class="priceRow" style="margin-top:6px">
+            <span class="lab">1デザイン・買い切り</span>
+            <span class="price num" id="buyPrice">¥1,000</span>
+          </div>
+          <div class="exgrid" style="margin-top:12px">
+            <span class="k">内容</span><span class="v" style="font-family:var(--sans)">実寸・シームレスの印刷用データ（TIFF）</span>
+            <span class="k">つかいみち</span><span class="v" style="font-family:var(--sans)">生地プリント入稿・自作品の制作/販売 OK</span>
+            <span class="k">おやくそく</span><span class="v" style="font-family:var(--sans)">データそのものの再配布・転売はNG</span>
+          </div>
+          <div class="cta">
+            <button class="cart" id="buyBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M6 2 3 6v13a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>データを購入</button>
+          </div>
         </div>
         <div class="exmsg" id="buyMsg"></div>
-        <div class="note">アップロードした絵の権利はお客様自身が持つものに限ります。購入後、ガラリエで生地を注文する際は¥1,000を割引予定。</div>
+        <div class="note">アップロードした絵の権利はお客様自身が持つものに限ります。デザインの登録は初回のみ（プリント注文と同時なら¥500／データのみ購入なら¥1,000）。以後は同じデザインで何度でも生地代のみで追加注文できます。</div>
       </div>
     </div>
 
@@ -2515,30 +2562,73 @@ function wire(){
     try{await loadRecipe(JSON.parse(await f.text()));}
     catch(err){alert('レシピを読み込めませんでした：'+err.message);}
   };
+  /* 販売: 生地プリント（本命）／データのみ */
+  const FABRICS=[
+    {v:'45843553026108',name:'スーピマコットン平織',price:1580},
+    {v:'45843553681468',name:'スビン天竺ニット',price:1980},
+    {v:'45843553714236',name:'スレキ',price:1580},
+    {v:'45843553747004',name:'コットンテンセルローン',price:1580},
+    {v:'45843553779772',name:'綿ポリ接触冷感ニット天竺',price:1980},
+  ];
+  const DATAFEE_VARIANT='45843552731196',DATAFEE=500,MIN_M=5;
+  const SHOP_BASE='https://rekuredool.myshopify.com';
+  let meters=MIN_M;
+  const fabSel=$('#fabSel');
+  FABRICS.forEach((f,i)=>{const o=document.createElement('option');o.value=i;o.textContent=f.name+'（¥'+f.price.toLocaleString()+'/m）';fabSel.appendChild(o);});
+  function calcPrint(){
+    const f=FABRICS[+fabSel.value],rep=$('#repChk').checked;
+    const total=f.price*meters+(rep?0:DATAFEE);
+    $('#mVal').textContent=meters;
+    $('#printCalc').textContent='生地 ¥'+f.price.toLocaleString()+'×'+meters+'m'+(rep?'':' ＋ データ登録 ¥'+DATAFEE);
+    $('#printTotal').textContent='¥'+total.toLocaleString();
+  }
+  fabSel.onchange=calcPrint;
+  $('#repChk').onchange=calcPrint;
+  $('#mMinus').onclick=()=>{if(meters>MIN_M){meters--;calcPrint();}};
+  $('#mPlus').onclick=()=>{meters++;calcPrint();};
+  calcPrint();
+  $$('#buySeg button').forEach(b=>b.onclick=()=>{
+    $$('#buySeg button').forEach(x=>x.classList.toggle('on',x===b));
+    $('#buyPrint').style.display=b.dataset.mode==='print'?'':'none';
+    $('#buyData').style.display=b.dataset.mode==='data'?'':'none';
+  });
+  function saveRecipeWithCode(){ /* レシピ保存＋照合コード（共通） */
+    const r=buildRecipe(),js=JSON.stringify(r),code=designCode(js);
+    download(new Blob([js],{type:'application/json'}),'gararie_'+code+'.gararie');
+    return code;
+  }
+  function cartAttrs(code){
+    const q=new URLSearchParams();
+    q.set('attributes[デザインコード]',code);
+    q.set('attributes[柄サイズ]',state.sizeCm+'cm');
+    q.set('attributes[リピート]',state.mode==='tile'?'既存データ':state.repeat+(state.repeat!=='straight'&&state.dropDen?' 1/'+state.dropDen:''));
+    return q;
+  }
   $('#buyPrice').textContent='¥'+PRICE_JPY.toLocaleString();
-  $('#buyBtn').onclick=()=>{
+  $('#buyBtn').onclick=()=>{ /* データのみ ¥1,000 */
     if(!PURCHASE_URL){
       $('#buyMsg').textContent='オンライン決済は準備中です。「レシピを保存」してお待ちください（オープン時にそのまま購入できます）';
       dlRecipe();return;
     }
-    /* ① レシピをコード付きファイル名で保存（照合キー） */
     let code='';
-    try{
-      const r=buildRecipe(),js=JSON.stringify(r);
-      code=designCode(js);
-      download(new Blob([js],{type:'application/json'}),'gararie_'+code+'.gararie');
-    }catch(e){$('#buyMsg').textContent='レシピ生成に失敗: '+e.message;return;}
-    /* ② Shopifyカートへ（/cart/形式なら注文属性にコードと柄情報を添付） */
+    try{code=saveRecipeWithCode();}
+    catch(e){$('#buyMsg').textContent='レシピ生成に失敗: '+e.message;return;}
     let url=PURCHASE_URL;
-    if(/\/cart\//.test(url)){
-      const q=new URLSearchParams();
-      q.set('attributes[デザインコード]',code);
-      q.set('attributes[柄サイズ]',state.sizeCm+'cm');
-      q.set('attributes[リピート]',state.mode==='tile'?'既存データ':state.repeat+(state.repeat!=='straight'&&state.dropDen?' 1/'+state.dropDen:''));
-      url+=(url.includes('?')?'&':'?')+q.toString();
-    }
+    if(/\/cart\//.test(url))url+=(url.includes('?')?'&':'?')+cartAttrs(code).toString();
     $('#buyMsg').textContent='✓ レシピ（'+code+'.gararie）を保存しました。決済画面が開きます — 注文にはデザインコード '+code+' が自動で付きます';
     window.open(url,'_blank');
+  };
+  $('#buyPrintBtn').onclick=()=>{ /* 生地プリント（初回=データ登録¥500込み／リピート=生地代のみ） */
+    let code='';
+    try{code=saveRecipeWithCode();}
+    catch(e){$('#buyMsg').textContent='レシピ生成に失敗: '+e.message;return;}
+    const f=FABRICS[+fabSel.value],rep=$('#repChk').checked;
+    const items=f.v+':'+meters+(rep?'':','+DATAFEE_VARIANT+':1');
+    const q=cartAttrs(code);
+    q.set('attributes[注文タイプ]',rep?'リピート（登録済みデザイン）':'初回（データ登録込み）');
+    q.set('attributes[生地]',f.name+' '+meters+'m');
+    $('#buyMsg').textContent='✓ レシピ（'+code+'.gararie）を保存しました。カートが開きます — デザインコード '+code+' が注文に付きます';
+    window.open(SHOP_BASE+'/cart/'+items+'?'+q.toString(),'_blank');
   };
   $$('input[type=range]').forEach(fill);
   /* スマホ: 本体プレビューもヘッダーも見えていない間だけ固定ミニバーを表示（タップで移動） */
