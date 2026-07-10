@@ -30,7 +30,7 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0}
-  html,body{overflow-x:hidden;max-width:100%}
+  html,body{overflow-x:hidden;overflow-x:clip;max-width:100%}
   body{font-family:var(--sans);color:var(--ink);line-height:1.6;background:var(--bg);
     font-size:14.5px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
   button,input{font-family:inherit;color:inherit}
@@ -171,6 +171,10 @@
 
   /* bottom cards */
   .bottom{margin-top:20px;display:grid;grid-template-columns:1fr;gap:20px;align-items:start}
+  .bottomwrap{padding:0 22px 48px}
+  .bottomwrap .bottom{max-width:1100px;margin:8px auto 0}
+  @media(min-width:921px){.previews{position:sticky;top:16px}}
+  @media(max-width:920px){.bottomwrap{padding:0 12px 40px}}
   .bottom .card,.pv{min-width:0;max-width:100%}
   @media(max-width:1020px){.bottom{grid-template-columns:1fr}}
   .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);padding:20px 22px}
@@ -483,7 +487,13 @@
       </div>
     </div>
 
-    <div class="bottom">
+    
+    <div id="testout"></div>
+  </main>
+</div>
+
+<section class="bottomwrap">
+<div class="bottom">
       <div class="card">
         <h2><span class="no">08</span><span class="t">保存・呼び出し（無料）</span></h2>
         <div class="demo">見た目の確認・SNS共有用。印刷には使えません（透かし・低解像度）</div>
@@ -575,10 +585,7 @@
         <div class="note">アップロードした絵の権利はお客様自身が持つものに限ります。デザインの登録は初回のみ（プリント注文と同時なら¥500／データのみ購入なら¥1,000）。以後は同じデザインで何度でも生地代のみで追加注文できます。</div>
       </div>
     </div>
-
-    <div id="testout"></div>
-  </main>
-</div>
+</section>
 
 <!-- スマホ用 固定ミニプレビュー（左=生地・右=完成形の並置） -->
 <div id="miniPv">
