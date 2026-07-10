@@ -44,6 +44,8 @@
   .topbar .sp{margin-left:auto}
   .chip{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px;background:var(--n1)}
   .chip .dot{width:6px;height:6px;border-radius:50%;background:var(--warn)}
+  .credit{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;color:var(--faint);white-space:nowrap}
+  .credit b{color:var(--accent);font-size:12px;letter-spacing:0}
   @media(max-width:760px){.tagline{display:none}}
 
   /* ===== workspace ===== */
@@ -231,6 +233,7 @@
     <input id="ktGateIn" type="text" autocomplete="off" style="width:100%;box-sizing:border-box;border:1px solid #cabfa6;border-radius:7px;padding:10px 12px;font-size:16px;background:#fff">
     <button id="ktGateBtn" style="width:100%;margin-top:10px;height:42px;border:0;border-radius:7px;background:#b0673f;color:#fff;font-size:14px;font-weight:700;cursor:pointer">開く</button>
     <div id="ktGateMsg" style="font-size:11px;color:#9e2e24;margin-top:8px;min-height:14px"></div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f0eadf;font-family:ui-monospace,monospace;font-size:9px;letter-spacing:.22em;color:#9a8e77;text-align:center">PRODUCED BY <span style="color:#b0673f;font-size:11.5px;letter-spacing:0">M</span></div>
   </div>
 </div>
 <script>
@@ -252,6 +255,7 @@
   <div class="tagline">描いた絵が、そのまま総柄の生地に。<br><b>かんたん4ステップ・約3分</b>で完成イメージまで</div>
   <span class="sp"></span>
   <div class="chip"><span class="dot"></span>プロトタイプ v3</div>
+  <div class="credit">PRODUCED BY <b>M</b></div>
 </div>
 
 <div class="ws">
