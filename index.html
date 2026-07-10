@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>着るタイル デザイナー v3｜レクレドール</title>
+<title>ガラリエ デザイナー v3｜レクレドール</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Old+Mincho:wght@500;600&display=swap" rel="stylesheet">
@@ -226,7 +226,7 @@
 <div id="ktGate" style="position:fixed;inset:0;z-index:9999;background:#ece5d7;display:flex;align-items:center;justify-content:center;padding:20px">
   <div style="background:#fcfaf5;border:1px solid #ded5c3;border-radius:14px;padding:28px;max-width:340px;width:100%;box-shadow:0 20px 50px -20px rgba(43,38,32,.4);font-family:'Hiragino Sans','Yu Gothic',sans-serif">
     <div style="font-size:9px;letter-spacing:.3em;color:#9a8e77">L E C R E D O R</div>
-    <div style="font-family:'Hiragino Mincho ProN',serif;font-size:19px;margin:4px 0 14px;color:#2b2620">着るタイル デザイナー</div>
+    <div style="font-family:'Hiragino Mincho ProN',serif;font-size:19px;margin:4px 0 14px;color:#2b2620">ガラリエ デザイナー</div>
     <label style="display:block;font-size:12px;color:#7c715c;margin-bottom:6px">合言葉を入力してください</label>
     <input id="ktGateIn" type="text" autocomplete="off" style="width:100%;box-sizing:border-box;border:1px solid #cabfa6;border-radius:7px;padding:10px 12px;font-size:16px;background:#fff">
     <button id="ktGateBtn" style="width:100%;margin-top:10px;height:42px;border:0;border-radius:7px;background:#b0673f;color:#fff;font-size:14px;font-weight:700;cursor:pointer">開く</button>
@@ -235,7 +235,7 @@
 </div>
 <script>
 (function(){
-  var KEY='kt_gate_ok',PASS='きるたいる',g=document.getElementById('ktGate');
+  var KEY='kt_gate_ok',PASS='がらりえ',g=document.getElementById('ktGate');
   if(sessionStorage.getItem(KEY)==='1'){g.remove();return;}
   var ok=function(){
     var v=(document.getElementById('ktGateIn').value||'').trim();
@@ -248,7 +248,7 @@
 </script>
 
 <div class="topbar">
-  <div class="brand"><span class="b">L E C R E D O R</span><span class="n">着るタイル</span></div>
+  <div class="brand"><span class="b">L E C R E D O R</span><span class="n">ガラリエ</span></div>
   <div class="tagline">描いた絵が、そのまま総柄の生地に。<br><b>かんたん4ステップ・約3分</b>で完成イメージまで</div>
   <span class="sp"></span>
   <div class="chip"><span class="dot"></span>プロトタイプ v3</div>
@@ -471,7 +471,7 @@
 <script>
 "use strict";
 /* ============================================================
-   着るタイル エンジン v3
+   ガラリエ エンジン v3
    ①切り抜き: 境界flood-fill(2段しきい値)＋k-means背景モデル＋自動しきい値
               ＋despeckle＋穴埋め＋defringe＋feather
    ②レイアウト: 正規化座標(モチーフ長辺=1)で計算 → プレビューと入稿を
@@ -1826,7 +1826,7 @@ function download(blob,name){
 }
 function tileName(ext){
   const lay=state.layout;
-  return `kirutile_${state.repeat}${(state.repeat==='half'||state.repeat==='brick')?'1-'+state.dropDen:''}_${(lay.UW*state.sizeCm).toFixed(1)}x${(lay.UH*state.sizeCm).toFixed(1)}cm_${state.dpi}dpi.${ext}`;
+  return `gararie_${state.repeat}${(state.repeat==='half'||state.repeat==='brick')?'1-'+state.dropDen:''}_${(lay.UW*state.sizeCm).toFixed(1)}x${(lay.UH*state.sizeCm).toFixed(1)}cm_${state.dpi}dpi.${ext}`;
 }
 function updateExportInfo(){
   const lay=state.layout;if(!lay)return;
