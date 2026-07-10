@@ -2249,7 +2249,19 @@ function buildSwatchUI(){
    販売MVP: 無料保存（透かしJPG・レシピ）と 印刷データ購入
 ============================================================ */
 const PRICE_JPY=1000;        // 印刷データ価格（Shopify移行後は商品側が正）
-const PURCHASE_URL='';       // Shopify商品URL（設定すると購入ボタンが有効化）
+/* Shopifyカートパーマリンクを設定すると購入ボタンが有効化。
+   例: 'https://xxxx.myshopify.com/cart/45678901234567:1'（45678…はバリアントID）
+   /cart/形式ならデザインコード等を注文属性(attributes)として自動添付する */
+const PURCHASE_URL='';
+/* デザインコード: レシピ内容から決定論で生成する短い照合キー。
+   注文（Shopify属性）とレシピファイル名の突き合わせに使う */
+function designCode(str){
+  let h=0x811c9dc5;
+  for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0;}
+  let h2=0x9e3779b9;
+  for(let i=str.length-1;i>=0;i--){h2^=str.charCodeAt(i);h2=Math.imul(h2,0x5bd1e995)>>>0;}
+  return 'G'+(h.toString(36)+h2.toString(36)).replace(/[^a-z0-9]/g,'').slice(0,8).toUpperCase();
+}
 
 /* 透かし（斜め繰り返しロゴ＋右下クレジット） */
 function watermark(ctx,w,h,strength){
@@ -2526,9 +2538,28 @@ function wire(){
   };
   $('#buyPrice').textContent='¥'+PRICE_JPY.toLocaleString();
   $('#buyBtn').onclick=()=>{
-    if(PURCHASE_URL){window.open(PURCHASE_URL,'_blank');return;}
-    $('#buyMsg').textContent='オンライン決済は準備中です。「レシピを保存」してお待ちください（オープン時にそのまま購入できます）';
-    dlRecipe();
+    if(!PURCHASE_URL){
+      $('#buyMsg').textContent='オンライン決済は準備中です。「レシピを保存」してお待ちください（オープン時にそのまま購入できます）';
+      dlRecipe();return;
+    }
+    /* ① レシピをコード付きファイル名で保存（照合キー） */
+    let code='';
+    try{
+      const r=buildRecipe(),js=JSON.stringify(r);
+      code=designCode(js);
+      download(new Blob([js],{type:'application/json'}),'gararie_'+code+'.gararie');
+    }catch(e){$('#buyMsg').textContent='レシピ生成に失敗: '+e.message;return;}
+    /* ② Shopifyカートへ（/cart/形式なら注文属性にコードと柄情報を添付） */
+    let url=PURCHASE_URL;
+    if(/\/cart\//.test(url)){
+      const q=new URLSearchParams();
+      q.set('attributes[デザインコード]',code);
+      q.set('attributes[柄サイズ]',state.sizeCm+'cm');
+      q.set('attributes[リピート]',state.mode==='tile'?'既存データ':state.repeat+(state.repeat!=='straight'&&state.dropDen?' 1/'+state.dropDen:''));
+      url+=(url.includes('?')?'&':'?')+q.toString();
+    }
+    $('#buyMsg').textContent='✓ レシピ（'+code+'.gararie）を保存しました。決済画面が開きます — 注文にはデザインコード '+code+' が自動で付きます';
+    window.open(url,'_blank');
   };
   $$('input[type=range]').forEach(fill);
   /* スマホ: 本体プレビューもヘッダーも見えていない間だけ固定ミニバーを表示（タップで移動） */
