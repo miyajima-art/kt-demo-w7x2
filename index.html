@@ -29,6 +29,7 @@
   }
   *{box-sizing:border-box}
   html,body{margin:0}
+  html,body{overflow-x:hidden;max-width:100%}
   body{font-family:var(--sans);color:var(--ink);line-height:1.6;background:var(--bg);
     font-size:13.5px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
   button,input{font-family:inherit;color:inherit}
@@ -2712,7 +2713,9 @@ function wire(){
     if(!mini||!card||!('IntersectionObserver' in window))return;
     let patVis=true,topVis=true;
     const upd=()=>mini.classList.toggle('show',window.innerWidth<=920&&!patVis&&!topVis);
-    new IntersectionObserver(es=>{patVis=es[0].isIntersecting;upd();},{threshold:0.05}).observe(card);
+    /* カード枠でなくプレビュー本体(canvas)を監視: 1/4以上見えている時だけ「見えている」扱い */
+    const cv=document.getElementById('patternCv')||card;
+    new IntersectionObserver(es=>{patVis=es[0].intersectionRatio>=0.25;upd();},{threshold:[0,0.25,0.5]}).observe(cv);
     new IntersectionObserver(es=>{topVis=es[0].isIntersecting;upd();},{threshold:0.1}).observe(top);
     /* タップ先を分離: 左=生地プレビューへ／右=仕上がりイメージへ */
     $('#miniCv').onclick=e=>{e.stopPropagation();card.scrollIntoView({behavior:'smooth',block:'start'});};
@@ -2727,6 +2730,7 @@ function wire(){
 function init(){
   buildRepeatSeg();buildSwatchUI();buildSamples();wire();
   const Q=new URLSearchParams(location.search);
+  if(Q.get('scrollto'))setTimeout(()=>{const el=document.querySelector(Q.get('scrollto'));if(el)el.scrollIntoView();},400); // 検証用
 
   /* 検証フック（rebuild完了時に発火するため、art/preset適用より先に登録） */
   const shot=Q.get('shot');
