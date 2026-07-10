@@ -1877,7 +1877,7 @@ function tileName(ext){
   return `gararie_${state.repeat}${(state.repeat==='half'||state.repeat==='brick')?'1-'+state.dropDen:''}_${(lay.UW*state.sizeCm).toFixed(1)}x${(lay.UH*state.sizeCm).toFixed(1)}cm_${state.dpi}dpi.${ext}`;
 }
 function updateExportInfo(){
-  if(!document.getElementById('exTif'))return; // 公開版はスタジオUIなし
+  if(!document.getElementById('exTif'))return; // 入稿ツールUIが無い構成では何もしない
   const lay=state.layout;if(!lay)return;
   const dpi=state.dpi,ppu=state.sizeCm/2.54*dpi;
   const w=Math.round(lay.UW*ppu),h=Math.round(lay.UH*ppu);
