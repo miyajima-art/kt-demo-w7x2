@@ -2559,10 +2559,14 @@ function makeKeepCard(code,cb){
   x.fillText('GARARIE ｜ REKUREDOOL ｜ '+d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate(),W2/2,cy+410);
   /* ロゴアイコン（ヘッダーの埋め込み画像を再利用） */
   const mk2=document.querySelector('.brand .mark');
-  const fin=()=>c.toBlob(b=>cb(b),'image/jpeg',0.85);
+  /* toBlobはcanvas汚染時にSecurityErrorを投げる。汚染してもカード自体は諦めずロゴ無しで出す */
+  let done=false;
+  const fin=()=>{if(done)return;done=true;try{c.toBlob(b=>cb(b),'image/jpeg',0.85);}catch(e){cb(null);}};
   if(mk2&&mk2.src){
     const im=new Image();
-    im.onload=()=>{x.drawImage(im,W2/2-45,cy+430,90,90);fin();};
+    im.crossOrigin='anonymous'; /* ロゴが外部URL（GitHub Pages）参照のため。無指定だとShopifyページ上でcanvasが汚染されtoBlobが失敗する */
+    setTimeout(fin,4000); /* 低速回線でロゴが来なくてもカードは4秒で出す（ロゴなし） */
+    im.onload=()=>{if(!done){try{x.drawImage(im,W2/2-45,cy+430,90,90);}catch(e){}}fin();};
     im.onerror=fin;
     im.src=mk2.src;
   }else fin();
