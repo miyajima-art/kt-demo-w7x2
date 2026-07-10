@@ -258,6 +258,11 @@
   .exbtns .png{display:flex;flex:1 1 180px;min-width:0;align-items:center;justify-content:center;gap:7px;height:44px;padding:0 16px;border:1px solid var(--line2);border-radius:var(--r-xs);background:var(--n1);color:var(--sec);font-size:13.5px}
   .exbtns .png:hover{background:var(--n3)}
   .exmsg{font-family:var(--mono);font-size:12px;color:var(--ok);margin-top:10px;min-height:15px}
+  .exmsg .codebadge{display:inline-flex;align-items:center;gap:8px;background:var(--accent-wash);border:1px solid var(--accent);
+    border-radius:var(--r-xs);padding:6px 10px;margin:6px 0;cursor:pointer}
+  .exmsg .codebadge b{font-family:var(--mono);font-size:19px;letter-spacing:.08em;color:var(--accent-h);font-weight:700}
+  .exmsg .codebadge span{font-size:11px;color:var(--muted);font-family:var(--sans)}
+  .exmsg .codeline{display:block}
   #testout{word-break:break-all;font-size:9.5px;color:transparent;max-height:8px;overflow:hidden}
 
   /* ===== スマホ最適化 ===== */
@@ -479,13 +484,13 @@
         </div>
         <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--n3)">
           <label class="lb">デザインレシピ<span style="color:var(--faint)">（このデザインの設計図・いつでも完全復元できます）</span></label>
-          <div class="exbtns" style="margin-top:6px">
+          <div class="exbtns" id="fileRow" style="margin-top:6px">
             <button class="png" id="dlRecipe" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>レシピを保存</button>
             <button class="png" id="ldRecipe" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21V9M8 13l4-4 4 4"/><path d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"/></svg>レシピを読み込む</button>
             <input type="file" id="recipeFile" accept=".gararie,application/json" hidden>
           </div>
           <div class="exbtns" id="keepRow" style="margin-top:6px;display:none">
-            <button class="png" id="keepFree" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l2.6 6.9L22 9.3l-5.6 4.9L18 22l-6-4-6 4 1.6-7.8L2 9.3l7.4-.4z"/></svg>コードでキープ（30日）</button>
+            <button class="cart" id="keepFree" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l2.6 6.9L22 9.3l-5.6 4.9L18 22l-6-4-6 4 1.6-7.8L2 9.3l7.4-.4z"/></svg>コードでキープ（30日）</button>
           </div>
           <div class="coderow" id="codeRow" style="display:none">
             <input type="text" id="recCode" placeholder="デザインコード（例: GA1B2C3D4）" maxlength="9" autocapitalize="characters" autocomplete="off">
@@ -2744,17 +2749,18 @@ function wire(){
   $('#dlRecipe').onclick=dlRecipe;
   $('#ldRecipe').onclick=()=>$('#recipeFile').click();
   if(STORAGE_URL){
+    $('#fileRow').style.display='none'; // コード保管に一本化（ファイルの手動保存/読込は非表示。自動フォールバックとしては温存）
     $('#codeRow').style.display='flex';
     $('#keepRow').style.display='flex';
-    $('#recipeNote').textContent='ご購入時、デザインは自動でお店に保存されます。デザインコード（ご注文に記載）を入力すれば、いつでもこの画面に呼び出せます。';
+    $('#recipeNote').textContent='デザインコードでいつでも復元できます。ご購入時は自動で保存（1年）、「コードでキープ」なら購入前でも30日保存できます。';
     $('#keepFree').onclick=async()=>{
       $('#freeMsg').textContent='キープ中…';
       try{
         const{code,deposited}=await depositRecipe('free');
-        $('#freeMsg').textContent=deposited
-          ? '✓ デザインコード '+code+' でキープしました（30日間）。ご購入いただくと保管期間が1年に延長されます'
-          : '✓ レシピ（'+code+'.gararie）を端末に保存しました。お店への自動保存ができなかったため、ファイルを保管しておいてください';
-      }catch(e){$('#freeMsg').textContent='キープに失敗しました。「レシピを保存」でファイル保存をお試しください';dlRecipe();}
+        $('#freeMsg').innerHTML=deposited
+          ? codeMsgHtml('✓ デザインをキープしました（30日間保存）',code,'ご購入いただくと保管期間が1年に延長されます')
+          : '✓ レシピ（'+code+'.gararie）を端末に保存しました（お店への自動保存ができなかったため）。このファイルを保管しておいてください';
+      }catch(e){$('#freeMsg').textContent='キープに失敗しました。もう一度お試しください';dlRecipe();}
     };
     $('#recCodeBtn').onclick=async()=>{
       const code=($('#recCode').value||'').trim().toUpperCase();
@@ -2764,7 +2770,7 @@ function wire(){
         const res=await fetch(STORAGE_URL+'/get/'+code);
         if(!res.ok)throw new Error('見つかりませんでした。コードをご確認ください');
         await loadRecipe(await res.json());
-        $('#freeMsg').textContent='✓ デザイン '+code+' を復元しました';
+        $('#freeMsg').innerHTML=codeMsgHtml('✓ デザインを復元しました',code,'');
       }catch(err){$('#freeMsg').textContent='呼び出せませんでした: '+err.message;}
     };
   }
@@ -2859,6 +2865,9 @@ function wire(){
     $('#buyPrint').style.display=b.dataset.mode==='print'?'':'none';
     $('#buyData').style.display=b.dataset.mode==='data'?'':'none';
   });
+  function codeMsgHtml(pre,code,post){ /* コードを大きなバッジで見せる共通メッセージ生成 */
+    return '<span class="codeline">'+pre+'</span><span class="codebadge"><b>'+code+'</b><span>タップでコピー</span></span><span class="codeline">'+(post||'')+'</span>';
+  }
   async function depositRecipe(tier){ /* レシピを預かり所へ自動保存（共通）。失敗時はDLフォールバック。tier:'paid'=400日/'free'=30日 */
     const r=buildRecipe(),js=JSON.stringify(r),code=designCode(js);
     if(STORAGE_URL){
@@ -2880,6 +2889,14 @@ function wire(){
     q.set('attributes[リピート]',state.mode==='tile'?'既存データ':state.repeat+(state.repeat!=='straight'&&state.dropDen?' 1/'+state.dropDen:''));
     return q;
   }
+  $('#freeMsg').addEventListener('click',e=>{
+    const b=e.target.closest('.codebadge');if(!b)return;
+    const code=b.querySelector('b').textContent;
+    navigator.clipboard?.writeText(code).then(()=>{
+      const hint=b.querySelector('span');const orig=hint.textContent;
+      hint.textContent='コピーしました';setTimeout(()=>{hint.textContent=orig;},1600);
+    }).catch(()=>{});
+  });
   $('#buyPrice').textContent='¥'+PRICE_JPY.toLocaleString();
   function openCartAfterDeposit(buildUrl){ /* 同期でタブを確保→確認をそのタブ内に表示→カートへ（スマホは新タブが前面になるため） */
     const w=window.open('','_blank');
