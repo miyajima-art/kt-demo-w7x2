@@ -1447,6 +1447,18 @@ function applyGrain(ctx,clipFn,alpha){
   ctx.fillStyle=ctx.createPattern(grainTile(),'repeat');ctx.fillRect(0,0,DS_W,DS_H);
   ctx.restore();
 }
+function foldShadow(ctx,x,y,len,ang,w,a){
+  /* 布のひだ影: 先細りの三角形＋先端に向かうフェード＋ぼかし＝柔らかい織り目
+     （矩形グラデだと帯の端が四角く切れて縞に見える） */
+  const g=ctx.createLinearGradient(x,y,x,y+len);
+  g.addColorStop(0,SH(a));g.addColorStop(0.6,SH(a*0.45));g.addColorStop(1,SH(0));
+  ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.translate(-x,-y);
+  ctx.filter='blur(3px)';
+  ctx.fillStyle=g;
+  ctx.beginPath();ctx.moveTo(x-w/2,y-4);ctx.lineTo(x+w/2,y-4);
+  ctx.lineTo(x+w*0.12,y+len);ctx.lineTo(x-w*0.12,y+len);ctx.closePath();ctx.fill();
+  ctx.filter='none';ctx.restore();
+}
 
 /* ---- Tシャツ（S字シルエット・凹袖ぐり・リブ襟・4層シェーディング） ---- */
 const TS=(()=>{ // ジオメトリ定義（左半分、右はミラー）実物比: 身幅52cm×着丈70cm相当
@@ -1818,14 +1830,19 @@ function osSleeve(ctx,side2){ // 袖パネル
   ctx.quadraticCurveTo(M(252),300,M(sh.x),sh.y);
   ctx.closePath();
 }
-function osCollar(ctx,side2){ // カンプカラー（開襟の折り返し）
+function osCollar(ctx){ // カンプカラー（左右一体・直線基調のシャープな襟先）
   const{cx,mx}=OS;
-  const M=side2>0?(v=>v):(v=>mx(v));
-  ctx.moveTo(cx,150);
-  ctx.quadraticCurveTo(M(356),150,M(332),286);        // 外縁→襟先
-  ctx.quadraticCurveTo(M(348),308,M(396),320);        // 襟先の下辺
-  ctx.quadraticCurveTo(M(432),252,M(446),190);        // 内縁（V沿いに戻る）
-  ctx.quadraticCurveTo(M(448),160,cx,150);
+  ctx.moveTo(cx,146);
+  ctx.quadraticCurveTo(370,148,348,170);              // 上縁（後ろ襟→肩）
+  ctx.quadraticCurveTo(324,230,318,290);              // 外縁（ほぼ直線）→襟先
+  ctx.lineTo(404,284);                                // 襟先の下辺（シャープ）
+  ctx.quadraticCurveTo(434,240,442,196);              // 内縁（V開きに沿う）
+  ctx.quadraticCurveTo(446,178,cx,174);               // 後ろ襟の内縁
+  ctx.quadraticCurveTo(mx(446),178,mx(442),196);
+  ctx.quadraticCurveTo(mx(434),240,mx(404),284);
+  ctx.lineTo(mx(318),290);
+  ctx.quadraticCurveTo(mx(324),230,mx(348),170);
+  ctx.quadraticCurveTo(mx(370),148,cx,146);
   ctx.closePath();
 }
 function osPocket(ctx){ // 胸ポケット（向かって左・五角形）
@@ -1857,17 +1874,21 @@ function drawOpenShirt(ctx,ppcm){
     if(pat){ctx.fillStyle=pat;ctx.fillRect(0,0,DS_W,DS_H);}
     ctx.restore();
   }
-  /* Vゾーン＝内側（後ろ身頃）を暗く */
-  ctx.save();ctx.beginPath();
-  ctx.moveTo(neckL.x,neckL.y);ctx.quadraticCurveTo(cx-22,268,bp.x,bp.y);
-  ctx.quadraticCurveTo(cx+22,268,mx(neckL.x),neckL.y);
-  ctx.quadraticCurveTo(cx,162,neckL.x,neckL.y);
-  ctx.closePath();ctx.clip();
-  ctx.fillStyle=bg;ctx.fillRect(0,0,DS_W,DS_H);
-  const gv=ctx.createLinearGradient(0,170,0,360);
-  gv.addColorStop(0,SH(0.30));gv.addColorStop(1,SH(0.05));
-  ctx.fillStyle=gv;ctx.fillRect(0,0,DS_W,DS_H);
-  ctx.restore();
+  /* Vゾーン＝開きから見える内側の後ろ身頃（同じ生地・影で沈む） */
+  (function(){
+    const patV=patFor(ctx,ppcm,36,84,0);
+    ctx.save();ctx.beginPath();
+    ctx.moveTo(neckL.x,neckL.y);ctx.quadraticCurveTo(cx-22,268,bp.x,bp.y);
+    ctx.quadraticCurveTo(cx+22,268,mx(neckL.x),neckL.y);
+    ctx.quadraticCurveTo(cx,162,neckL.x,neckL.y);
+    ctx.closePath();ctx.clip();
+    ctx.fillStyle=bg;ctx.fillRect(0,0,DS_W,DS_H);
+    if(patV){ctx.fillStyle=patV;ctx.fillRect(0,0,DS_W,DS_H);}
+    const gv=ctx.createLinearGradient(0,170,0,364);
+    gv.addColorStop(0,SH(0.40));gv.addColorStop(1,SH(0.16));
+    ctx.fillStyle=gv;ctx.fillRect(0,0,DS_W,DS_H);
+    ctx.restore();
+  })();
   /* 前立て（縦の帯・両端に細い影＋ステッチ） */
   const pkX=cx-15,pkW=30;
   (function(){
@@ -1941,26 +1962,37 @@ function drawOpenShirt(ctx,ppcm){
     ctx.beginPath();osPocket(ctx);ctx.lineWidth=1.2;ctx.strokeStyle='rgba(58,47,35,.30)';ctx.stroke();
     ctx.restore();
   })();
-  /* 襟（カンプカラー・左右・落ち影→本体→輪郭） */
-  for(const s2 of[1,-1]){
-    const M=s2>0?(v=>v):(v=>mx(v));
+  /* 輪郭（襟より先に描く＝V縁の線が襟の上を横切らない） */
+  ctx.beginPath();osOutline(ctx);
+  ctx.lineWidth=1.6;ctx.strokeStyle='rgba(58,47,35,.34)';ctx.stroke();
+  /* 襟（カンプカラー・左右一体：落ち影→本体→縁ステッチ→輪郭） */
+  (function(){
     ctx.save();ctx.beginPath();osOutline(ctx);ctx.clip();
-    ctx.save();ctx.translate(0,5);ctx.beginPath();osCollar(ctx,s2);
-    ctx.fillStyle='rgba(58,47,35,.16)';ctx.filter='blur(4px)';ctx.fill();ctx.restore();
+    ctx.save();ctx.translate(0,6);ctx.beginPath();osCollar(ctx);
+    ctx.fillStyle='rgba(58,47,35,.18)';ctx.filter='blur(5px)';ctx.fill();ctx.restore();
     ctx.restore();
-    const pat=patFor(ctx,ppcm,s2>0?60:-52,-36,s2*0.04);
-    ctx.save();ctx.beginPath();osCollar(ctx,s2);ctx.clip();
+    const pat=patFor(ctx,ppcm,54,-32,0.02);
+    ctx.save();ctx.beginPath();osCollar(ctx);ctx.clip();
     ctx.fillStyle=bg;ctx.fillRect(0,0,DS_W,DS_H);
     if(pat){ctx.fillStyle=pat;ctx.fillRect(0,0,DS_W,DS_H);}
     ctx.globalCompositeOperation='multiply';
-    const gc=ctx.createLinearGradient(cx,150,M(340),300);
-    gc.addColorStop(0,SH(0.05));gc.addColorStop(1,SH(0.13));
+    const gc=ctx.createLinearGradient(0,150,0,292);      // 襟先に向かってわずかに沈む
+    gc.addColorStop(0,SH(0));gc.addColorStop(1,SH(0.07));
     ctx.fillStyle=gc;ctx.fillRect(0,0,DS_W,DS_H);
     ctx.globalCompositeOperation='source-over';
     ctx.restore();
-    ctx.beginPath();osCollar(ctx,s2);
-    ctx.lineWidth=1.4;ctx.strokeStyle='rgba(58,47,35,.38)';ctx.stroke();
-  }
+    /* 縁ステッチ（外縁の内側5px） */
+    ctx.save();ctx.beginPath();osCollar(ctx);ctx.clip();
+    ctx.setLineDash([3,2.5]);ctx.lineWidth=1;ctx.strokeStyle=SH(0.32);
+    for(const M of[v=>v,v=>mx(v)]){
+      ctx.beginPath();ctx.moveTo(M(352),176);
+      ctx.quadraticCurveTo(M(330),232,M(325),283);
+      ctx.lineTo(M(400),277);ctx.stroke();
+    }
+    ctx.restore();
+    ctx.beginPath();osCollar(ctx);
+    ctx.lineWidth=1.5;ctx.strokeStyle='rgba(58,47,35,.42)';ctx.stroke();
+  })();
   /* ボタン（5個・貝調4つ穴） */
   for(let i=0;i<5;i++){
     const by=bp.y+18+i*(hemC.y-40-(bp.y+18))/4;
@@ -1984,9 +2016,6 @@ function drawOpenShirt(ctx,ppcm){
     ctx.beginPath();ctx.moveTo(M(svO.x)+(s2>0?8:-8),svO.y-9);ctx.quadraticCurveTo(M(188),434,M(svI.x)+(s2>0?-4:4),svI.y-8);ctx.stroke();
   }
   ctx.restore();
-  /* 輪郭 */
-  ctx.beginPath();osOutline(ctx);
-  ctx.lineWidth=1.6;ctx.strokeStyle='rgba(58,47,35,.34)';ctx.stroke();
   ctx.restore();
 }
 
@@ -2074,14 +2103,11 @@ function drawOnepiece(ctx,ppcm){
   ctx.beginPath();ctx.moveTo(wside.x+4,waistY);ctx.lineTo(mx(wside.x)-4,waistY);ctx.stroke();
   ctx.filter='none';
   ctx.globalCompositeOperation='multiply';
-  for(let i=0;i<11;i++){ // ギャザー（切替下の細かいひだ）
+  const dlens=[112,62,92,56,120,70,102,60,116,66,96]; // 長短のリズム（決定論）
+  for(let i=0;i<11;i++){ // ギャザー（切替下の細かいひだ・先細りフェード）
     const t=i/10,gx=wside.x+18+(mx(wside.x)-wside.x-36)*t;
-    const ang=(gx-cx)/(mx(wside.x)-wside.x)*0.22;
-    const len=54+46*Math.abs(t-0.5)*2;
-    const g2=ctx.createLinearGradient(gx-5,0,gx+5,0);
-    g2.addColorStop(0,SH(0));g2.addColorStop(0.5,SH(0.085));g2.addColorStop(1,SH(0));
-    ctx.save();ctx.translate(gx,waistY+4);ctx.rotate(ang);ctx.translate(-gx,-(waistY+4));
-    ctx.fillStyle=g2;ctx.fillRect(gx-8,waistY+2,16,len);ctx.restore();
+    const ang=(gx-cx)/(mx(wside.x)-wside.x)*0.26;
+    foldShadow(ctx,gx,waistY+2,dlens[i],ang,11,0.07);
   }
   /* シェーディング（円筒＋脇AO＋襟下） */
   let g=ctx.createLinearGradient(170,0,730,0);
@@ -2192,15 +2218,12 @@ function drawSkirt(ctx,ppcm){
   let g=ctx.createLinearGradient(0,wbY1-6,0,wbY1+52);
   g.addColorStop(0,SH(0.20));g.addColorStop(1,SH(0));
   ctx.fillStyle=g;ctx.fillRect(0,wbY1-6,DS_W,60);
-  /* ギャザーのひだ（放射状・外側ほど長い） */
+  /* ギャザーのひだ（放射状・長短のリズム・先細りフェード） */
+  const lens=[430,180,300,150,380,200,250,190,410,160,290,150,440]; // 決定論的な揺らぎ
   for(let i=0;i<13;i++){
     const t=i/12,gx=wbX0+10+(wbX1-wbX0-20)*t;
-    const ang=(gx-cx)/(wbX1-wbX0)*0.62;
-    const len=180+330*Math.abs(t-0.5)*2+((i*7)%3)*40; // 決定論的な揺らぎ
-    const g2=ctx.createLinearGradient(gx-6,0,gx+6,0);
-    g2.addColorStop(0,SH(0));g2.addColorStop(0.5,SH(0.07));g2.addColorStop(1,SH(0));
-    ctx.save();ctx.translate(gx,wbY1);ctx.rotate(ang);ctx.translate(-gx,-wbY1);
-    ctx.fillStyle=g2;ctx.fillRect(gx-9,wbY1,18,len);ctx.restore();
+    const ang=(gx-cx)/(wbX1-wbX0)*0.60;
+    foldShadow(ctx,gx,wbY1-4,lens[i],ang,13,0.08);
   }
   /* 円筒（両サイド） */
   g=ctx.createLinearGradient(200,0,700,0);
@@ -2224,6 +2247,9 @@ function drawSkirt(ctx,ppcm){
   ctx.quadraticCurveTo(mx(376),874,mx(308),858);
   ctx.quadraticCurveTo(mx(242),846,mx(hemL.x)-6,hemL.y-12);ctx.stroke();
   ctx.restore();
+  /* 輪郭（ベルトより先＝上端の線がベルトの上に出ないように） */
+  ctx.beginPath();skBody(ctx);
+  ctx.lineWidth=1.6;ctx.strokeStyle='rgba(58,47,35,.30)';ctx.stroke();
   /* ウエストベルト（別裁断・柄90°＝生地の耳方向が変わるのを再現） */
   (function(){
     const patB=patFor(ctx,ppcm,10,6,Math.PI/2);
@@ -2246,9 +2272,6 @@ function drawSkirt(ctx,ppcm){
     ctx.beginPath();skBand(ctx);
     ctx.lineWidth=1.5;ctx.strokeStyle='rgba(58,47,35,.36)';ctx.stroke();
   })();
-  /* 輪郭 */
-  ctx.beginPath();skBody(ctx);
-  ctx.lineWidth=1.6;ctx.strokeStyle='rgba(58,47,35,.30)';ctx.stroke();
   ctx.restore();
 }
 
