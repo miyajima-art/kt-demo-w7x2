@@ -195,6 +195,11 @@
     background:var(--ink);color:#fff;font-size:15px;font-weight:700;transition:.14s}
   .cart:hover{background:#1d2d28}
   .cart .ic{stroke:#fff;width:17px}
+  /* 無料アクション用（購入CTAと視覚的に区別） */
+  .keepbtn{display:flex;align-items:center;justify-content:center;gap:9px;height:46px;border:1.5px solid var(--accent);border-radius:var(--r-xs);
+    background:var(--accent-wash);color:var(--accent-h);font-size:14px;font-weight:700}
+  .keepbtn:hover{background:#d3f2e8}
+  .keepbtn .ic{stroke:var(--accent-h);width:17px}
   /* 購入カード: 2択セグメント＋生地セレクタ */
   .buyseg{display:flex;gap:6px;margin:4px 0 12px}
   .buyseg button{flex:1;height:38px;border:1.5px solid var(--line);border-radius:var(--r-xs);background:var(--n1);font-size:14px;color:var(--muted);font-weight:600;transition:.13s}
@@ -213,7 +218,7 @@
   .lenseg{display:flex;gap:4px}
   .lenseg button{height:36px;padding:0 12px;border:1.5px solid var(--line);border-radius:var(--r-xs);background:var(--n1);font-size:14px;color:var(--muted);font-weight:600;transition:.13s}
   .lenseg button.on{border-color:var(--accent);background:var(--accent-wash);color:var(--ink)}
-  .unitnote{font-family:var(--mono);font-size:12.5px;color:var(--faint);margin:6px 0 0 46px}
+  .unitnote{font-family:var(--mono);font-size:13.5px;color:var(--sec);margin:6px 0 0 46px}
   /* 生地カードピッカー＋詳細パネル */
   .fabcards{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;-webkit-overflow-scrolling:touch}
   .fabcard{flex:0 0 116px;display:flex;flex-direction:column;align-self:flex-start;border:1.5px solid var(--line);border-radius:var(--r-sm);background:var(--paper);padding:6px;cursor:pointer;transition:.13s;text-align:left}
@@ -263,6 +268,8 @@
   .exmsg .codebadge b{font-family:var(--mono);font-size:19px;letter-spacing:.08em;color:var(--accent-h);font-weight:700}
   .exmsg .codebadge span{font-size:11px;color:var(--muted);font-family:var(--sans)}
   .exmsg .codeline{display:block}
+  .shipline{font-size:13.5px;color:var(--ink);text-align:right;margin-top:2px;font-weight:600}
+  .shipline b{font-family:var(--mono);font-size:16px}
   .exmsg .sharebtn{display:block;margin-top:8px;height:42px;padding:0 16px;border:1px solid var(--accent);
     border-radius:var(--r-xs);background:var(--paper);color:var(--accent-h);font-size:13.5px;font-weight:700;width:100%}
   #testout{word-break:break-all;font-size:9.5px;color:transparent;max-height:8px;overflow:hidden}
@@ -320,7 +327,7 @@
 
 <div class="topbar">
   <div class="brand"><img class="mark" src="https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-logo-icon.png" alt="ガラリエ"><div class="brandtext"><span class="b">R E K U R E D O O L</span><span class="n">ガラリエ</span></div></div>
-  <div class="tagline">描いた絵が、そのまま総柄の生地に。<br><b>かんたん操作・約3分</b>で完成イメージまで</div>
+  <div class="tagline">描いた絵が、そのまま総柄の生地に。<br><b>見本柄なら約3分</b>で完成イメージまで</div>
   <span class="sp"></span>
   <div class="credit">PRODUCED BY <b>M</b></div>
 </div>
@@ -333,7 +340,7 @@
       <div class="drop" id="drop">
         <svg class="ic" viewBox="0 0 24 24"><path d="M12 16V5M8 9l4-4 4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
         <p>じぶんの絵をアップ</p>
-        <small>手描き・写真・既存プリントデータ（TIFF）OK</small>
+        <small>手描き・写真・お手持ちの印刷用データ（TIFF）もOK</small>
         <input type="file" id="file" accept="image/*,.tif,.tiff" hidden>
       </div>
       <div class="samples">
@@ -478,27 +485,28 @@
 
     <div class="bottom">
       <div class="card">
-        <h2><span class="no">08</span><span class="t">保存する（無料）</span></h2>
+        <h2><span class="no">08</span><span class="t">保存・呼び出し（無料）</span></h2>
         <div class="demo">見た目の確認・SNS共有用。印刷には使えません（透かし・低解像度）</div>
         <div class="exbtns" style="margin-top:4px">
           <button class="png" id="dlPattern" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5"/><circle cx="8.5" cy="10" r="1.6"/><path d="M4 17l4.5-4 3 2.4L15 12l5 5"/></svg>柄イメージ（JPG）</button>
           <button class="png" id="dlMock" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><path d="M7 4l3-1 2 2 2-2 3 1 3 4-3 2v11H7V10L4 8z"/></svg>仕上がりイメージ（JPG）</button>
         </div>
         <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--n3)">
-          <label class="lb">デザインレシピ<span style="color:var(--faint)">（このデザインの設計図・いつでも完全復元できます）</span></label>
+          <label class="lb">このデザインを取っておく・呼び出す</label>
           <div class="exbtns" id="fileRow" style="margin-top:6px">
             <button class="png" id="dlRecipe" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12M8 11l4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>レシピを保存</button>
             <button class="png" id="ldRecipe" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><path d="M12 21V9M8 13l4-4 4 4"/><path d="M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"/></svg>レシピを読み込む</button>
             <input type="file" id="recipeFile" accept=".gararie,application/json" hidden>
           </div>
           <div class="exbtns" id="keepRow" style="margin-top:6px;display:none">
-            <button class="cart" id="keepFree" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l2.6 6.9L22 9.3l-5.6 4.9L18 22l-6-4-6 4 1.6-7.8L2 9.3l7.4-.4z"/></svg>コードでキープ（30日）</button>
+            <button class="keepbtn" id="keepFree" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l2.6 6.9L22 9.3l-5.6 4.9L18 22l-6-4-6 4 1.6-7.8L2 9.3l7.4-.4z"/></svg>コードでキープ（30日）</button>
           </div>
           <div class="coderow" id="codeRow" style="display:none">
             <input type="text" id="recCode" placeholder="デザインコード（例: GA1B2C3D4）" maxlength="9" autocapitalize="characters" autocomplete="off">
             <button id="recCodeBtn" type="button">コードで呼び出す</button>
           </div>
           <div class="mini" id="recipeNote">レシピ（.gararieファイル）を保存しておけば、次に来たとき読み込むだけで続き・再購入ができます。</div>
+          <div class="mini" id="restoreCaution" style="display:none">※呼び出すと、いま画面のデザインは置き換わります</div>
         </div>
         <div class="exmsg" id="freeMsg"></div>
       </div>
@@ -540,6 +548,7 @@
             <span class="lab" id="printCalc">生地 ¥1,580×5m ＋ データ登録 ¥500</span>
             <span class="price num" id="printTotal">¥8,400</span>
           </div>
+          <div class="shipline" id="shipLine"></div>
           <div class="note" style="margin-top:2px">1〜4mは小ロット単価・5m以上で通常単価。送料 全国一律¥700（お試しは送料込み）。アパレル残反使用のため生地耳等に汚れがある場合がありますが、プリント部分に問題がないものをお届けします。</div>
           <div class="cta">
             <button class="cart" id="buyPrintBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M6 2 3 6v13a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>生地プリントを注文</button>
@@ -556,6 +565,7 @@
             <span class="k">内容</span><span class="v" style="font-family:var(--sans)">実寸・シームレスの印刷用データ（TIFF）</span>
             <span class="k">つかいみち</span><span class="v" style="font-family:var(--sans)">生地プリント入稿・自作品の制作/販売 OK</span>
             <span class="k">おやくそく</span><span class="v" style="font-family:var(--sans)">データそのものの再配布・転売はNG</span>
+            <span class="k">送料</span><span class="v" style="font-family:var(--sans)">かかりません（データでのお渡し）</span>
           </div>
           <div class="cta">
             <button class="cart" id="buyBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M6 2 3 6v13a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>データを購入</button>
@@ -1390,16 +1400,15 @@ function buildLayout(){
   });
   /* すき間の背景モチーフ（主役を障害物にして隙間だけ充填） */
   let fillerType=null;
-  const isPaw=state.filler.type==='paw';
-  if(isPaw||fillerMotif()){
-    fillerType=isPaw?'paw':'img';
+  if(fillerMotif()){
+    fillerType='img';
     const seeds=main.map(p=>({x:p.x,y:p.y,exR:p.exR}));
-    const fs=isPaw?0.09:state.fillerScale/100;      // 名目サイズ（主役=1に対する比）
-    const spacing=isPaw?0.6:Math.max(0.3,fs*1.5);   // 充填間隔
+    const fs=state.fillerScale/100;
+    const spacing=Math.max(0.3,fs*1.5);
     const pts=poissonTor(UW,UH,spacing,rand,seeds);
     paws=pts.map(p=>({x:p.x,y:p.y,
-      sc:fs*(1+(isPaw?0.35:0.25)*(rand()-0.5)),
-      ang:isPaw?rand()*TAU:(rand()*2-1)*Math.PI}));
+      sc:fs*(1+0.25*(rand()-0.5)),
+      ang:(rand()*2-1)*Math.PI}));
   }
   places=main.map(p=>[p.x,p.y,p.mi,p.rot,p.flip,p.sc]);
   return{type:'toss',UW,UH,places,paws,fillerType,pitch};
@@ -1419,7 +1428,6 @@ function fillerMotif(){
   return null;
 }
 
-function pawPath(ctx,cx,cy,r){ctx.beginPath();ctx.ellipse(cx,cy+r*0.35,r*0.7,r*0.55,0,0,TAU);ctx.fill();[[-0.55,-0.5,0.32],[0.55,-0.5,0.32],[-0.15,-0.95,0.3],[0.15,-0.95,0.3]].forEach(t=>{ctx.beginPath();ctx.arc(cx+r*t[0],cy+r*t[1],r*t[2],0,TAU);ctx.fill();});}
 
 /* renderUnit: レイアウト×スケール(px/unit)→シームレスタイルcanvas */
 const unitCache={};
@@ -1488,18 +1496,7 @@ function renderUnit(pxPerU,opts){
   }
   /* 背景モチーフ（フィラー層・主役の下） */
   if(lay.paws&&lay.fillerType){
-    if(lay.fillerType==='paw'){
-      uc.fillStyle='rgba(255,255,255,.5)';
-      for(const p of lay.paws){
-        const pr=p.sc*pxPerU;
-        const g2=pr*1.45; // 指先まで含めた実インク範囲（カリング余白）
-        for(let ox=-1;ox<=1;ox++)for(let oy=-1;oy<=1;oy++){
-          const px2=(p.x+ox*lay.UW)*sx,py2=(p.y+oy*lay.UH)*sy;
-          if(px2+g2<-2||px2-g2>UWpx+2||py2+g2<-2||py2-g2>UHpx+2)continue;
-          uc.save();uc.translate(px2,py2);uc.rotate(p.ang);pawPath(uc,0,0,pr);uc.restore();
-        }
-      }
-    }else{
+    {
       const fm=fillerMotif();
       if(fm){
         const fc=motifCanvas(fm,pxPerU*(state.fillerScale/100)*1.3,opts&&opts.print);
@@ -1587,7 +1584,7 @@ function renderPattern(){
     ctx.font='10px ui-monospace,monospace';ctx.fillStyle='#2b2620';ctx.fillText('10cm（実寸）',30,h-31);
     ctx.restore();
   }
-  const names={full:'ストレート',half:'ハーフドロップ',brick:'ブリック',diamond:'ダイヤモンド',sateen:'飛び柄（朱子配置）',mirror:'ミラー',toss:'トス（散らし）'};
+  const names={full:'ストレート',half:'ハーフドロップ',brick:'ブリック',diamond:'ダイヤモンド',sateen:'飛び柄（斜めずらし）',mirror:'ミラー',toss:'トス（散らし）'};
   const cmW=(lay.UW*state.sizeCm).toFixed(1),cmH=(lay.UH*state.sizeCm).toFixed(1);
   const tail=state.mode==='tile'
     ?`取り込みタイル ${state.tileSrc.width}×${state.tileSrc.height}px`
@@ -2403,7 +2400,7 @@ const REPEATS=[
   {id:'half',name:'ハーフドロップ'},
   {id:'brick',name:'ブリック'},
   {id:'diamond',name:'ダイヤ'},
-  {id:'sateen',name:'飛び柄（朱子配置）'},
+  {id:'sateen',name:'飛び柄（斜めずらし）'},
   {id:'mirror',name:'ミラー'},
   {id:'toss',name:'トス（散らし）'},
 ];
@@ -2801,7 +2798,8 @@ function wire(){
     $('#fileRow').style.display='none'; // コード保管に一本化（ファイルの手動保存/読込は非表示。自動フォールバックとしては温存）
     $('#codeRow').style.display='flex';
     $('#keepRow').style.display='flex';
-    $('#recipeNote').textContent='デザインコードでいつでも復元できます。ご購入時は自動で保存（1年）、「コードでキープ」なら購入前でも30日保存できます。';
+    $('#recipeNote').innerHTML='・ご購入すると自動で<b>1年間</b>保存されます<br>・購入前でも「コードでキープ」で<b>30日間</b>保存できます';
+    $('#restoreCaution').style.display='block';
     $('#keepFree').onclick=async()=>{
       $('#freeMsg').textContent='キープ中…';
       try{
@@ -2902,18 +2900,26 @@ function wire(){
   function unitPrice(f){return meters<5?f.p14:f.p5;}
   function calcPrint(){
     const f=FABRICS[fabIdx],rep=$('#repChk').checked;
+    /* 生地カードの表示価格を選択中の長さに連動（『〜』の曖昧表記をやめ、適用単価を出す） */
+    $$('#fabCards .fabcard .fp').forEach((el,i)=>{
+      const ff=FABRICS[i];
+      el.textContent=lenMode==='trial'?'お試し ¥1,480':
+        (meters<5?'¥'+ff.p14.toLocaleString()+'/m（1〜4m）':'¥'+ff.p5.toLocaleString()+'/m（5m〜）');
+    });
     $('#unitNote').textContent='単価: 1〜4m ¥'+f.p14.toLocaleString()+'/m ／ 5m〜 ¥'+f.p5.toLocaleString()+'/m';
     $('#mQty').style.display=lenMode==='meter'?'':'none';
     $('#repRow').style.display=lenMode==='meter'?'':'none';
     if(lenMode==='trial'){
-      $('#printCalc').textContent='お試し 50cm×生地幅（送料込み・データ登録費なし）';
+      $('#printCalc').textContent='お試し 50cm×生地幅（データ登録費なし）';
       $('#printTotal').textContent='¥'+TRIAL_PRICE.toLocaleString();
+      $('#shipLine').innerHTML='送料込み ＝ お支払い合計 <b>¥'+TRIAL_PRICE.toLocaleString()+'</b>';
       return;
     }
     const u=unitPrice(f),total=u*meters+(rep?0:DATAFEE);
     $('#mVal').textContent=meters;
     $('#printCalc').textContent='生地 ¥'+u.toLocaleString()+'×'+meters+'m'+(rep?'':' ＋ データ登録 ¥'+DATAFEE);
     $('#printTotal').textContent='¥'+total.toLocaleString();
+    $('#shipLine').innerHTML='＋送料 ¥700 ＝ お支払い合計 <b>¥'+(total+700).toLocaleString()+'</b>';
   }
   $('#repChk').onchange=calcPrint;
   $('#mMinus').onclick=()=>{if(meters>MIN_M){meters--;calcPrint();}};
