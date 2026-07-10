@@ -2865,15 +2865,33 @@ function wire(){
     return q;
   }
   $('#buyPrice').textContent='¥'+PRICE_JPY.toLocaleString();
-  function openCartAfterDeposit(buildUrl){ /* 同期でタブを確保→預け完了後に遷移（Safariのポップアップ制限対策） */
+  function openCartAfterDeposit(buildUrl){ /* 同期でタブを確保→確認をそのタブ内に表示→カートへ（スマホは新タブが前面になるため） */
     const w=window.open('','_blank');
-    if(w){try{w.document.write('<meta charset="utf-8"><body style="font-family:sans-serif;padding:40px;color:#263a34">カートへ移動しています…</body>');}catch(e){}}
+    const paint=(html)=>{if(!w)return;try{
+      w.document.open();
+      w.document.write('<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+        +'<body style="margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f7f3ed;font-family:\'Hiragino Maru Gothic ProN\',\'Hiragino Sans\',sans-serif;color:#263a34">'
+        +'<div style="text-align:center;padding:32px;max-width:340px">'+html+'</div></body>');
+      w.document.close();
+    }catch(e){}};
+    paint('<div style="font-size:17px;font-weight:700">デザインをお店に保存しています…</div><div style="margin-top:10px;font-size:13px;color:#6e7d75">そのままお待ちください</div>');
     depositRecipe().then(({code,deposited})=>{
       const url=buildUrl(code);
-      $('#buyMsg').textContent=deposited
-        ?'✓ デザインはお店に自動保存されました（デザインコード '+code+'）。決済画面に進みます'
-        :'✓ 通信できなかったためレシピ（'+code+'.gararie）を端末に保存しました。ご注文後、このファイルをお店にお送りください';
-      if(w)w.location=url;else location.href=url;
+      if(deposited){
+        $('#buyMsg').textContent='✓ デザインはお店に自動保存されました（デザインコード '+code+'）';
+        paint('<div style="font-size:34px">✓</div>'
+          +'<div style="font-size:17px;font-weight:700;margin-top:6px">デザインをお店に保存しました</div>'
+          +'<div style="margin-top:12px;font-size:13px;color:#6e7d75">あなたのデザインコード</div>'
+          +'<div style="font-family:Menlo,monospace;font-size:26px;letter-spacing:.08em;margin-top:4px">'+code+'</div>'
+          +'<div style="margin-top:16px;font-size:13px;color:#6e7d75">このままカートへ進みます…</div>');
+        setTimeout(()=>{if(w)w.location=url;else location.href=url;},1600);
+      }else{
+        $('#buyMsg').textContent='✓ レシピ（'+code+'.gararie）を端末に保存しました。ご注文後、このファイルをお店にお送りください';
+        paint('<div style="font-size:17px;font-weight:700">デザインファイルを端末に保存しました</div>'
+          +'<div style="margin-top:12px;font-size:13px;color:#6e7d75;line-height:1.8">通信の都合でお店への自動保存ができなかったため、<br>ご注文のあとに保存されたファイル（gararie_'+code+'.gararie）を<br>お店までお送りください。</div>'
+          +'<div style="margin-top:16px;font-size:13px;color:#6e7d75">このままカートへ進みます…</div>');
+        setTimeout(()=>{if(w)w.location=url;else location.href=url;},3200);
+      }
     }).catch(e=>{
       $('#buyMsg').textContent='エラー: '+e.message;
       if(w)w.close();
