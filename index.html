@@ -57,7 +57,7 @@
 
   /* ===== workspace ===== */
   .ws{display:grid;grid-template-columns:318px minmax(0,1fr);gap:0}
-  .inspector{background:var(--surface);border-right:1px solid var(--line);height:calc(100vh - 56px);overflow-y:auto;position:sticky;top:56px}
+  .inspector{background:var(--surface);border-right:1px solid var(--line)}
   @media(max-width:920px){
     .ws{display:flex;flex-direction:column}
     .inspector{order:0;height:auto;position:static;border-right:0;border-bottom:1px solid var(--line)}
@@ -170,7 +170,7 @@
   .sub{display:flex;align-items:center;justify-content:space-between;margin-top:7px}
 
   /* bottom cards */
-  .bottom{margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  .bottom{margin-top:20px;display:grid;grid-template-columns:1fr;gap:20px;align-items:start}
   .bottom .card,.pv{min-width:0;max-width:100%}
   @media(max-width:1020px){.bottom{grid-template-columns:1fr}}
   .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);padding:20px 22px}
@@ -3024,12 +3024,12 @@ function wire(){
     });
   };
   $$('input[type=range]').forEach(fill);
-  /* スマホ: 本体プレビューもヘッダーも見えていない間だけ固定ミニバーを表示（タップで移動） */
+  /* 本体プレビューもヘッダーも見えていない間だけ固定ミニバーを表示（タップで移動） */
   (function(){
     const mini=$('#miniPv'),card=$('#patCard'),top=document.querySelector('.topbar');
     if(!mini||!card||!('IntersectionObserver' in window))return;
     let patVis=true,topVis=true;
-    const upd=()=>mini.classList.toggle('show',window.innerWidth<=920&&!patVis&&!topVis);
+    const upd=()=>mini.classList.toggle('show',!patVis&&!topVis);
     /* カード枠でなくプレビュー本体(canvas)を監視: 1/4以上見えている時だけ「見えている」扱い */
     const cv=document.getElementById('patternCv')||card;
     new IntersectionObserver(es=>{patVis=es[0].intersectionRatio>=0.25;upd();},{threshold:[0,0.25,0.5]}).observe(cv);
