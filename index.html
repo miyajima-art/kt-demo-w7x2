@@ -263,6 +263,8 @@
   .exmsg .codebadge b{font-family:var(--mono);font-size:19px;letter-spacing:.08em;color:var(--accent-h);font-weight:700}
   .exmsg .codebadge span{font-size:11px;color:var(--muted);font-family:var(--sans)}
   .exmsg .codeline{display:block}
+  .exmsg .sharebtn{display:block;margin-top:8px;height:42px;padding:0 16px;border:1px solid var(--accent);
+    border-radius:var(--r-xs);background:var(--paper);color:var(--accent-h);font-size:13.5px;font-weight:700;width:100%}
   #testout{word-break:break-all;font-size:9.5px;color:transparent;max-height:8px;overflow:hidden}
 
   /* ===== スマホ最適化 ===== */
@@ -2511,6 +2513,50 @@ function dlPatternJpg(){
   watermark(x,W2,H2,0.10);
   c.toBlob(b=>{if(b){download(b,'gararie_pattern_sample.jpg');$('#freeMsg').textContent='✓ 柄イメージを保存しました（印刷用ではありません）';}},'image/jpeg',0.82);
 }
+/* キープカード: 柄＋デザインコードの控え画像（キープ成功時に自動保存・写真共有用） */
+function makeKeepCard(code,cb){
+  const W2=1080,H2=1350,c=makeCanvas(W2,H2),x=c.getContext('2d');
+  /* 上2/3=柄（透かし入り・無料JPGと同ポリシー） */
+  x.fillStyle='#f7f3ed';x.fillRect(0,0,W2,H2);
+  const patH=820;
+  const ppu=state.sizeCm*PPCM*1.35;
+  const u=renderUnit(ppu,{flat:true});
+  if(u){
+    x.save();x.beginPath();x.rect(0,0,W2,patH);x.clip();
+    x.fillStyle=(state.bg!=='transparent')?state.bg:'#ffffff';x.fillRect(0,0,W2,patH);
+    const pt=x.createPattern(u,'repeat');
+    if(pt.setTransform){try{pt.setTransform(new DOMMatrix().translate(u.width*0.37,u.height*0.61));}catch(e){}}
+    x.fillStyle=pt;x.fillRect(0,0,W2,patH);
+    watermark(x,W2,patH,0.09);
+    x.restore();
+  }
+  /* 下1/3=コード情報カード */
+  const cy=patH;
+  x.fillStyle='#fdfbf6';x.fillRect(0,cy,W2,H2-cy);
+  x.fillStyle='rgba(38,58,52,.12)';x.fillRect(0,cy,W2,2);
+  x.textAlign='center';
+  x.fillStyle='#6e7d75';x.font='500 30px "Zen Maru Gothic","Hiragino Maru Gothic ProN",sans-serif';
+  x.fillText('あなたのデザインコード',W2/2,cy+78);
+  x.fillStyle='#263a34';x.font='700 104px Menlo,monospace';
+  x.fillText(code,W2/2,cy+204);
+  x.fillStyle='#2fa285';x.font='700 33px "Zen Maru Gothic","Hiragino Maru Gothic ProN",sans-serif';
+  x.fillText('30日間キープ中（ご購入で1年保管に延長）',W2/2,cy+280);
+  x.fillStyle='#96a39b';x.font='500 27px "Zen Maru Gothic","Hiragino Maru Gothic ProN",sans-serif';
+  x.fillText('ガラリエでこのコードを入力すると、柄をいつでも復元できます',W2/2,cy+340);
+  x.fillStyle='#b8b3a3';x.font='600 24px Menlo,monospace';
+  const d=new Date();
+  x.fillText('GARARIE ｜ REKUREDOOL ｜ '+d.getFullYear()+'/'+(d.getMonth()+1)+'/'+d.getDate(),W2/2,cy+410);
+  /* ロゴアイコン（ヘッダーの埋め込み画像を再利用） */
+  const mk2=document.querySelector('.brand .mark');
+  const fin=()=>c.toBlob(b=>cb(b),'image/jpeg',0.85);
+  if(mk2&&mk2.src){
+    const im=new Image();
+    im.onload=()=>{x.drawImage(im,W2/2-45,cy+430,90,90);fin();};
+    im.onerror=fin;
+    im.src=mk2.src;
+  }else fin();
+}
+
 /* 無料: 仕上がりモックJPG（現在の製品タブ・控えめ透かし） */
 function dlMockJpg(){
   if(!state.layout)return;
@@ -2758,8 +2804,23 @@ function wire(){
       try{
         const{code,deposited}=await depositRecipe('free');
         $('#freeMsg').innerHTML=deposited
-          ? codeMsgHtml('✓ デザインをキープしました（30日間保存）',code,'ご購入いただくと保管期間が1年に延長されます')
+          ? codeMsgHtml('✓ デザインをキープしました（30日間保存）',code,'柄とコードの控え画像も保存しました。ご購入いただくと保管期間が1年に延長されます')
           : '✓ レシピ（'+code+'.gararie）を端末に保存しました（お店への自動保存ができなかったため）。このファイルを保管しておいてください';
+        if(deposited)makeKeepCard(code,blob=>{
+          if(!blob)return;
+          download(blob,'gararie_keep_'+code+'.jpg');
+          /* iOS等: 共有シート→「画像を保存」で写真アプリへ直行できるボタンを追加 */
+          try{
+            const file=new File([blob],'gararie_keep_'+code+'.jpg',{type:'image/jpeg'});
+            if(navigator.canShare&&navigator.canShare({files:[file]})){
+              const sb=document.createElement('button');
+              sb.type='button';sb.className='sharebtn';
+              sb.textContent='写真に保存 / LINEで送る';
+              sb.onclick=()=>{navigator.share({files:[file],title:'ガラリエ デザインコード '+code}).catch(()=>{});};
+              $('#freeMsg').appendChild(sb);
+            }
+          }catch(e){}
+        });
       }catch(e){$('#freeMsg').textContent='キープに失敗しました。もう一度お試しください';dlRecipe();}
     };
     $('#recCodeBtn').onclick=async()=>{
