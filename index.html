@@ -39,7 +39,8 @@
   svg.ic{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
 
   /* ===== topbar ===== */
-  .topbar{position:sticky;top:0;z-index:80;height:56px;display:flex;align-items:center;gap:22px;padding:0 22px;background:var(--surface);border-bottom:1px solid var(--line)}
+  .topbar{height:56px;display:flex;align-items:center;gap:22px;padding:0 22px;background:var(--surface);border-bottom:1px solid var(--line)}
+  @media(min-width:921px){.topbar{position:sticky;top:0;z-index:80}}
   .brand{display:flex;align-items:center;gap:10px}
   .brand .mark{height:36px;width:auto;flex:none}
   .brandtext{display:flex;flex-direction:column;line-height:1}
@@ -280,7 +281,7 @@
 
   /* ===== スマホ最適化 ===== */
   /* 固定ミニプレビュー: 本体プレビューが画面外に出たら上部に出る（タップで戻る） */
-  #miniPv{display:none;position:fixed;top:56px;left:0;right:0;z-index:60;background:var(--paper);
+  #miniPv{display:none;position:fixed;top:0;left:0;right:0;z-index:60;background:var(--paper);
     border-bottom:1px solid var(--line);box-shadow:0 10px 24px -14px rgba(43,38,32,.5);cursor:pointer}
   #miniPv.show{display:block}
   #miniPv .mrow{display:flex}
@@ -3042,12 +3043,12 @@ function wire(){
     });
   };
   $$('input[type=range]').forEach(fill);
-  /* 本体プレビューもヘッダーも見えていない間だけ固定ミニバーを表示（タップで移動） */
+  /* スマホ: 本体プレビューもヘッダーも見えていない間だけ固定ミニバーを表示（タップで移動） */
   (function(){
     const mini=$('#miniPv'),card=$('#patCard'),top=document.querySelector('.topbar');
     if(!mini||!card||!('IntersectionObserver' in window))return;
     let patVis=true,topVis=true;
-    const upd=()=>mini.classList.toggle('show',!patVis);
+    const upd=()=>mini.classList.toggle('show',window.innerWidth<=920&&!patVis&&!topVis);
     /* カード枠でなくプレビュー本体(canvas)を監視: 1/4以上見えている時だけ「見えている」扱い */
     const cv=document.getElementById('patternCv')||card;
     new IntersectionObserver(es=>{patVis=es[0].intersectionRatio>=0.25;upd();},{threshold:[0,0.25,0.5]}).observe(cv);
