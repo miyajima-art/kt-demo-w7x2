@@ -349,8 +349,9 @@
         <input type="file" id="file" accept="image/*,.tif,.tiff" hidden>
       </div>
       <div class="samples quickcolor">
-        <div class="cap"><span>COLOR</span><em>先に色を選べます</em></div>
+        <div class="cap"><span>COLOR</span><em>背景の色・あとからでも変えられます</em></div>
         <div class="swatches" id="swatchesQuick"></div>
+        <div class="pick">自由に <input type="color" id="bgColor" value="#f2ebdc"></div>
       </div>
       <div class="samples">
         <div class="cap"><span>SAMPLE</span><em>そのまま使える見本柄</em></div>
@@ -444,18 +445,13 @@
       </div>
     </section>
 
-    <section class="sec">
-      <h2><span class="no">05</span>背景の色<span class="hint">もっと詳しく選ぶ</span></h2>
-      <div class="swatches" id="swatches"></div>
-      <div class="pick">自由に <input type="color" id="bgColor" value="#f2ebdc"></div>
-    </section>
   </aside>
 
   <!-- ===== STAGE ===== -->
   <main class="stage">
     <div class="previews">
       <div class="pv" id="patCard">
-        <div class="h"><span class="no">06</span><span class="t">生地プレビュー</span>
+        <div class="h"><span class="no">05</span><span class="t">生地プレビュー</span>
           <div class="htools">
             <div class="tabs" id="patTabs">
               <button data-t="surface" class="on">敷き詰め</button>
@@ -474,7 +470,7 @@
         <div class="foot"><span id="unitInfo">—</span><span id="seamlessInfo" style="color:var(--ok)">どこまでも続く、継ぎ目のない総柄</span></div>
       </div>
       <div class="pv" id="prodCard">
-        <div class="h"><span class="no">07</span><span class="t">仕上がりイメージ</span>
+        <div class="h"><span class="no">06</span><span class="t">仕上がりイメージ</span>
           <div class="htools">
             <div class="tabs" id="prodTabs">
               <button data-prod="tshirt" class="on">Tシャツ</button>
@@ -500,7 +496,7 @@
 <section class="bottomwrap">
 <div class="bottom">
       <div class="card">
-        <h2><span class="no">08</span><span class="t">保存・呼び出し（無料）</span></h2>
+        <h2><span class="no">07</span><span class="t">保存・呼び出し（無料）</span></h2>
         <div class="demo">見た目の確認・SNS共有用。印刷には使えません（透かし・低解像度）</div>
         <div class="exbtns" style="margin-top:4px">
           <button class="png" id="dlPattern" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5"/><circle cx="8.5" cy="10" r="1.6"/><path d="M4 17l4.5-4 3 2.4L15 12l5 5"/></svg>柄イメージ（JPG）</button>
@@ -527,7 +523,7 @@
       </div>
 
       <div class="card">
-        <h2><span class="no">09</span><span class="t">購入する</span></h2>
+        <h2><span class="no">08</span><span class="t">購入する</span></h2>
         <div class="buyseg" id="buySeg">
           <button data-mode="print" class="on">生地にプリント</button>
           <button data-mode="data">データのみ</button>
@@ -2460,7 +2456,8 @@ function buildRepeatSeg(){
   });
 }
 /* アパレル定番・人気カラー順: 無地系→ベージュ/グレー→カーキ/オリーブ/ブラウン→
-   くすみ暖色（ピンク/テラコッタ/ボルドー/マスタード）→ミント/サックス/ラベンダー→濃色 */
+   くすみ暖色（ピンク/テラコッタ/ボルドー/マスタード）→ミント/サックス/ラベンダー→濃色
+   ※フルパレット台帳・BG_QUICKの入れ替え候補。旧05廃止(2026-07-12)以降UIには出していない */
 const BG=['transparent','#ffffff','#f2ecdf','#e3d4b9','#b9b9b9','#4a4a4a','#8a8259','#5b6247','#6b4a35',
   '#e6c3bc','#c07856','#7b2d3b','#d9a94e','#9fd4c0','#a9c3d4','#b9aed3','#2e3a54','#26221e'];
 const BG_NAMES={'#ffffff':'ホワイト','#f2ecdf':'アイボリー（生成り）','#e3d4b9':'ベージュ','#b9b9b9':'杢グレー','#4a4a4a':'チャコール',
@@ -2480,10 +2477,9 @@ function drawSwatchGroup(sel,list){
     w.appendChild(d);
   });
 }
-/* 01のクイック(#swatchesQuick)と05の詳細(#swatches)を同じstate.bgで同期描画 */
+/* 01のクイック(#swatchesQuick)を state.bg と同期描画 */
 function buildSwatchUI(){
   drawSwatchGroup('#swatchesQuick',BG_QUICK);
-  drawSwatchGroup('#swatches',BG);
 }
 /* 色決定の単一入口。クイック/詳細/カスタムピッカーの3箇所すべてここを呼ぶ */
 function setBg(c){
@@ -2505,7 +2501,7 @@ const PURCHASE_URL='https://rekuredool.myshopify.com/cart/45843205062716:1';
 const STORAGE_URL='https://gararie-recipes.rekuredool.workers.dev';
 /* 柄エンジンのビルドID。tools/freeze_designer.mjs が中身のSHA-256から書き換える。
    レシピに刻まれ、印刷時に「顧客が見たのと同じエンジン」で描いたことを保証する。 */
-const BUILD='6056a9e1f3c0';
+const BUILD='479b43da7cc1';
 /* デザインコード: レシピ内容から決定論で生成する短い照合キー。
    注文（Shopify属性）とレシピファイル名の突き合わせに使う */
 function designCode(str){
