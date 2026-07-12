@@ -672,7 +672,7 @@
             <input type="file" id="recipeFile" accept=".gararie,application/json" hidden>
           </div>
           <div class="exbtns" id="keepRow" style="margin-top:6px;display:none">
-            <button class="keepbtn" id="keepFree" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l2.6 6.9L22 9.3l-5.6 4.9L18 22l-6-4-6 4 1.6-7.8L2 9.3l7.4-.4z"/></svg>コードでキープ（30日）</button>
+            <button class="keepbtn" id="keepFree" style="flex:1"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2l2.6 6.9L22 9.3l-5.6 4.9L18 22l-6-4-6 4 1.6-7.8L2 9.3l7.4-.4z"/></svg>コードでキープ（3日）</button>
           </div>
           <div class="coderow" id="codeRow" style="display:none">
             <input type="text" id="recCode" placeholder="デザインコード（例: GA1B2C3D4）" maxlength="9" autocapitalize="characters" autocomplete="off">
@@ -3573,7 +3573,7 @@ const PURCHASE_URL='https://rekuredool.myshopify.com/cart/45843205062716:1';
 const STORAGE_URL='https://gararie-recipes.rekuredool.workers.dev';
 /* 柄エンジンのビルドID。tools/freeze_designer.mjs が中身のSHA-256から書き換える。
    レシピに刻まれ、印刷時に「顧客が見たのと同じエンジン」で描いたことを保証する。 */
-const BUILD='622d1b0c1e63';
+const BUILD='02debed7abdc';
 /* デザインコード: レシピ内容から決定論で生成する短い照合キー。
    注文（Shopify属性）とレシピファイル名の突き合わせに使う */
 function designCode(str){
@@ -3665,7 +3665,7 @@ function makeKeepCard(code,cb){
   x.fillStyle='#263a34';x.font='700 104px Menlo,monospace';
   x.fillText(code,W2/2,cy+204);
   x.fillStyle='#2fa285';x.font='700 33px "Zen Maru Gothic","Hiragino Maru Gothic ProN",sans-serif';
-  x.fillText('30日間キープ中（ご購入で1年保管に延長）',W2/2,cy+280);
+  x.fillText('3日間キープ中（ご購入で1年保管に延長）',W2/2,cy+280);
   x.fillStyle='#96a39b';x.font='500 27px "Zen Maru Gothic","Hiragino Maru Gothic ProN",sans-serif';
   x.fillText('ガラリエでこのコードを入力すると、柄をいつでも復元できます',W2/2,cy+340);
   x.fillStyle='#b8b3a3';x.font='600 24px Menlo,monospace';
@@ -3860,7 +3860,13 @@ async function loadRecipe(obj,srcCode){
   $('#freeMsg').textContent='✓ レシピを読み込みました';
 }
 /* 見本柄名ラベルの改行位置（自然な語の区切り。未指定＝1行に収まる想定でそのまま） */
-const SAMP_NAME_BREAK={}; // 新8キー分は実機スクショで折返しが必要なものだけ追記
+const SAMP_NAME_BREAK={ // 意味の区切りでのみ改行（word-break:keep-all併用・語の途中で割れるのを防ぐ）
+  sm0301:2,  // トイ｜プードル
+  sm3502:2,  // グミ｜ベア
+  sm3601:4,  // バルーン｜アニマル
+  fd0301:3,  // ベリー｜ミックス
+  sm3801:3,  // ボルダ｜リング
+};
 function setSampName(nm,text,breakAt){
   if(breakAt){nm.textContent='';nm.append(text.slice(0,breakAt),document.createElement('wbr'),text.slice(breakAt));}
   else nm.textContent=text;
@@ -4255,14 +4261,14 @@ function wire(){
     $('#fileRow').style.display='none'; // コード保管に一本化（ファイルの手動保存/読込は非表示。自動フォールバックとしては温存）
     $('#codeRow').style.display='flex';
     $('#keepRow').style.display='flex';
-    $('#recipeNote').innerHTML='・ご購入すると自動で<b>1年間</b>保存されます<br>・購入前でも「コードでキープ」で<b>30日間</b>保存できます';
+    $('#recipeNote').innerHTML='・ご購入すると自動で<b>1年間</b>保存されます<br>・購入前でも「コードでキープ」で<b>3日間</b>保存できます';
     $('#restoreCaution').style.display='block';
     $('#keepFree').onclick=async()=>{
       $('#freeMsg').textContent='キープ中…';
       try{
         const{code,deposited}=await depositRecipe('free');
         $('#freeMsg').innerHTML=deposited
-          ? codeMsgHtml('✓ デザインをキープしました（30日間保存）',code,'柄とコードの控え画像も保存しました。ご購入いただくと保管期間が1年に延長されます')
+          ? codeMsgHtml('✓ デザインをキープしました（3日間保存）',code,'柄とコードの控え画像も保存しました。ご購入いただくと保管期間が1年に延長されます')
           : '✓ レシピ（'+code+'.gararie）を端末に保存しました（お店への自動保存ができなかったため）。このファイルを保管しておいてください';
         if(deposited)makeKeepCard(code,blob=>{
           if(!blob)return;
@@ -4395,7 +4401,7 @@ function wire(){
   function codeMsgHtml(pre,code,post){ /* コードを大きなバッジで見せる共通メッセージ生成 */
     return '<span class="codeline">'+pre+'</span><span class="codebadge"><b>'+code+'</b><span>タップでコピー</span></span><span class="codeline">'+(post||'')+'</span>';
   }
-  async function depositRecipe(tier){ /* レシピを預かり所へ自動保存（共通）。失敗時はDLフォールバック。tier:'paid'=400日/'free'=30日 */
+  async function depositRecipe(tier){ /* レシピを預かり所へ自動保存（共通）。失敗時はDLフォールバック。tier:'paid'=1年(365日)/'free'=3日（2026-07-13変更） */
     const r=buildRecipe(),code=currentCode(r);
     r.code=code;                    /* レシピ自身にコードを刻む（.gararieファイルからも復元元コードが分かる） */
     const js=JSON.stringify(r);
