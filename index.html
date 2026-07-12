@@ -88,7 +88,8 @@
   .samp.on{border:1.5px solid var(--accent);box-shadow:0 0 0 3px var(--ring)}
   .samp canvas{width:100%;aspect-ratio:1;display:block}
   .samp .nm{display:block;font-size:12.5px;color:var(--muted);text-align:center;padding:3px 2px 4px;line-height:1.2;background:var(--n1);word-break:keep-all} /* 改行は<wbr>の位置のみ（語の途中で割れるのを防ぐ） */
-  .samp .fixedtag{position:absolute;top:5px;left:5px;font-size:10px;letter-spacing:.02em;background:rgba(58,47,35,.72);color:#fff;border-radius:999px;padding:2px 7px 3px;pointer-events:none} /* 切り抜きなし（タイル型）の目印 */
+  #fillerSeg button{word-break:keep-all} /* 改行は<wbr>の位置のみ（「か/ら」等の途中割れ防止） */
+  .samp .fixedtag{position:absolute;top:4px;left:4px;font-size:9.5px;line-height:1;white-space:nowrap;letter-spacing:.02em;background:rgba(253,252,249,.92);color:#6b6357;border:1px solid rgba(58,47,35,.28);border-radius:999px;padding:2px 6px 3px;pointer-events:none} /* 切り抜きなし（タイル型）の目印。改行禁止・明色ピル＝柄を隠さない */
 
   /* cutout */
   .cutrow{display:flex;gap:14px;align-items:flex-start}
@@ -525,9 +526,9 @@
         <div id="fillerControls">
           <div class="segline" id="fillerSeg">
             <button data-f="none" class="on"><span class="sans">なし</span></button>
-            <button data-f="motif"><span class="sans">モチーフから</span></button>
-            <button data-f="upload"><span class="sans">絵をアップ</span></button>
-            <button data-f="gallery"><span class="sans">デザインから</span></button>
+            <button data-f="gallery"><span class="sans">デザイン<wbr>から</span></button>
+            <button data-f="motif"><span class="sans">モチーフ<wbr>から</span></button>
+            <button data-f="upload"><span class="sans">絵を<wbr>アップ</span></button>
           </div>
           <input type="file" id="fillerFile" accept="image/*,.tif,.tiff" hidden>
           <div id="fillerPick" style="display:none;margin-top:10px">
