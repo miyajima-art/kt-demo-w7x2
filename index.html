@@ -317,6 +317,26 @@
     .tabs button{padding:7px 11px 8px}
   }
 
+  /* F25: 自由配置ドラッグとページスクロールの競合防止（freeform×1リピート時のみ動的付与） */
+  #patternCv.ffedit{touch-action:none}
+
+  /* F25: 自由配置のスマホ編集シート（PCは #ffOpenModal 非表示＋#ffModal 二重ガードで従来UIのまま） */
+  #ffOpenModal{display:none;font-size:13px;padding:8px 14px;margin:2px 0 10px}
+  @media(max-width:920px){#ffOpenModal{display:inline-flex;align-items:center}}
+  #ffModal{display:none;position:fixed;inset:0;background:rgba(43,38,32,.42);z-index:110;padding:10px}
+  #ffModal.open{display:flex}
+  .ffmodal__card{background:var(--paper);border-radius:var(--r-md);box-shadow:0 24px 60px -20px rgba(43,38,32,.55);flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .ffmodal__head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}
+  .ffmodal__head b{font-family:var(--mincho);font-size:16px;font-weight:600}
+  .ffmodal__head button{border:0;background:none;font-size:24px;line-height:1;color:var(--muted);padding:2px 8px}
+  #ffModalCvSlot{flex:0 0 auto;max-height:52vh;padding:10px 12px 4px}
+  #ffModalCvSlot .cv{background:var(--canvas);border-radius:var(--r-sm)}
+  #ffModal #patternCv{width:100%;height:auto;max-height:50vh;object-fit:contain}
+  #ffModalCtrlSlot{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;padding:8px 16px 12px}
+  .ffmodal__foot{flex:0 0 auto;padding:10px 16px;border-top:1px solid var(--line)}
+  .ffmodal__foot button{display:block;width:100%;border:0;border-radius:var(--r-sm);background:var(--accent);color:#fff;font-size:15px;font-weight:600;padding:12px}
+  @media(min-width:921px){#ffModal{display:none!important}}
+
   /* TIFF取り込みダイアログ */
   #tiffDlg{display:none;position:fixed;inset:0;background:rgba(43,38,32,.42);z-index:100;align-items:center;justify-content:center;padding:20px}
   #tiffDlg.open{display:flex}
@@ -493,6 +513,8 @@
       </div>
       <div id="freeformBox" style="display:none;margin-top:12px" data-feature="multiMotif">
         <label class="lb">自由配置のモチーフ</label>
+        <button id="ffOpenModal" type="button" class="ghost">柄配置を編集（拡大）</button>
+        <div id="ffControls">
         <div class="sampgrid" id="ffPalette" style="grid-template-columns:repeat(6,1fr)"></div>
         <button id="ffAdd" type="button" style="margin-top:8px;font-size:13px;padding:7px 12px;border:1px solid #d8d2c6;border-radius:8px;background:#fdfcf9;cursor:pointer">＋ モチーフを追加</button>
         <div id="ffGateMsg" style="display:none;font-size:12px;color:#a4552f;margin-top:6px">先にベース（絵・見本柄）を選択してください</div>
@@ -513,6 +535,7 @@
           </div>
         </div>
         <div style="font-size:11px;color:#8a8377;margin-top:8px">「1リピート」表示でモチーフを直接ドラッグ／タップで選択できます</div>
+        </div>
       </div>
     </section>
 
@@ -565,7 +588,7 @@
             <label class="toggle"><input type="checkbox" id="seams"> 継ぎ目</label>
           </div>
         </div>
-        <div class="cv"><canvas id="patternCv" width="980" height="600"></canvas></div>
+        <div class="cv" id="patCvWrap"><canvas id="patternCv" width="980" height="600"></canvas></div>
         <div class="foot"><span id="unitInfo">—</span><span id="fabricWInfo" style="color:#8a8377"></span><span id="seamlessInfo" style="color:var(--ok)">どこまでも続く、継ぎ目のない総柄</span></div>
       </div>
       <div class="pv" id="prodCard">
@@ -717,6 +740,21 @@
       <small>描いた絵のスキャン・写真向け。背景を透過してモチーフ化し、リピートを組み直します。</small>
     </button>
     <button class="dlgcancel" id="dlgCancel">キャンセル</button>
+  </div>
+</div>
+
+<!-- F25: 自由配置のスマホ編集シート（open時に #patCvWrap / #ffControls をここへ移動し、閉じると元へ戻す） -->
+<div id="ffModal" data-feature="multiMotif">
+  <div class="ffmodal__card">
+    <div class="ffmodal__head">
+      <b>柄配置を編集</b>
+      <button id="ffModalClose" type="button" aria-label="閉じる">×</button>
+    </div>
+    <div id="ffModalCvSlot"></div>
+    <div id="ffModalCtrlSlot"></div>
+    <div class="ffmodal__foot">
+      <button id="ffModalDone" type="button">完了</button>
+    </div>
   </div>
 </div>
 
@@ -3168,6 +3206,7 @@ function ffSyncUI(){
   const box=$('#freeformBox');if(!box)return;
   const on=(state.repeat==='freeform'&&state.mode!=='tile');
   box.style.display=on?'block':'none';
+  ffTouchSync(); // 自由配置の成立状態に合わせてcanvasのタッチスクロール制御を同期
   if(!on)return;
   const g=$('#ffPalette');g.innerHTML='';
   if(ffPaletteSel>=state.motifs.length)ffPaletteSel=0;
@@ -3190,6 +3229,51 @@ function ffSyncUI(){
     $('#ffRot').value=it.rot;$('#ffRotV').textContent=Math.round(it.rot)+'°';
     fill($('#ffSc'));fill($('#ffRot'));
   }
+}
+/* ---- F25 スマホ編集シート（reparent方式）＋スクロールロック ---- */
+function ffTouchSync(){ // ドラッグでモチーフ移動が成立する条件（ポインタIIFEのヒット条件）と完全一致させる
+  const cv=$('#patternCv');if(!cv)return;
+  cv.classList.toggle('ffedit',state.patTab==='unit'&&state.repeat==='freeform'&&state.mode!=='tile');
+}
+let __ffScrollY=0;
+function lockBodyScroll(){ // iOSラバーバンド対策: bodyをfixed化しスクロール位置を退避
+  __ffScrollY=window.scrollY||0;
+  Object.assign(document.body.style,{position:'fixed',top:(-__ffScrollY)+'px',left:'0',right:'0',width:'100%'});
+}
+function unlockBodyScroll(){
+  Object.assign(document.body.style,{position:'',top:'',left:'',right:'',width:''});
+  window.scrollTo(0,__ffScrollY);
+}
+const __ffHome={cvP:null,cvN:null,ctP:null,ctN:null}; // reparent元の親/兄弟を保持
+function ffModalMoveIn(){
+  const wrap=$('#patCvWrap'),ctrl=$('#ffControls');
+  __ffHome.cvP=wrap.parentNode;__ffHome.cvN=wrap.nextSibling;
+  __ffHome.ctP=ctrl.parentNode;__ffHome.ctN=ctrl.nextSibling;
+  $('#ffModalCvSlot').appendChild(wrap);
+  $('#ffModalCtrlSlot').appendChild(ctrl);
+}
+function ffModalMoveOut(){
+  if(__ffHome.cvP)__ffHome.cvP.insertBefore($('#patCvWrap'),__ffHome.cvN);
+  if(__ffHome.ctP)__ffHome.ctP.insertBefore($('#ffControls'),__ffHome.ctN);
+}
+function ffModalCanUse(){return window.innerWidth<=920&&!!$('#ffModal');}
+function openFfModal(){
+  const m=$('#ffModal');if(!m||m.classList.contains('open'))return;
+  if(state.patTab!=='unit'){state.patTab='unit';$$('#patTabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==='unit'));}
+  ffModalMoveIn();
+  m.classList.add('open');
+  lockBodyScroll();
+  const cv=$('#patternCv');cv.width=900;cv.height=900; // 正方バッファ=3×3の正方unitが幅いっぱいに（閉時に復元）
+  ffTouchSync();renderPattern();
+}
+function closeFfModal(){
+  const m=$('#ffModal');if(!m||!m.classList.contains('open'))return;
+  m.classList.remove('open');
+  unlockBodyScroll();
+  ffModalMoveOut();
+  const cv=$('#patternCv');cv.width=980;cv.height=600;
+  fitPvCanvases(); // PC幅ならレイアウト実寸に再フィット（モバイルは既定値のままのno-op）
+  ffTouchSync();rerender(); // 製品プレビューにも反映
 }
 /* 1リピート表示のビュー座標（renderPatternのunit分岐と同一計算） */
 function ffViewGeom(){
@@ -3257,6 +3341,7 @@ function buildRepeatSeg(){
         state.patTab='unit';$$('#patTabs button').forEach(x2=>x2.classList.toggle('on',x2.dataset.t==='unit'));
       }
       updateArrange();rebuild();
+      if(r.id==='freeform'&&ffModalCanUse())openFfModal(); // F25: スマホは編集シートを自動で開く（明示タップ時のみ・検証フックは非経由）
     };
     seg.appendChild(b);
   });
@@ -3308,7 +3393,7 @@ const PURCHASE_URL='https://rekuredool.myshopify.com/cart/45843205062716:1';
 const STORAGE_URL='https://gararie-recipes.rekuredool.workers.dev';
 /* 柄エンジンのビルドID。tools/freeze_designer.mjs が中身のSHA-256から書き換える。
    レシピに刻まれ、印刷時に「顧客が見たのと同じエンジン」で描いたことを保証する。 */
-const BUILD='04f85792565d';
+const BUILD='ca756a7c84aa';
 /* デザインコード: レシピ内容から決定論で生成する短い照合キー。
    注文（Shopify属性）とレシピファイル名の突き合わせに使う */
 function designCode(str){
@@ -3649,6 +3734,7 @@ function redrawSamples(){
     $$('#sampGrid .samp').forEach(d=>{
       const P=PRESETS[d.dataset.sample];
       if(P)drawSampleTile(d.querySelector('canvas'),P);
+      else if(d.dataset.sample==='textOnly')drawTextOnlyTile(d.querySelector('canvas'));
     });
   });
 }
@@ -3783,7 +3869,12 @@ function wire(){
     $('#ffDown').onclick=()=>{const s=state.freeform.sel,a=state.freeform.items;if(s<=0)return;
       [a[s],a[s-1]]=[a[s-1],a[s]];state.freeform.sel=s-1;ffre();};
   }
-  $$('#patTabs button').forEach(b=>b.onclick=()=>{state.patTab=b.dataset.t;$$('#patTabs button').forEach(x=>x.classList.toggle('on',x===b));renderPattern();});
+  if($('#ffModal')){ // F25: スマホ編集シートの配線（multiMotif OFF時は要素ごと畳まれるためガード）
+    if($('#ffOpenModal'))$('#ffOpenModal').onclick=()=>{openFfModal();};
+    $('#ffModalClose').onclick=closeFfModal;
+    $('#ffModalDone').onclick=closeFfModal;
+  }
+  $$('#patTabs button').forEach(b=>b.onclick=()=>{state.patTab=b.dataset.t;ffTouchSync();$$('#patTabs button').forEach(x=>x.classList.toggle('on',x===b));renderPattern();});
   $$('#zoomSeg button').forEach(b=>b.onclick=()=>{state.zoom=+b.dataset.z;$$('#zoomSeg button').forEach(x=>x.classList.toggle('on',x===b));
     $('#patternCv').classList.toggle('zoomed',state.zoom>1); // ズーム時のみタッチスクロールを奪う
     renderPattern();});
@@ -3796,7 +3887,9 @@ function wire(){
   /* F23 文字入れ */
   if($('#tmText')){
     const tmUI=()=>{$('#tmScaleV').textContent=state.textMotif.scale+'%';$('#tmRotV').textContent=state.textMotif.rot+'°';};
-    $('#tmText').oninput=e=>{state.textMotif.text=e.target.value;syncTextMotif();};
+    $('#tmText').oninput=e=>{state.textMotif.text=e.target.value;syncTextMotif();
+      if(state.sample==='textOnly')$('#motifCount').textContent=state.textMotif.text.trim()
+        ?'文字だけの柄（絵は未使用）':'文字だけの柄 — TEXT欄に文字を入力してください';};
     /* 文字だけの柄（絵なし・名入れ生地）。SAMPLEの「文字だけ」カードと同じ処理 */
     $('#tmOnly').onclick=()=>{
       if(!state.textMotif.text.trim()){$('#tmText').focus();return;} // 未入力なら入力欄へ誘導
@@ -4261,7 +4354,9 @@ function fitPvCanvases(){
   if(a)renderPattern();
   if(b)renderProduct();
 }
-window.addEventListener('resize',()=>{clearTimeout(window.__pvFitT);window.__pvFitT=setTimeout(fitPvCanvases,150);});
+window.addEventListener('resize',()=>{clearTimeout(window.__pvFitT);window.__pvFitT=setTimeout(fitPvCanvases,150);
+  if(window.innerWidth>920&&$('#ffModal')&&$('#ffModal').classList.contains('open'))closeFfModal(); // F25: PC幅では編集シートを畳む（保険）
+});
 /* フォント読込でヘッダー高が変わるため、確定後に再フィット */
 window.addEventListener('load',()=>setTimeout(fitPvCanvases,100));
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>setTimeout(fitPvCanvases,0));
