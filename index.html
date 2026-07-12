@@ -134,6 +134,12 @@
   #fillerBox.dis #fillerControls{opacity:.35;pointer-events:none}
   #fillerBox .lockhint{display:none;font-size:11px;color:var(--muted);margin:2px 0 8px}
   #fillerBox.dis .lockhint{display:block}
+  #bgBox.dis #bgControls{opacity:.35;pointer-events:none}
+  #bgBox .lockhint{display:none;font-size:11px;color:var(--muted);margin:2px 0 8px}
+  #bgBox.dis .lockhint{display:block}
+  #textBox.dis #textControls{opacity:.35;pointer-events:none}
+  #textBox .lockhint{display:none;font-size:11px;color:var(--muted);margin:2px 0 8px}
+  #textBox.dis .lockhint{display:block}
   .ghost{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--n2);border-radius:var(--r-xs);padding:7px 12px;font-size:13px;color:var(--sec)}
   .ghost:hover{background:var(--n3)}
   .ghost .ic{width:14px;height:14px;stroke:var(--muted)}
@@ -377,8 +383,10 @@
         <input type="file" id="file" accept="image/*,.tif,.tiff" hidden>
       </div>
       <label class="toggle" style="margin-top:10px"><input type="checkbox" id="noSplit"> ひとつのデザインとして扱う（ロゴ・文字入り向け）</label>
-      <div class="samples quickcolor">
+      <div class="samples quickcolor" id="bgBox">
         <div class="cap"><span>COLOR</span><em>背景の色・あとからでも変えられます</em></div>
+        <div class="lockhint">※「絵として切り抜いて総柄にする」か、切り抜き済みの見本柄を選ぶと使用できます</div>
+        <div id="bgControls">
         <div class="swatches" id="swatchesQuick"></div>
         <div class="pick">自由に <input type="color" id="bgColor" value="#f2ebdc"></div>
         <div class="segline" id="bgTypeSeg" style="margin-top:8px">
@@ -440,13 +448,16 @@
           <label class="lb">背景の濃さ <span class="val num" id="bgAlphaV" style="min-width:auto">100%</span></label>
           <div class="range"><input type="range" id="bgAlpha" min="10" max="100" step="5" value="100"></div>
         </div>
+        </div>
       </div>
       <div class="samples">
         <div class="cap"><span>SAMPLE</span><em>そのまま使える見本柄</em></div>
         <div class="sampgrid" id="sampGrid"></div>
       </div>
-      <div class="samples" data-feature="textMotif">
+      <div class="samples" data-feature="textMotif" id="textBox">
         <div class="cap"><span>TEXT</span><em>文字を柄に入れる（オプション・空欄で消える）</em></div>
+        <div class="lockhint">※「絵として切り抜いて総柄にする」か、切り抜き済みの見本柄を選ぶと使用できます</div>
+        <div id="textControls">
         <input type="text" id="tmText" placeholder="例: rekuredool / ガラリエ" style="width:100%;padding:8px 10px;border:1px solid #d8d2c6;border-radius:8px;font-size:14px;background:#fdfcf9">
         <div style="margin-top:8px">
           <button id="tmFontBtn" type="button" style="width:100%;text-align:left;font-size:13px;padding:8px 10px;border:1px solid #d8d2c6;border-radius:8px;background:#fdfcf9;cursor:pointer">フォント: <span id="tmFontName">ゴシック（標準）</span><span style="float:right;color:#8a8377">▾</span></button>
@@ -469,6 +480,7 @@
         <div style="margin-top:6px">
           <label class="lb">回転 <span class="val num" id="tmRotV" style="min-width:auto">0°</span></label>
           <div class="range"><input type="range" id="tmRot" min="-45" max="45" step="5" value="0"></div>
+        </div>
         </div>
       </div>
     </section>
@@ -3232,6 +3244,10 @@ function updateModeUI(){
   const tossOn=(!tile&&state.repeat==='toss');
   $('#tossShuffleRow').style.display=tossOn?'block':'none';
   $('#fillerBox').classList.toggle('dis',!tossOn);
+  /* タイルモード（TIFFアップロード「そのままリピートタイル」/見本柄「柄そのまま」）は
+     生地全面が完成柄そのものなので、背景・文字入れは合成されず効果が無い→グレーアウト */
+  $('#bgBox').classList.toggle('dis',tile);
+  $('#textBox').classList.toggle('dis',tile);
 }
 /* ---- 背景モチーフのUI同期・アップロード ---- */
 function syncFillerUI(){
@@ -3573,7 +3589,7 @@ const PURCHASE_URL='https://rekuredool.myshopify.com/cart/45843205062716:1';
 const STORAGE_URL='https://gararie-recipes.rekuredool.workers.dev';
 /* 柄エンジンのビルドID。tools/freeze_designer.mjs が中身のSHA-256から書き換える。
    レシピに刻まれ、印刷時に「顧客が見たのと同じエンジン」で描いたことを保証する。 */
-const BUILD='02debed7abdc';
+const BUILD='eaf92b72b30d';
 /* デザインコード: レシピ内容から決定論で生成する短い照合キー。
    注文（Shopify属性）とレシピファイル名の突き合わせに使う */
 function designCode(str){
