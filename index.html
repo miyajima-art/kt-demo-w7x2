@@ -463,6 +463,11 @@
               <button data-z="2">200%</button>
               <button data-z="5">500%</button>
             </div>
+            <div class="zoomseg" id="baseSeg">
+              <button data-cm="3" class="on">3cm</button>
+              <button data-cm="5">5cm</button>
+              <button data-cm="10">10cm</button>
+            </div>
             <label class="toggle"><input type="checkbox" id="seams"> 継ぎ目</label>
           </div>
         </div>
@@ -644,7 +649,7 @@ const state={
   tol:50, skipCut:false, seed:20260710,
   filler:{type:'none',motifIdx:-1,motif:null}, // すき間の背景モチーフ: none/paw/motif/upload
   fillerScale:30,                              // 主役に対する大きさ%（15-50）
-  patTab:'surface', zoom:1, showSeams:false,
+  patTab:'surface', zoom:1, showSeams:false, baseCm:3, // 実寸ルーラーの基準長さ(cm): 3/5/10
   panCmX:0, panCmY:0,            // 生地プレビューのスライド位置（実寸cm・ズーム非依存）
   product:'tshirt', prodZoom:'full',
   dpi:300,
@@ -1581,15 +1586,25 @@ function renderPattern(){
       for(let y=y0-uh2;y<=h;y+=uh2){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
       ctx.restore();
     }
-    /* スケールバー: 10cm */
-    const bar=10*PPCM*state.zoom;
+    /* スケールバー: L字型（2026-07-12改修・横=右方向／縦=上方向、角=左下）。
+       角(cx,cy)は旧バーの始点(28,h-24)を継承し、両腕とも実寸state.baseCm(3/5/10cm)を
+       state.zoomと連動させて描画（bar式は旧実装のPPCM*state.zoom係数をそのまま流用）。
+       箱サイズはbarとラベル幅(ctx.measureText実測)の大きい方に追従＝旧実装は箱幅がbar
+       固定でテキストがはみ出す不具合があったため、ここで併せて修正する。 */
+    const bar=state.baseCm*PPCM*state.zoom;
     ctx.save();
-    ctx.fillStyle='rgba(252,250,245,.85)';ctx.fillRect(16,h-42,bar+24,28);
-    ctx.strokeStyle='rgba(43,38,32,.2)';ctx.strokeRect(16.5,h-41.5,bar+23,27);
+    ctx.font='10px ui-monospace,monospace';
+    const label=state.baseCm+'cm（実寸）';
+    const tw=ctx.measureText(label).width;
+    const cw=Math.max(bar,tw);
+    const bw=cw+24,bh=bar+25,bx=16,by=h-14-bh;
+    ctx.fillStyle='rgba(252,250,245,.85)';ctx.fillRect(bx,by,bw,bh);
+    ctx.strokeStyle='rgba(43,38,32,.2)';ctx.strokeRect(bx+0.5,by+0.5,bw-1,bh-1);
     ctx.strokeStyle='#2b2620';ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.moveTo(28,h-24);ctx.lineTo(28+bar,h-24);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(28,h-29);ctx.lineTo(28,h-19);ctx.moveTo(28+bar,h-29);ctx.lineTo(28+bar,h-19);ctx.stroke();
-    ctx.font='10px ui-monospace,monospace';ctx.fillStyle='#2b2620';ctx.fillText('10cm（実寸）',30,h-31);
+    const cx=bx+12,cy=h-24;
+    ctx.beginPath();ctx.moveTo(cx+bar,cy);ctx.lineTo(cx,cy);ctx.lineTo(cx,cy-bar);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(cx+bar,cy-5);ctx.lineTo(cx+bar,cy+5);ctx.moveTo(cx-5,cy-bar);ctx.lineTo(cx+5,cy-bar);ctx.stroke();
+    ctx.fillStyle='#2b2620';ctx.fillText(label,cx,by+11);
     ctx.restore();
   }
   const names={full:'ストレート',half:'ハーフドロップ',brick:'ブリック',diamond:'ダイヤモンド',sateen:'飛び柄（斜めずらし）',mirror:'ミラー',toss:'トス（散らし）'};
@@ -2502,7 +2517,7 @@ const PURCHASE_URL='https://rekuredool.myshopify.com/cart/45843205062716:1';
 const STORAGE_URL='https://gararie-recipes.rekuredool.workers.dev';
 /* 柄エンジンのビルドID。tools/freeze_designer.mjs が中身のSHA-256から書き換える。
    レシピに刻まれ、印刷時に「顧客が見たのと同じエンジン」で描いたことを保証する。 */
-const BUILD='479b43da7cc1';
+const BUILD='748776e5a34a';
 /* デザインコード: レシピ内容から決定論で生成する短い照合キー。
    注文（Shopify属性）とレシピファイル名の突き合わせに使う */
 function designCode(str){
@@ -2856,6 +2871,8 @@ function wire(){
   $$('#patTabs button').forEach(b=>b.onclick=()=>{state.patTab=b.dataset.t;$$('#patTabs button').forEach(x=>x.classList.toggle('on',x===b));renderPattern();});
   $$('#zoomSeg button').forEach(b=>b.onclick=()=>{state.zoom=+b.dataset.z;$$('#zoomSeg button').forEach(x=>x.classList.toggle('on',x===b));
     $('#patternCv').classList.toggle('zoomed',state.zoom>1); // ズーム時のみタッチスクロールを奪う
+    renderPattern();});
+  $$('#baseSeg button').forEach(b=>b.onclick=()=>{state.baseCm=+b.dataset.cm;$$('#baseSeg button').forEach(x=>x.classList.toggle('on',x===b));
     renderPattern();});
   $$('#prodTabs button').forEach(b=>b.onclick=()=>{state.product=b.dataset.prod;$$('#prodTabs button').forEach(x=>x.classList.toggle('on',x===b));renderProduct();});
   $$('#prodZoomSeg button').forEach(b=>b.onclick=()=>{state.prodZoom=b.dataset.z;$$('#prodZoomSeg button').forEach(x=>x.classList.toggle('on',x===b));renderProduct();});
