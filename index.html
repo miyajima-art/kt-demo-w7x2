@@ -88,6 +88,7 @@
   .samp.on{border:1.5px solid var(--accent);box-shadow:0 0 0 3px var(--ring)}
   .samp canvas{width:100%;aspect-ratio:1;display:block}
   .samp .nm{display:block;font-size:12.5px;color:var(--muted);text-align:center;padding:3px 2px 4px;line-height:1.2;background:var(--n1);word-break:keep-all} /* 改行は<wbr>の位置のみ（語の途中で割れるのを防ぐ） */
+  .samp .fixedtag{position:absolute;top:5px;left:5px;font-size:10px;letter-spacing:.02em;background:rgba(58,47,35,.72);color:#fff;border-radius:999px;padding:2px 7px 3px;pointer-events:none} /* 切り抜きなし（タイル型）の目印 */
 
   /* cutout */
   .cutrow{display:flex;gap:14px;align-items:flex-start}
@@ -382,7 +383,6 @@
         <div class="segline" id="bgTypeSeg" style="margin-top:8px">
           <button data-t="solid" class="on">単色</button>
           <button data-t="grad" data-feature="bgGradient">グラデ</button>
-          <button data-t="fluid" data-feature="bgFluid">流体</button>
           <button data-t="dots" data-feature="bgPattern">ドット</button>
           <button data-t="stripes" data-feature="bgPattern">縞</button>
           <button data-t="checks" data-feature="bgPattern">チェック</button>
@@ -398,35 +398,28 @@
               </div>
             </div>
             <div class="segline" id="bgAngleSeg">
-              <button data-a="v" class="on">縦</button><button data-a="h">横</button><button data-a="d">斜め</button>
+              <button data-a="v" class="on">縦</button><button data-a="h">横</button><button data-a="d">斜め</button><button data-a="fluid" data-feature="bgFluid">流体</button>
             </div>
-            <div>
+            <div id="bgGradLinearRow">
               <label class="lb">幅（なだらかさ） <span class="val num" id="bgGradWidthV" style="min-width:auto">100%</span></label>
               <div class="range"><input type="range" id="bgGradWidth" min="0" max="100" step="5" value="100"></div>
             </div>
-          </div>
-          <div id="bgFluidRow" style="display:none;flex-direction:column;gap:10px">
-            <div>
-              <label class="lb" style="margin-bottom:6px">色（同じ色パレットをグラデと共有）</label>
-              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                <div id="bgFluidColorChips" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"></div>
-                <button id="bgFluidColorAdd" type="button" title="色を追加" style="width:26px;height:26px;border:1.5px dashed #b0a890;border-radius:50%;background:#fdfcf9;cursor:pointer;font-size:15px;color:#8a7358;line-height:1;padding:0">＋</button>
+            <div id="bgFluidRow" style="display:none;flex-direction:column;gap:10px">
+              <div style="font-size:11.5px;color:#8a8377">プレビューの柄の上を指でドラッグすると、色の塊（ブロブ）を動かせます</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button id="bgFluidAdd" type="button" class="ghost" style="font-size:12px;padding:6px 10px">＋ 塊を追加</button>
+                <button id="bgFluidDel" type="button" class="ghost" style="font-size:12px;padding:6px 10px">選択中を削除</button>
+                <button id="bgFluidWarp" type="button" class="ghost" style="font-size:12px;padding:6px 10px">🔀 流れを変える</button>
               </div>
-            </div>
-            <div style="font-size:11.5px;color:#8a8377">プレビューの柄の上を指でドラッグすると、色の塊（ブロブ）を動かせます</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button id="bgFluidAdd" type="button" class="ghost" style="font-size:12px;padding:6px 10px">＋ 塊を追加</button>
-              <button id="bgFluidDel" type="button" class="ghost" style="font-size:12px;padding:6px 10px">選択中を削除</button>
-              <button id="bgFluidWarp" type="button" class="ghost" style="font-size:12px;padding:6px 10px">🔀 流れを変える</button>
-            </div>
-            <div id="bgFluidSelRow" style="display:none">
-              <label class="lb">選択中の大きさ <span class="val num" id="bgFluidRV" style="min-width:auto">100%</span></label>
-              <div class="range"><input type="range" id="bgFluidR" min="20" max="200" step="5" value="100"></div>
-            </div>
-            <div>
-              <label class="lb">流れの大きさ <span class="val num" id="bgFluidScaleV" style="min-width:auto">12cm</span></label>
-              <div class="range"><input type="range" id="bgFluidScale" min="4" max="30" step="1" value="12"></div>
-              <div class="mini" style="margin-top:4px">小さくするほど、服のどこを裁断しても同じような色合いになります（柄の大きさとは独立）</div>
+              <div id="bgFluidSelRow" style="display:none">
+                <label class="lb">選択中の大きさ <span class="val num" id="bgFluidRV" style="min-width:auto">100%</span></label>
+                <div class="range"><input type="range" id="bgFluidR" min="20" max="200" step="5" value="100"></div>
+              </div>
+              <div>
+                <label class="lb">流れの大きさ <span class="val num" id="bgFluidScaleV" style="min-width:auto">12cm</span></label>
+                <div class="range"><input type="range" id="bgFluidScale" min="4" max="30" step="1" value="12"></div>
+                <div class="mini" style="margin-top:4px">小さくするほど、服のどこを裁断しても同じような色合いになります（柄の大きさとは独立）</div>
+              </div>
             </div>
           </div>
           <div id="bgPatRow" style="display:none">
@@ -534,15 +527,24 @@
             <button data-f="none" class="on"><span class="sans">なし</span></button>
             <button data-f="motif"><span class="sans">モチーフから</span></button>
             <button data-f="upload"><span class="sans">絵をアップ</span></button>
+            <button data-f="gallery"><span class="sans">デザインから</span></button>
           </div>
           <input type="file" id="fillerFile" accept="image/*,.tif,.tiff" hidden>
           <div id="fillerPick" style="display:none;margin-top:10px">
             <label class="lb">背景に回すモチーフ</label>
             <div class="sampgrid" id="fillerPickGrid" style="grid-template-columns:repeat(6,1fr)"></div>
           </div>
+          <div id="fillerGalleryPick" style="display:none;margin-top:10px">
+            <label class="lb">背景のデザイン</label>
+            <div class="sampgrid" id="fillerGalleryGrid" style="grid-template-columns:repeat(3,1fr)"></div>
+          </div>
           <div id="fillerScaleRow" style="display:none;margin-top:12px">
             <label class="lb">背景モチーフの大きさ <span class="val num" id="fillerScaleV" style="min-width:auto">30%</span></label>
             <div class="range"><input type="range" id="fillerScale" min="15" max="50" value="30"></div>
+          </div>
+          <div id="fillerGapRow" style="display:none;margin-top:12px">
+            <label class="lb">背景モチーフの間隔 <span class="val num" id="fillerGapV" style="min-width:auto">100%</span></label>
+            <div class="range"><input type="range" id="fillerGap" min="70" max="200" value="100"></div>
           </div>
         </div>
       </div>
@@ -817,8 +819,9 @@ const state={
   repeat:'half', dropDen:2, arrange:'checker',
   sizeCm:7, density:45, rot:0, bg:'#f2ecdf', bgTouched:false, // bgTouched: ユーザーが明示的に色を選んだか（trueならプリセット切替でbgを上書きしない）
   tol:50, skipCut:false, noSplit:false, seed:20260710, // noSplit: 切り抜き後にモチーフ分割しない（ロゴ・文字入り向け）
-  filler:{type:'none',motifIdx:-1,motif:null}, // すき間の背景モチーフ: none/paw/motif/upload
+  filler:{type:'none',motifIdx:-1,motif:null,galleryKey:null,set:null,tile:null}, // すき間の背景: none/motif/upload/gallery（'paw'は旧レシピ互換のみ）
   fillerScale:30,                              // 主役に対する大きさ%（15-50）
+  fillerGap:1,                                 // 背景モチーフの間隔倍率（0.7-2.0・1=従来）
   patTab:'surface', zoom:1, showSeams:false, showGrid:false, // showGrid: 1cm/5cm方眼グリッド線の表示
   panCmX:0, panCmY:0,            // 生地プレビューのスライド位置（実寸cm・ズーム非依存）
   product:'tshirt', prodZoom:'full',
@@ -837,7 +840,7 @@ const state={
   layout:null, autoBase:0,
 };
 const PPCM=28;              // プレビュー基準スケール(px/cm・zoom=1) ※2026-07-12: Retina(dpr=2)実効密度3.5→14px/cmへ引き上げ(7→28,×4)
-const CUT_MAX=700;          // 解析解像度
+const CUT_MAX=1100;         // 解析解像度（v2: 700→1100・細部の切り抜き精度向上）
 const HI_MAX=2200;          // 入稿用切り抜きの上限解像度
 
 /* ---- 機能フラグ（F27: 単一システム＋機能開閉。要件定義v2 §3） ----
@@ -860,17 +863,22 @@ const FEATURES={
 function hasFeature(k){return !!FEATURES[k];}
 
 
-/* 見本柄（実プリントデータ8点・GitHub Pages配信）。各keyはurl(実寸解像度)/thumbUrl(サムネ軽量版)/cmW(実寸幅cm)を持つ */
+/* 見本柄（実プリントデータ8点・GitHub Pages配信）
+   kind:'motifs'＝完全切り抜き済み透過モチーフ群（背景色・並べ方・大きさ・密度が調整可能）
+   kind:'tile'  ＝モチーフが密接に連結し分離不能なデザイン（完成タイルをそのまま敷き詰め）
+   motifPre+motifN → GA_ASSETS+motifPre+n+'.png' の透過PNG群。repeat/sizeCm/density/rot/bg は選択時の既定値 */
+const GA_ASSETS='https://miyajima-art.github.io/kt-demo-w7x2/assets/';
 const TILE_SAMPLES={
-  fd0201:{key:'fd0201',name:'さくらんぼ',       url:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-fd0201.jpg', thumbUrl:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-fd0201-thumb.jpg', cmW:25.4},
-  fd0301:{key:'fd0301',name:'ベリーミックス',   url:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-fd0301.jpg', thumbUrl:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-fd0301-thumb.jpg', cmW:27.5},
-  plum:  {key:'plum',  name:'梅の花（ブルー）', url:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-plum.jpg',   thumbUrl:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-plum-thumb.jpg',   cmW:15.0},
-  sm0301:{key:'sm0301',name:'トイプードル',     url:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-sm0301.jpg', thumbUrl:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-sm0301-thumb.jpg', cmW:17.1},
-  sm0501:{key:'sm0501',name:'豆柴',             url:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-sm0501.jpg', thumbUrl:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-sm0501-thumb.jpg', cmW:17.1},
-  sm3502:{key:'sm3502',name:'グミベア',         url:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-sm3502.jpg', thumbUrl:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-sm3502-thumb.jpg', cmW:10.7},
-  sm3601:{key:'sm3601',name:'バルーンアニマル', url:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-sm3601.jpg', thumbUrl:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-sm3601-thumb.jpg', cmW:31.1},
-  sm3801:{key:'sm3801',name:'ボルダリング',     url:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-sm3801.jpg', thumbUrl:'https://miyajima-art.github.io/kt-demo-w7x2/assets/gararie-samp-sm3801-thumb.jpg', cmW:32.8},
+  fd0201:{key:'fd0201',kind:'motifs',name:'さくらんぼ',       thumb:'gararie-samp-fd0201-thumb.jpg', motifPre:'gararie-motif-fd0201-',motifN:5, repeat:'toss',sizeCm:4,  density:55,rot:160,bg:'#fef9f3'},
+  fd0301:{key:'fd0301',kind:'tile',  name:'ベリーミックス',   thumb:'gararie-samp-fd0301-thumb.jpg', url:'gararie-samp-fd0301.jpg', cmW:27.5},
+  plum:  {key:'plum',  kind:'tile',  name:'梅の花（ブルー）', thumb:'gararie-samp-plum-thumb.jpg',   url:'gararie-samp-plum.jpg',   cmW:15.0},
+  sm0301:{key:'sm0301',kind:'motifs',name:'トイプードル',     thumb:'gararie-samp-sm0301-thumb.jpg', motifPre:'gararie-motif-sm0301-',motifN:4, repeat:'toss',sizeCm:4.5,density:52,rot:25, bg:'#ffffff'},
+  sm0501:{key:'sm0501',kind:'motifs',name:'豆柴',             thumb:'gararie-samp-sm0501-thumb.jpg', motifPre:'gararie-motif-sm0501-',motifN:4, repeat:'toss',sizeCm:4.5,density:52,rot:25, bg:'#ffffff'},
+  sm3502:{key:'sm3502',kind:'motifs',name:'グミベア',         thumb:'gararie-samp-sm3502-thumb.jpg', motifPre:'gararie-motif-sm3502-',motifN:6, repeat:'toss',sizeCm:2.6,density:55,rot:30, bg:'#ffffff'},
+  sm3601:{key:'sm3601',kind:'motifs',name:'バルーンアニマル', thumb:'gararie-samp-sm3601-thumb.jpg', motifPre:'gararie-motif-sm3601-',motifN:4, repeat:'toss',sizeCm:9,  density:55,rot:20, bg:'#ffffff'},
+  sm3801:{key:'sm3801',kind:'tile',  name:'ボルダリング',     thumb:'gararie-samp-sm3801-thumb.jpg', url:'gararie-samp-sm3801.jpg', cmW:32.8},
 };
+function sampleMotifUrls(spec){const a=[];for(let i=1;i<=spec.motifN;i++)a.push(GA_ASSETS+spec.motifPre+i+'.png');return a;}
 /* 外部URL画像をcanvasへ読み込む共通ローダ。crossOrigin='anonymous'必須
    （makeKeepCard()と同じ理由＝無指定だとShopifyページ上でcanvas汚染→toBlob/toDataURL/印刷TIFFが失敗する） */
 function loadImageToCanvas(url){
@@ -899,7 +907,7 @@ function drawCoverThumb(cv,url){
 }
 /* 見本柄プリセットの適用（実寸cmから自動dpi算出→タイルモードへ。旧デモタイル起動処理の一般化） */
 function applyTilePreset(spec){
-  loadImageToCanvas(spec.url).then(c=>{
+  loadImageToCanvas(GA_ASSETS+spec.url).then(c=>{
     enterTileMode({canvas:c,width:c.width,height:c.height,
       dpi:c.width/spec.cmW*2.54,cmW:spec.cmW,
       info:`見本柄「${spec.name}」（実寸${spec.cmW}cm幅）`});
@@ -907,6 +915,58 @@ function applyTilePreset(spec){
   }).catch(()=>{
     alert('見本柄「'+spec.name+'」の読み込みに失敗しました。通信環境をご確認のうえ再度お試しください');
   });
+}
+
+/* 見本柄（モチーフ型）の適用: 切り抜き済み透過PNG群を通常モチーフとして読み込み、
+   デザインごとの既定値（並べ方・大きさ・密度・背景色）を設定。以後は背景色ピッカー・
+   リピート方式・大きさ/密度/回転・すき間フィラー・文字入れが全て通常どおり効く */
+function applyMotifPreset(spec){
+  Promise.all(sampleMotifUrls(spec).map(loadImageToCanvas)).then(fulls=>{
+    state.sample=spec.key;state.rawFull=null;state.raw=null;
+    state.mode='motif';state.tileSrc=null;updateModeUI();
+    state.motifs=fulls.map(c=>{
+      const sc=Math.min(1,CUT_MAX/Math.max(c.width,c.height));
+      let pv=c;
+      if(sc<1){pv=makeCanvas(Math.round(c.width*sc),Math.round(c.height*sc));
+        const px=pv.getContext('2d');px.imageSmoothingQuality='high';px.drawImage(c,0,0,pv.width,pv.height);}
+      return{pv,hi:()=>c,_expensive:true}; // 印刷時は原寸PNGをそのまま使用
+    });
+    state.srcPxMax=Math.max(...fulls.map(c=>Math.max(c.width,c.height)));
+    applySizeGuard();
+    state.repeat=spec.repeat;state.dropDen=2;
+    state.sizeCm=spec.sizeCm;state.density=spec.density;state.rot=spec.rot;
+    if(!state.bgTouched)state.bg=spec.bg;
+    state.filler={type:'none',motifIdx:-1,motif:null};
+    /* UI同期（旧applyPresetの流儀） */
+    $('#size').value=spec.sizeCm;$('#sizeN').value=spec.sizeCm;
+    $('#dens').value=spec.density;$('#rot').value=spec.rot;
+    $('#sizeV').innerHTML=spec.sizeCm+'<small>cm・'+sizeLabel(spec.sizeCm)+'</small>';
+    $('#densV').textContent=spec.density+'%';$('#rotV').textContent=spec.rot+'°';
+    $$('input[type=range]').forEach(fill);
+    $$('#repeatSeg button').forEach(b=>b.classList.toggle('on',b.dataset.id===spec.repeat));
+    $$('#dropSeg button').forEach(b=>b.classList.toggle('on',+b.dataset.d===state.dropDen));
+    $$('#arrangeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.a===state.arrange));
+    $('#dropRow').style.display=(spec.repeat==='half'||spec.repeat==='brick')?'block':'none';
+    $('#tossShuffleRow').style.display=spec.repeat==='toss'?'block':'none';
+    $('#fillerBox').classList.toggle('dis',spec.repeat!=='toss');
+    syncFillerUI();
+    if(!state.bgTouched)$('#bgColor').value=spec.bg;
+    buildSwatchUI();
+    $$('.samp').forEach(s=>s.classList.toggle('on',s.dataset.sample===spec.key));
+    const cc=$('#cutCv'),x=cc.getContext('2d');x.clearRect(0,0,cc.width,cc.height);
+    const m0=state.motifs[0].pv,s=Math.min(cc.width/m0.width,cc.height/m0.height)*0.85;
+    x.drawImage(m0,(cc.width-m0.width*s)/2,(cc.height-m0.height*s)/2,m0.width*s,m0.height*s);
+    $('#motifCount').textContent=`見本柄「${spec.name}」 モチーフ ${state.motifs.length}点（切り抜き済み）`;
+    syncTextMotif(false);
+    updateArrange();rebuild();
+  }).catch(()=>{
+    alert('見本柄「'+spec.name+'」の読み込みに失敗しました。通信環境をご確認のうえ再度お試しください');
+  });
+}
+/* 見本柄のkind分岐（カードクリック・起動時デフォルト共用） */
+function applySample(spec){
+  if(spec.kind==='motifs')applyMotifPreset(spec);
+  else applyTilePreset(spec);
 }
 
 /* モチーフ取得（hiキャッシュ付き）。_expensive(アップ画像の原寸切り抜き)は印刷時のみhiを使う */
@@ -998,7 +1058,7 @@ function cutoutPro(src,tolMul,skip){
   for(let i=0;i<samples.length;i++){let bd3=Infinity;for(const c2 of keep){const dd=redmean2(samples[i],c2);if(dd<bd3)bd3=dd;}rs[i]=Math.sqrt(bd3);}
   rs.sort();
   const p90=rs[Math.min(rs.length-1,(rs.length*0.90)|0)];
-  const base=Math.min(85,Math.max(26,p90*1.3));
+  const base=Math.min(85,Math.max(18,p90*1.3)); // v2: 下限26→18（淡色モチーフの縁を食いにくく）
   const Tlo=base*tolMul,Thi=Tlo*1.55,Tlo2=Tlo*Tlo,Thi2=Thi*Thi;
 
   /* 4. 全画素の背景距離 */
@@ -1017,20 +1077,20 @@ function cutoutPro(src,tolMul,skip){
   for(let x=0;x<w;x++){for(const y of[0,h-1]){const p=y*w+x;if(!bgMask[p]&&core(p,x,y)){bgMask[p]=1;stack[sp++]=p;}}}
   for(let y=0;y<h;y++){for(const x of[0,w-1]){const p=y*w+x;if(!bgMask[p]&&core(p,x,y)){bgMask[p]=1;stack[sp++]=p;}}}
   while(sp>0){const p=stack[--sp],x=p%w,y=(p/w)|0;
-    for(let k2=0;k2<4;k2++){
-      const nx=x+(k2===0?1:k2===1?-1:0),ny=y+(k2===2?1:k2===3?-1:0);
-      if(nx<0||ny<0||nx>=w||ny>=h)continue;const np=ny*w+nx;
-      if(bgMask[np])continue;
-      if(core(np,nx,ny)){bgMask[np]=1;stack[sp++]=np;}
-      else if(distA[np]<Thi2){bgMask[np]=2;}
-    }}
+    for(let dy2=-1;dy2<=1;dy2++){const ny=y+dy2;if(ny<0||ny>=h)continue; /* v2: 8連結（斜めの細隙を貫通） */
+      for(let dx2=-1;dx2<=1;dx2++){if(!dx2&&!dy2)continue;const nx=x+dx2;if(nx<0||nx>=w)continue;
+        const np=ny*w+nx;
+        if(bgMask[np])continue;
+        if(core(np,nx,ny)){bgMask[np]=1;stack[sp++]=np;}
+        else if(distA[np]<Thi2){bgMask[np]=2;}
+      }}}
 
   /* 6. アルファ決定 */
   const alpha=new Uint8ClampedArray(N);
   for(let p=0;p<N;p++){
     if(!bgMask[p]){alpha[p]=d[p*4+3];continue;}
     if(bgMask[p]===1){alpha[p]=0;continue;}
-    alpha[p]=Math.round(255*(Math.sqrt(distA[p])-Tlo)/(Thi-Tlo));
+    {const t=Math.min(1,Math.max(0,(Math.sqrt(distA[p])-Tlo)/(Thi-Tlo)));alpha[p]=Math.round(255*t*t*(3-2*t));} /* v2: smoothstep */
   }
 
   /* 6.5 ソフト帯掃除: 前景近傍2px以外は完全透過 */
@@ -1063,6 +1123,35 @@ function cutoutPro(src,tolMul,skip){
     for(let i2=0;i2<keep.length;i2++){const dd=redmean2(px,keep[i2]);if(dd<bd5){bd5=dd;bi=i2;}}
     const bgc=keep[bi],af=a/255;
     for(let ch=0;ch<3;ch++){const v=(d[k+ch]-(1-af)*bgc[ch])/af;d[k+ch]=v<0?0:v>255?255:v;}
+  }
+
+  /* 9b. v2強化: 完全不透明(a>=250)の縁2pxにも背景色被りが残る
+        → 背景距離から混合率を推定してunmix（白フチの根絶） */
+  {
+    const edge=new Uint8Array(N);
+    for(let y2=0;y2<h;y2++)for(let x2=0;x2<w;x2++){
+      const p=y2*w+x2;if(alpha[p]<250)continue;
+      let nearT=false;
+      for(let dy3=-1;dy3<=1&&!nearT;dy3++){const yy=y2+dy3;if(yy<0||yy>=h)continue; /* 1pxリング限定（広げると淡色モチーフに斑点が出る） */
+        for(let dx3=-1;dx3<=1;dx3++){const xx=x2+dx3;if(xx<0||xx>=w)continue;
+          if(alpha[yy*w+xx]<128){nearT=true;break;}}}
+      if(nearT)edge[p]=1;
+    }
+    for(let p=0;p<N;p++){
+      if(!edge[p])continue;
+      const t=Math.min(1,Math.sqrt(distA[p])/Thi);
+      const af=Math.max(0.7,t); /* 補正下限0.7＝過補正（黒ずみ）防止 */
+      if(af>=0.995)continue;
+      const k=p*4;px[0]=d[k];px[1]=d[k+1];px[2]=d[k+2];
+      let bi6=0,bd6=Infinity;
+      for(let i2=0;i2<keep.length;i2++){const dd=redmean2(px,keep[i2]);if(dd<bd6){bd6=dd;bi6=i2;}}
+      const bgc=keep[bi6];
+      for(let ch=0;ch<3;ch++){
+        const full=(d[k+ch]-(1-af)*bgc[ch])/af;
+        const v=d[k+ch]+(full-d[k+ch])*0.6; /* 補正6割＝淡色モチーフの黒ずみ点を防ぎつつハローを薄く */
+        d[k+ch]=v<0?0:v>255?255:v;
+      }
+    }
   }
 
   /* 10. feather（3x3 x2） */
@@ -1439,18 +1528,22 @@ function buildLayout(){
   });
   /* すき間の背景モチーフ（主役を障害物にして隙間だけ充填） */
   let fillerType=null;
-  if(fillerMotif()){
+  const fms=fillerMotifs();
+  if(fms.length){
     fillerType='img';
     const seeds=main.map(p=>({x:p.x,y:p.y,exR:p.exR}));
     const fs=state.fillerScale/100;
-    const spacing=Math.max(0.3,fs*1.5);
+    const spacing=Math.max(0.3,fs*1.5*(state.fillerGap||1));
     const pts=poissonTor(UW,UH,spacing,rand,seeds);
+    const K=fms.length;
     paws=pts.map(p=>({x:p.x,y:p.y,
       sc:fs*(1+0.25*(rand()-0.5)),
-      ang:(rand()*2-1)*Math.PI}));
+      ang:(rand()*2-1)*Math.PI,
+      mi:K>1?(rand()*K)|0:0})); // K=1では乱数を消費しない＝既存レシピの決定論を壊さない
   }
   places=main.map(p=>[p.x,p.y,p.mi,p.rot,p.flip,p.sc]);
-  return{type:'toss',UW,UH,places,paws,fillerType,pitch};
+  return{type:'toss',UW,UH,places,paws,fillerType,pitch,
+    fillerTile:(state.filler.type==='gallery'&&state.filler.tile)?state.filler.galleryKey:null};
 }
 /* 主役モチーフ（背景係に回したモチーフを除く） */
 function mainMotifs(){
@@ -1465,6 +1558,22 @@ function fillerMotif(){
   if(f.type==='motif'&&f.motifIdx>=0&&f.motifIdx<state.motifs.length&&state.motifs.length>1)return state.motifs[f.motifIdx];
   if(f.type==='upload'&&f.motif)return f.motif;
   return null;
+}
+/* 背景ギャラリー（完全切り抜き済み透過モチーフ群 or 全面敷きタイル）。GA_ASSETS配信 */
+const BG_DESIGNS={
+  mz0101:{key:'mz0101',kind:'motifs',name:'さくらんぼ',     thumb:'gararie-bgtile-mz0101-thumb.jpg', motifPre:'gararie-fmotif-mz0101-',motifN:4},
+  dt0101:{key:'dt0101',kind:'motifs',name:'カラフル水玉',   thumb:'gararie-bgtile-dt0101-thumb.jpg', motifPre:'gararie-fmotif-dt0101-',motifN:10},
+  fd0701:{key:'fd0701',kind:'motifs',name:'星',             thumb:'gararie-bgtile-fd0701-thumb.jpg', motifPre:'gararie-fmotif-fd0701-',motifN:2},
+  mz0803:{key:'mz0803',kind:'motifs',name:'リボン',         thumb:'gararie-bgtile-mz0803-thumb.jpg', motifPre:'gararie-fmotif-mz0803-',motifN:3},
+  sm2904:{key:'sm2904',kind:'motifs',name:'ハート',         thumb:'gararie-bgtile-sm2904-thumb.jpg', motifPre:'gararie-fmotif-sm2904-',motifN:3},
+  gm0101:{key:'gm0101',kind:'tile',  name:'ギンガム',       thumb:'gararie-bgtile-gm0101-thumb.jpg', url:'gararie-bgtile-gm0101.jpg', cmW:4.0, cmH:4.0},
+};
+/* フィラーのモチーフ集合（gallery=複数・motif/upload=1個・なし=空） */
+function fillerMotifs(){
+  const f=state.filler;
+  if(f.type==='gallery'&&f.set&&f.set.length)return f.set;
+  const m=fillerMotif();
+  return m?[m]:[];
 }
 
 /* ---- F23 文字入れ（テキストモチーフ） ----
@@ -1583,15 +1692,16 @@ function colorChips(containerId,colors,onChange){
     inp.style.cssText='width:26px;height:26px;border-radius:50%;border:1px solid #d8d2c6;padding:0;cursor:pointer';
     /* input+changeの両方に登録: ブラウザ・OSのネイティブカラーピッカーによってはinputイベントが
        発火せずchangeのみ（またはその逆）のケースがあり、片方だけだとチップの表示色は変わるのに
-       state.bgExtra.colorsが更新されず柄に反映されない、という不具合が起きるため両対応する */
-    const apply=ev=>{colors[i]=ev.target.value;onChange();};
+       state.bgExtra.colorsが更新されず柄に反映されない、という不具合が起きるため両対応する。
+       onChangeに(index,newColor)を渡し、呼び出し側で「選択中の塊にも反映」等の追加処理を可能にする */
+    const apply=ev=>{colors[i]=ev.target.value;onChange(i,ev.target.value);};
     inp.oninput=apply;inp.onchange=apply;
     wrap.appendChild(inp);
     if(colors.length>1){
       const del=document.createElement('button');
       del.type='button';del.textContent='×';del.title='この色を削除';
       del.style.cssText='position:absolute;top:-6px;right:-6px;width:14px;height:14px;border-radius:50%;background:#8a7358;color:#fff;font-size:9px;line-height:14px;text-align:center;border:none;cursor:pointer;padding:0';
-      del.onclick=()=>{colors.splice(i,1);onChange();syncBgUI();};
+      del.onclick=()=>{colors.splice(i,1);onChange(-1,null);syncBgUI();}; // 削除は色変更ではないためindex=-1で「反映不要」を明示
       wrap.appendChild(del);
     }
     box.appendChild(wrap);
@@ -1599,12 +1709,25 @@ function colorChips(containerId,colors,onChange){
 }
 function syncBgUI(){
   const e=state.bgExtra;if(!$('#bgTypeSeg'))return;
-  $$('#bgTypeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.t===e.type));
+  const t=e.type;
+  /* 流体はグラデーションの一種としてUI上まとめる（#bgTypeSegでは「グラデ」に含める。
+     内部のstate.bgExtra.typeは従来どおり'grad'/'fluid'を別値として持ち続け、描画・
+     レシピ・キャッシュキー等の既存ロジックは無改修。角度セグメント(#bgAngleSeg)を
+     「縦/横/斜め/流体」の4択として扱い、そこでtypeを実質的に切り替える） */
+  $$('#bgTypeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.t===(t==='fluid'?'grad':t)));
   const colors=(e.colors&&e.colors.length)?e.colors:(e.colors=[e.c2||'#d8c49e']);
-  const onColorChange=()=>{state.bgTouched=true;rebuild();};
-  colorChips('bgColorChips',colors,onColorChange);
-  colorChips('bgFluidColorChips',colors,onColorChange);
-  $$('#bgAngleSeg button').forEach(b=>b.classList.toggle('on',b.dataset.a===e.angle));
+  colorChips('bgColorChips',colors,(i,newColor)=>{
+    state.bgTouched=true;
+    /* 流体で塊を選択中に色チップを変更したら、選択中の塊の色も同じ色に同期する
+       （色チップは本来「新規に塊を追加する時のパレット」だが、選択中の塊がある間は
+       その塊の色編集としても機能させる。i===-1は削除操作＝色変更ではないため対象外） */
+    if(i!==-1&&e.type==='fluid'&&e.fluidSel>=0){
+      const b=e.fluidBlobs[e.fluidSel];
+      if(b)b.color=newColor;
+    }
+    rebuild();
+  });
+  $$('#bgAngleSeg button').forEach(b=>b.classList.toggle('on',t==='fluid'?b.dataset.a==='fluid':b.dataset.a===e.angle));
   if($('#bgGradWidth')){const gw=e.gradWidth==null?100:e.gradWidth;$('#bgGradWidth').value=gw;$('#bgGradWidthV').textContent=gw+'%';fill($('#bgGradWidth'));}
   if($('#bgFgColor'))$('#bgFgColor').value=e.fg;
   if($('#bgCell')){$('#bgCell').value=e.cellCm;$('#bgCellV').textContent=(+e.cellCm).toFixed(1)+'cm';fill($('#bgCell'));}
@@ -1614,9 +1737,9 @@ function syncBgUI(){
   if($('#bgFluidSelRow'))$('#bgFluidSelRow').style.display=sel?'block':'none';
   if(sel&&$('#bgFluidR')){const rv=Math.round(sel.r*100);$('#bgFluidR').value=rv;$('#bgFluidRV').textContent=rv+'%';fill($('#bgFluidR'));}
   if($('#bgFluidScale')){const fsc=e.fluidScaleCm||12;$('#bgFluidScale').value=fsc;$('#bgFluidScaleV').textContent=fsc+'cm';fill($('#bgFluidScale'));}
-  const t=e.type;
   if($('#bgExtraRow'))$('#bgExtraRow').style.display=(t==='solid')?'none':'block';
-  if($('#bgGradRow'))$('#bgGradRow').style.display=(t==='grad')?'flex':'none';
+  if($('#bgGradRow'))$('#bgGradRow').style.display=(t==='grad'||t==='fluid')?'flex':'none';
+  if($('#bgGradLinearRow'))$('#bgGradLinearRow').style.display=(t==='grad')?'block':'none';
   if($('#bgFluidRow'))$('#bgFluidRow').style.display=(t==='fluid')?'flex':'none';
   if($('#bgPatRow'))$('#bgPatRow').style.display=(t==='dots'||t==='stripes'||t==='checks')?'block':'none';
   if($('#bgImgRow'))$('#bgImgRow').style.display=(t==='image')?'block':'none';
@@ -1889,21 +2012,37 @@ function renderUnit(pxPerU,opts){
     return u;
   }
   /* 背景モチーフ（フィラー層・主役の下） */
-  if(lay.paws&&lay.fillerType){
+  if(lay.fillerTile&&state.filler.tile&&BG_DESIGNS[lay.fillerTile]){
+    /* 背景ギャラリー: 全面敷きタイル（ギンガム等・切り抜き不能なデザイン）。
+       実寸cm周期をユニット幅の整数割りに微調整＝ユニット境界でも継ぎ目なし。主柄の下 */
+    const spec2=BG_DESIGNS[lay.fillerTile],img2=state.filler.tile;
+    const pxPerCm2=pxPerU/Math.max(0.1,state.sizeCm);
+    const nomW=Math.max(4,spec2.cmW*pxPerCm2),nomH=Math.max(4,spec2.cmH*pxPerCm2);
+    const nrep=Math.max(1,Math.round(UWpx/nomW)),mrep=Math.max(1,Math.round(UHpx/nomH));
+    const repC=makeCanvas(Math.max(1,Math.round(UWpx/nrep)),Math.max(1,Math.round(UHpx/mrep)));
+    const rc2=repC.getContext('2d');rc2.imageSmoothingQuality='high';
+    rc2.drawImage(img2,0,0,repC.width,repC.height);
+    const pat2=uc.createPattern(repC,'repeat');
+    uc.save();uc.fillStyle=pat2;uc.fillRect(0,0,UWpx,UHpx);uc.restore();
+  }else if(lay.paws&&lay.fillerType){
     {
-      const fm=fillerMotif();
-      if(fm){
-        const fc=motifCanvas(fm,pxPerU*(state.fillerScale/100)*1.3,opts&&opts.print);
-        const ff=inkFracOf(fm),fk=1/Math.max(ff.w,ff.h,1e-6); // 背景モチーフも見た目のインク寸で%を効かせる
-        const lo=Math.max(fc.width,fc.height),fdw=fc.width/lo*fk,fdh=fc.height/lo*fk;
+      const fms=fillerMotifs();
+      if(fms.length){
+        const fcs=fms.map(fm=>{
+          const fc=motifCanvas(fm,pxPerU*(state.fillerScale/100)*1.3,opts&&opts.print);
+          const ff=inkFracOf(fm),fk=1/Math.max(ff.w,ff.h,1e-6); // 背景モチーフも見た目のインク寸で%を効かせる
+          const lo=Math.max(fc.width,fc.height);
+          return{fc,fdw:fc.width/lo*fk,fdh:fc.height/lo*fk};
+        });
         for(const p of lay.paws){
-          const dw=fdw*pxPerU*p.sc,dh=fdh*pxPerU*p.sc;
+          const e2=fcs[(p.mi||0)%fcs.length];
+          const dw=e2.fdw*pxPerU*p.sc,dh=e2.fdh*pxPerU*p.sc;
           const g2=Math.max(dw,dh)*0.75;
           for(let ox=-1;ox<=1;ox++)for(let oy=-1;oy<=1;oy++){
             const px2=(p.x+ox*lay.UW)*sx,py2=(p.y+oy*lay.UH)*sy;
             if(px2+g2<-2||px2-g2>UWpx+2||py2+g2<-2||py2-g2>UHpx+2)continue;
             uc.save();uc.translate(px2,py2);uc.rotate(p.ang);
-            uc.drawImage(fc,-dw/2,-dh/2,dw,dh);uc.restore();
+            uc.drawImage(e2.fc,-dw/2,-dh/2,dw,dh);uc.restore();
           }
         }
       }
@@ -3099,7 +3238,10 @@ function syncFillerUI(){
   const f=state.filler;
   $$('#fillerSeg button').forEach(b=>b.classList.toggle('on',b.dataset.f===f.type));
   $('#fillerPick').style.display=f.type==='motif'?'block':'none';
-  $('#fillerScaleRow').style.display=(f.type==='motif'||f.type==='upload')?'block':'none';
+  $('#fillerGalleryPick').style.display=f.type==='gallery'?'block':'none';
+  const scatter=(f.type==='motif'||f.type==='upload'||(f.type==='gallery'&&f.set)); // 散らし型のみ大きさ/間隔が効く（全面敷きは対象外）
+  $('#fillerScaleRow').style.display=scatter?'block':'none';
+  $('#fillerGapRow').style.display=scatter?'block':'none';
   if(f.type==='motif'){
     const g=$('#fillerPickGrid');g.innerHTML='';
     state.motifs.forEach((m,i)=>{
@@ -3112,6 +3254,41 @@ function syncFillerUI(){
       g.appendChild(b);
     });
   }
+  if(f.type==='gallery'){
+    const g=$('#fillerGalleryGrid');g.innerHTML='';
+    Object.entries(BG_DESIGNS).forEach(([k,spec])=>{
+      const b=document.createElement('button');b.className='samp'+(k===f.galleryKey?' on':'');b.type='button';
+      const cv=makeCanvas(84,84);b.appendChild(cv);
+      drawCoverThumb(cv,GA_ASSETS+spec.thumb);
+      const nm=document.createElement('span');nm.className='nm';nm.textContent=spec.name;b.appendChild(nm);
+      b.onclick=()=>{selectFillerGallery(k);};
+      g.appendChild(b);
+    });
+  }
+}
+/* 背景ギャラリーのアセット読込（state.fillerへ反映のみ・UI/再描画は呼び出し側） */
+async function loadFillerGalleryInto(key){
+  const spec=BG_DESIGNS[key];if(!spec)throw new Error('unknown gallery: '+key);
+  if(spec.kind==='tile'){
+    const c=await loadImageToCanvas(GA_ASSETS+spec.url);
+    state.filler={type:'gallery',galleryKey:key,motifIdx:-1,motif:null,set:null,tile:c};
+  }else{
+    const fulls=await Promise.all(sampleMotifUrls(spec).map(loadImageToCanvas));
+    const set=fulls.map(c=>{
+      const sc=Math.min(1,CUT_MAX/Math.max(c.width,c.height));
+      let pv=c;
+      if(sc<1){pv=makeCanvas(Math.round(c.width*sc),Math.round(c.height*sc));
+        pv.getContext('2d').drawImage(c,0,0,pv.width,pv.height);}
+      return{pv,hi:()=>c,_expensive:true};
+    });
+    state.filler={type:'gallery',galleryKey:key,motifIdx:-1,motif:null,set,tile:null};
+  }
+}
+async function selectFillerGallery(key){
+  try{
+    await loadFillerGalleryInto(key);
+    syncFillerUI();rebuild();
+  }catch(e){alert('背景デザインを読み込めませんでした。通信環境をご確認ください');}
 }
 async function loadFillerFile(f){
   try{
@@ -3125,12 +3302,26 @@ async function loadFillerFile(f){
         img.src=url;
       });
     }
-    const mx=520,sc=Math.min(1,mx/Math.max(src2.width,src2.height));
-    const c=makeCanvas(Math.round(src2.width*sc),Math.round(src2.height*sc));
-    c.getContext('2d').drawImage(src2,0,0,c.width,c.height);
-    const res=cutoutPro(c,tolToMul(50),false); // 自動しきい値で切り抜き
+    /* v2: メイン画像と同品質＝原寸(≤HI_MAX)保持＋解析はCUT_MAX＋tolスライダー連動＋印刷時は原寸再切り抜き */
+    const scF=Math.min(1,HI_MAX/Math.max(src2.width,src2.height));
+    const full=makeCanvas(Math.round(src2.width*scF),Math.round(src2.height*scF));
+    full.getContext('2d').drawImage(src2,0,0,full.width,full.height);
+    const scA=Math.min(1,CUT_MAX/Math.max(full.width,full.height));
+    let ana=full;
+    if(scA<1){ana=makeCanvas(Math.round(full.width*scA),Math.round(full.height*scA));
+      ana.getContext('2d').drawImage(full,0,0,ana.width,ana.height);}
+    const res=cutoutPro(ana,tolToMul(state.tol),false);
     const parts=splitMotifs(res.canvas,1);
-    state.filler={type:'upload',motifIdx:-1,motif:{pv:parts.length?parts[0].canvas:res.canvas}};
+    let hiShared=null;
+    const hi=()=>{ /* 印刷時のみ原寸から再切り抜き（メモ化） */
+      if(!hiShared){
+        const r2=cutoutPro(full,tolToMul(state.tol),false);
+        const p2=splitMotifs(r2.canvas,1);
+        hiShared=p2.length?p2[0].canvas:r2.canvas;
+      }
+      return hiShared;
+    };
+    state.filler={type:'upload',motifIdx:-1,motif:{pv:parts.length?parts[0].canvas:res.canvas,hi,_expensive:true}};
     syncFillerUI();rebuild();
   }catch(e){alert('背景モチーフを読み込めませんでした：'+e.message);}
 }
@@ -3515,7 +3706,7 @@ function buildRecipe(){
     mode:state.mode,sample:state.sample,
     params:{repeat:state.repeat,dropDen:state.dropDen,arrange:state.arrange,
       sizeCm:state.sizeCm,density:state.density,rot:state.rot,bg:state.bg,seed:state.seed,
-      filler:{type:state.filler.type,motifIdx:state.filler.motifIdx},fillerScale:state.fillerScale,
+      filler:{type:state.filler.type,motifIdx:state.filler.motifIdx,galleryKey:state.filler.galleryKey||null},fillerScale:state.fillerScale,fillerGap:state.fillerGap??1,
       product:state.product,
       /* F23/F24/F25（2026-07-12追加。Worker/orders-deskの指紋は汎用JSON正規化のため追記だけで整合） */
       textMotif:{text:state.textMotif.text,font:state.textMotif.font,scale:state.textMotif.scale,
@@ -3585,7 +3776,9 @@ async function loadRecipe(obj,srcCode){
     if(typeof obj.textIdx==='number'&&obj.textIdx>=0&&state.motifs[obj.textIdx])state.motifs[obj.textIdx]._isText=true;
     /* 解像度ガード: 復元モチーフの原寸（最大の長辺）から上限cmを再計算 */
     state.srcPxMax=Math.max(...cs.map(c=>Math.max(c.width,c.height)));
-    $$('.samp').forEach(s=>s.classList.remove('on'));
+    /* 見本柄の出自キーを引き継ぐ（往復でデザインコード指紋が変わらないように） */
+    state.sample=obj.sample||null;
+    $$('.samp').forEach(s=>s.classList.toggle('on',!!state.sample&&s.dataset.sample===state.sample));
     updateModeUI();
     const cc=$('#cutCv'),x=cc.getContext('2d');x.clearRect(0,0,cc.width,cc.height);
     const m0=state.motifs[0].pv,s=Math.min(cc.width/m0.width,cc.height/m0.height)*0.85;
@@ -3595,12 +3788,20 @@ async function loadRecipe(obj,srcCode){
   /* パラメータ上書き（applyTilePreset/enterTileModeの既定値の後に適用） */
   Object.assign(state,{repeat:p.repeat??state.repeat,dropDen:p.dropDen??2,arrange:p.arrange??'checker',
     sizeCm:p.sizeCm??state.sizeCm,density:p.density??state.density,rot:p.rot??state.rot,
-    bg:p.bg??state.bg,seed:p.seed??state.seed,fillerScale:p.fillerScale??30,
+    bg:p.bg??state.bg,seed:p.seed??state.seed,fillerScale:p.fillerScale??30,fillerGap:p.fillerGap??1,
     product:(p.product in PRODUCTS)?p.product:'tshirt',bgTouched:true});
   if(p.filler){
-    state.filler={type:(p.filler.type==='paw'?'none':p.filler.type)||'none',motifIdx:p.filler.motifIdx??-1,motif:null};
+    state.filler={type:(p.filler.type==='paw'?'none':p.filler.type)||'none',motifIdx:p.filler.motifIdx??-1,motif:null,galleryKey:p.filler.galleryKey||null,set:null,tile:null};
     if(p.filler.type==='upload'&&obj.fillerImg){state.filler.motif={pv:await dataUrlToCanvas(obj.fillerImg)};}
     if(p.filler.type==='upload'&&!obj.fillerImg)state.filler={type:'none',motifIdx:-1,motif:null};
+    if(state.filler.type==='gallery'){
+      /* 背景ギャラリーはアセット再ロード。失敗・不明キーは安全側で「なし」へ */
+      const gk=state.filler.galleryKey;
+      if(gk&&BG_DESIGNS[gk]){
+        try{await loadFillerGalleryInto(gk);}
+        catch(e){state.filler={type:'none',motifIdx:-1,motif:null,galleryKey:null,set:null,tile:null};}
+      }else state.filler={type:'none',motifIdx:-1,motif:null,galleryKey:null,set:null,tile:null};
+    }
   }
   /* F23/F24/F25 の復元（旧レシピはフィールドが無い＝既定値のまま） */
   if(p.textMotif){
@@ -3643,6 +3844,7 @@ async function loadRecipe(obj,srcCode){
   $('#dens').value=state.density;$('#densV').textContent=state.density+'%';
   $('#rot').value=state.rot;$('#rotV').textContent=state.rot+'°';
   $('#fillerScale').value=state.fillerScale;$('#fillerScaleV').textContent=state.fillerScale+'%';
+  $('#fillerGap').value=Math.round((state.fillerGap??1)*100);$('#fillerGapV').textContent=Math.round((state.fillerGap??1)*100)+'%';
   if(state.bg&&state.bg!=='transparent')$('#bgColor').value=state.bg;
   syncTextUI();syncBgUI(); // F23/F24 のUI同期
   buildSwatchUI();syncFillerUI();updateModeUI();updateArrange();redrawSamples();
@@ -3670,9 +3872,10 @@ function buildSamples(){
     const cv=makeCanvas(120,120);
     d.appendChild(cv);
     const nm=document.createElement('span');nm.className='nm';setSampName(nm,spec.name,SAMP_NAME_BREAK[k]);d.appendChild(nm);
-    d.onclick=()=>applyTilePreset(spec);
+    if(spec.kind==='tile'){const tg=document.createElement('span');tg.className='fixedtag';tg.textContent='柄そのまま';d.appendChild(tg);} // 切り抜きなし＝色・配置の変更不可の目印
+    d.onclick=()=>applySample(spec);
     g.appendChild(d);
-    drawCoverThumb(cv,spec.thumbUrl);
+    drawCoverThumb(cv,GA_ASSETS+spec.thumb);
   });
   /* 文字だけ（名入れ・テキストパターン）の入口カード。選ぶとTEXT入力欄へ誘導 */
   if(hasFeature('textMotif')){
@@ -3733,6 +3936,7 @@ function wire(){
   $$('#fillerSeg button').forEach(b=>b.onclick=()=>{
     const t=b.dataset.f;
     if(t==='upload'){$('#fillerFile').click();return;} // 確定はロード成功後
+    if(t==='gallery'){selectFillerGallery(state.filler.galleryKey||'mz0101');return;} // 確定はロード成功後
     if(t==='motif'){
       if(state.motifs.length<2){alert('「モチーフから」はモチーフが2点以上のときに使えます。\n（1枚の絵に複数の要素があると自動で分かれます）');return;}
       state.filler={type:'motif',motifIdx:state.motifs.length-1,motif:null}; // 既定=いちばん小さいモチーフ
@@ -3741,6 +3945,7 @@ function wire(){
   });
   $('#fillerFile').onchange=e=>{const f2=e.target.files[0];if(f2)loadFillerFile(f2);e.target.value='';};
   $('#fillerScale').oninput=e=>{state.fillerScale=+e.target.value;$('#fillerScaleV').textContent=e.target.value+'%';fill(e.target);rebuild();};
+  $('#fillerGap').oninput=e=>{state.fillerGap=(+e.target.value)/100;$('#fillerGapV').textContent=e.target.value+'%';fill(e.target);rebuild();};
   const syncSize=v=>{
     const mx2=state.mode==='tile'?120:20;
     v=Math.min(mx2,Math.max(2,v));state.sizeCm=v;
@@ -3959,24 +4164,31 @@ function wire(){
   if($('#bgTypeSeg')){
     $$('#bgTypeSeg button').forEach(b=>b.onclick=()=>{
       state.bgExtra.type=b.dataset.t;state.bgTouched=true;
-      if(b.dataset.t==='fluid'&&state.patTab!=='unit'){ // 流体グラデはblobドラッグ編集のため1リピート表示に誘導（F25と同じ発想）
-        state.patTab='unit';$$('#patTabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==='unit'));
-      }
       syncBgUI();rebuild();
     });
-    $$('#bgAngleSeg button').forEach(b=>b.onclick=()=>{state.bgExtra.angle=b.dataset.a;$$('#bgAngleSeg button').forEach(x=>x.classList.toggle('on',x===b));rebuild();});
+    /* 縦/横/斜め/流体の4択。流体は内部的にtype='fluid'へ切替（グラデーションの一種としてUI上まとめる） */
+    $$('#bgAngleSeg button').forEach(b=>b.onclick=()=>{
+      if(b.dataset.a==='fluid'){
+        state.bgExtra.type='fluid';
+        if(state.patTab!=='unit'){ // 流体グラデはblobドラッグ編集のため1リピート表示に誘導（F25と同じ発想）
+          state.patTab='unit';$$('#patTabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==='unit'));
+        }
+      }else{
+        state.bgExtra.type='grad';state.bgExtra.angle=b.dataset.a;
+      }
+      state.bgTouched=true;
+      syncBgUI();rebuild();
+    });
     if($('#bgGradWidth'))$('#bgGradWidth').oninput=e=>{state.bgExtra.gradWidth=+e.target.value;fill(e.target);$('#bgGradWidthV').textContent=state.bgExtra.gradWidth+'%';rebuild();};
     if($('#bgFgColor'))$('#bgFgColor').oninput=e=>{state.bgExtra.fg=e.target.value;state.bgTouched=true;rebuild();};
     if($('#bgCell'))$('#bgCell').oninput=e=>{state.bgExtra.cellCm=+e.target.value;fill(e.target);$('#bgCellV').textContent=state.bgExtra.cellCm.toFixed(1)+'cm';rebuild();};
     if($('#bgAlpha'))$('#bgAlpha').oninput=e=>{state.bgExtra.alpha=+e.target.value;fill(e.target);$('#bgAlphaV').textContent=state.bgExtra.alpha+'%';rebuild();};
-    /* 色チップの「＋」追加ボタン（grad/fluidで共有パレット、上限5色） */
-    const addBgColor=()=>{
+    /* 色チップの「＋」追加ボタン（grad/fluid共通パレット、上限5色） */
+    if($('#bgColorAdd'))$('#bgColorAdd').onclick=()=>{
       const e=state.bgExtra;if(e.colors.length>=5)return;
       e.colors.push(e.colors[e.colors.length-1]||'#d8c49e');
       state.bgTouched=true;syncBgUI();rebuild();
     };
-    if($('#bgColorAdd'))$('#bgColorAdd').onclick=addBgColor;
-    if($('#bgFluidColorAdd'))$('#bgFluidColorAdd').onclick=addBgColor;
     /* 流体グラデ: blobの追加/削除/大きさ調整（F25 #ffAdd/#ffDel/#ffScと同型） */
     if($('#bgFluidAdd'))$('#bgFluidAdd').onclick=()=>{
       const e=state.bgExtra,colors=e.colors&&e.colors.length?e.colors:['#d8c49e'];
@@ -4350,9 +4562,9 @@ function init(){
       x.send();
     });
   }
-  const fl=Q.get('filler'); // 検証用: paw / motif / motif:N（トス配置に自動切替）
+  const fl=Q.get('filler'); // 検証用: paw / motif / motif:N / gallery:<key>（トス配置に自動切替）
   if(fl){
-    (window.__ktReadyQ=window.__ktReadyQ||[]).push(()=>{
+    (window.__ktReadyQ=window.__ktReadyQ||[]).push(async()=>{
       state.repeat='toss';
       $$('#repeatSeg button').forEach(b=>b.classList.toggle('on',b.dataset.id==='toss'));
       $('#tossShuffleRow').style.display='block';$('#dropRow').style.display='none';
@@ -4360,6 +4572,9 @@ function init(){
       if(fl.startsWith('motif')&&state.motifs.length>1){
         const idx=+(fl.split(':')[1]??(state.motifs.length-1));
         state.filler={type:'motif',motifIdx:Math.min(idx,state.motifs.length-1),motif:null};
+      }else if(fl.startsWith('gallery')){
+        const gk=fl.split(':')[1]||'mz0101';
+        if(BG_DESIGNS[gk]){try{await loadFillerGalleryInto(gk);}catch(e){}}
       }
       syncFillerUI();updateArrange();rebuild();
     });
@@ -4376,8 +4591,8 @@ function init(){
       }),Q.get('mode')==='ask'?undefined:(Q.get('mode')||'tile'));
     }else loadImage(art);
   }
-  else if(TILE_SAMPLES[Q.get('preset')])applyTilePreset(TILE_SAMPLES[Q.get('preset')]);
-  else applyTilePreset(TILE_SAMPLES.fd0201); // 既定＝さくらんぼ（社長確認事項）
+  else if(TILE_SAMPLES[Q.get('preset')])applySample(TILE_SAMPLES[Q.get('preset')]);
+  else applySample(TILE_SAMPLES.fd0201); // 既定＝さくらんぼ
 }
 /* PCではプレビューcanvasのバッファを表示ボックス実寸(×dpr)に合わせ、枠いっぱいに描画 */
 function fitPvCanvases(){
