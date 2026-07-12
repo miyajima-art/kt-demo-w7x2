@@ -125,6 +125,8 @@
   .segline button:hover{background:var(--n3)}
   .segline button.on{border:1.5px solid var(--accent);background:var(--accent-wash);color:var(--ink);padding:5px 0}
   .segline button .sans{font-family:var(--sans);font-size:12.5px}
+  #bgTypeSeg{display:grid;grid-template-columns:repeat(3,1fr)} /* 6択は3列×2段（1行flexだと「グラデ」等が折り返す） */
+  #bgTypeSeg button{white-space:nowrap}
   #dropRow,#arrangeRow,#tossShuffleRow{margin-top:12px;display:none}
   #fillerBox{margin-top:12px}
   #fillerBox.dis #fillerControls{opacity:.35;pointer-events:none}
@@ -352,14 +354,74 @@
         <small>手描き・写真・お手持ちの印刷用データ（TIFF）もOK</small>
         <input type="file" id="file" accept="image/*,.tif,.tiff" hidden>
       </div>
+      <label class="toggle" style="margin-top:10px"><input type="checkbox" id="noSplit"> ひとつのデザインとして扱う（ロゴ・文字入り向け）</label>
       <div class="samples quickcolor">
         <div class="cap"><span>COLOR</span><em>背景の色・あとからでも変えられます</em></div>
         <div class="swatches" id="swatchesQuick"></div>
         <div class="pick">自由に <input type="color" id="bgColor" value="#f2ebdc"></div>
+        <div class="segline" id="bgTypeSeg" style="margin-top:8px">
+          <button data-t="solid" class="on">単色</button>
+          <button data-t="grad" data-feature="bgGradient">グラデ</button>
+          <button data-t="dots" data-feature="bgPattern">ドット</button>
+          <button data-t="stripes" data-feature="bgPattern">縞</button>
+          <button data-t="checks" data-feature="bgPattern">チェック</button>
+          <button data-t="image" data-feature="bgImage">画像</button>
+        </div>
+        <div id="bgExtraRow" style="display:none;margin-top:8px">
+          <div id="bgGradRow" style="display:none;align-items:center;gap:10px;flex-wrap:wrap">
+            <label style="font-size:12px;display:flex;align-items:center;gap:6px">2色目 <input type="color" id="bg2Color" value="#d8c49e"></label>
+            <div class="segline" id="bgAngleSeg">
+              <button data-a="v" class="on">縦</button><button data-a="h">横</button><button data-a="d">斜め</button>
+            </div>
+          </div>
+          <div id="bgPatRow" style="display:none">
+            <label style="font-size:12px;display:flex;align-items:center;gap:6px">柄の色 <input type="color" id="bgFgColor" value="#c8b28c"></label>
+            <div style="margin-top:6px">
+              <label class="lb">間隔 <span class="val num" id="bgCellV" style="min-width:auto">1.2cm</span></label>
+              <div class="range"><input type="range" id="bgCell" min="0.5" max="4" step="0.1" value="1.2"></div>
+            </div>
+          </div>
+          <div id="bgImgRow" style="display:none">
+            <button id="bgImgBtn" type="button" style="font-size:12px;padding:6px 10px;border:1px solid #d8d2c6;border-radius:8px;background:#fdfcf9;cursor:pointer">背景画像を選ぶ…</button>
+            <input type="file" id="bgImgFile" accept="image/*" hidden>
+            <span id="bgImgName" style="font-size:11px;color:#8a8377"></span>
+          </div>
+        </div>
+        <div style="margin-top:8px" data-feature="bgOpacity">
+          <label class="lb">背景の濃さ <span class="val num" id="bgAlphaV" style="min-width:auto">100%</span></label>
+          <div class="range"><input type="range" id="bgAlpha" min="10" max="100" step="5" value="100"></div>
+        </div>
       </div>
       <div class="samples">
         <div class="cap"><span>SAMPLE</span><em>そのまま使える見本柄</em></div>
         <div class="sampgrid" id="sampGrid"></div>
+      </div>
+      <div class="samples" data-feature="textMotif">
+        <div class="cap"><span>TEXT</span><em>文字を柄に入れる（オプション・空欄で消える）</em></div>
+        <input type="text" id="tmText" placeholder="例: RYOKO / ガラリエ" style="width:100%;padding:8px 10px;border:1px solid #d8d2c6;border-radius:8px;font-size:14px;background:#fdfcf9">
+        <button class="ghost" id="tmOnly" type="button" style="margin-top:8px">文字だけの柄にする</button>
+        <div style="margin-top:8px">
+          <button id="tmFontBtn" type="button" style="width:100%;text-align:left;font-size:13px;padding:8px 10px;border:1px solid #d8d2c6;border-radius:8px;background:#fdfcf9;cursor:pointer">フォント: <span id="tmFontName">ゴシック（標準）</span><span style="float:right;color:#8a8377">▾</span></button>
+          <div id="tmFontList" style="display:none;max-height:210px;overflow-y:auto;border:1px solid #d8d2c6;border-radius:8px;margin-top:6px;background:#fdfcf9"></div>
+          <div style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <button id="tmFontUpBtn" type="button" style="font-size:12px;padding:6px 10px;border:1px solid #d8d2c6;border-radius:8px;background:#fdfcf9;cursor:pointer">お手持ちのフォントを追加…</button>
+            <input type="file" id="tmFontFile" accept=".ttf,.otf,.woff,.woff2" hidden>
+          </div>
+          <small style="font-size:10.5px;color:#8a8377;display:block;margin-top:4px">※追加フォントの商用利用ライセンスはお客様にてご確認ください</small>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;margin-top:8px;flex-wrap:wrap">
+          <label style="font-size:12px;display:flex;align-items:center;gap:6px">色 <input type="color" id="tmColor" value="#3a2f23"></label>
+          <label class="toggle"><input type="checkbox" id="tmStroke"> 縁取り</label>
+          <label class="toggle"><input type="checkbox" id="tmShadow"> 影</label>
+        </div>
+        <div style="margin-top:8px">
+          <label class="lb">大きさ <span class="val num" id="tmScaleV" style="min-width:auto">100%</span></label>
+          <div class="range"><input type="range" id="tmScale" min="30" max="300" step="5" value="100"></div>
+        </div>
+        <div style="margin-top:6px">
+          <label class="lb">回転 <span class="val num" id="tmRotV" style="min-width:auto">0°</span></label>
+          <div class="range"><input type="range" id="tmRot" min="-45" max="45" step="5" value="0"></div>
+        </div>
       </div>
     </section>
 
@@ -382,7 +444,7 @@
           <div class="motifcount" id="motifCount">—</div>
         </div>
       </div>
-      <div class="mini">背景の色ムラ・質感にも追従します。複数の絵は自動で個別のモチーフに分かれます。</div>
+      <div class="mini">背景の色ムラ・質感にも追従します。複数の絵は自動で個別のモチーフに分かれます。ロゴなど分けたくない絵は01の「ひとつのデザインとして扱う」をオンに。</div>
       </div>
     </section>
 
@@ -429,13 +491,36 @@
           </div>
         </div>
       </div>
+      <div id="freeformBox" style="display:none;margin-top:12px" data-feature="multiMotif">
+        <label class="lb">自由配置のモチーフ</label>
+        <div class="sampgrid" id="ffPalette" style="grid-template-columns:repeat(6,1fr)"></div>
+        <button id="ffAdd" type="button" style="margin-top:8px;font-size:13px;padding:7px 12px;border:1px solid #d8d2c6;border-radius:8px;background:#fdfcf9;cursor:pointer">＋ モチーフを追加</button>
+        <div id="ffGateMsg" style="display:none;font-size:12px;color:#a4552f;margin-top:6px">先にベース（絵・見本柄）を選択してください</div>
+        <div id="ffSel" style="display:none;margin-top:10px">
+          <div>
+            <label class="lb">選択モチーフの大きさ <span class="val num" id="ffScV" style="min-width:auto">100%</span></label>
+            <div class="range"><input type="range" id="ffSc" min="30" max="300" step="5" value="100"></div>
+          </div>
+          <div style="margin-top:6px">
+            <label class="lb">選択モチーフの回転 <span class="val num" id="ffRotV" style="min-width:auto">0°</span></label>
+            <div class="range"><input type="range" id="ffRot" min="-180" max="180" step="5" value="0"></div>
+          </div>
+          <div class="segline" style="margin-top:8px">
+            <button id="ffDup" type="button">複製</button>
+            <button id="ffDel" type="button">削除</button>
+            <button id="ffUp" type="button">前面へ</button>
+            <button id="ffDown" type="button">背面へ</button>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#8a8377;margin-top:8px">「1リピート」表示でモチーフを直接ドラッグ／タップで選択できます</div>
+      </div>
     </section>
 
     <section class="sec">
       <h2><span class="no">04</span>柄の調整<span class="hint">動かすと即反映</span></h2>
       <div class="adjcol">
         <div class="c">
-          <label class="lb"><svg class="ic" viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg><span id="sizeLb">柄の大きさ（実寸）</span></label>
+          <label class="lb"><svg class="ic" viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg><span id="sizeLb">柄の大きさ（主役の実寸）</span></label>
           <div class="range"><input type="range" id="size" min="2" max="20" step="0.5" value="7"></div>
           <div class="sub"><span class="val num" id="sizeV" style="text-align:left">7<small>cm・中</small></span>
             <span class="numin"><input type="number" id="sizeN" min="2" max="20" step="0.5" value="7"><span class="unit">cm</span></span></div>
@@ -481,20 +566,27 @@
           </div>
         </div>
         <div class="cv"><canvas id="patternCv" width="980" height="600"></canvas></div>
-        <div class="foot"><span id="unitInfo">—</span><span id="seamlessInfo" style="color:var(--ok)">どこまでも続く、継ぎ目のない総柄</span></div>
+        <div class="foot"><span id="unitInfo">—</span><span id="fabricWInfo" style="color:#8a8377"></span><span id="seamlessInfo" style="color:var(--ok)">どこまでも続く、継ぎ目のない総柄</span></div>
       </div>
       <div class="pv" id="prodCard">
         <div class="h"><span class="no">06</span><span class="t">仕上がりイメージ</span>
           <div class="htools">
             <div class="tabs" id="prodTabs">
               <button data-prod="tshirt" class="on">Tシャツ</button>
+              <button data-prod="kids" data-feature="kidsTshirt">キッズT</button>
+              <button data-prod="dog" data-feature="dogTshirt">犬服</button>
               <button data-prod="tote">トート</button>
               <button data-prod="bolt">反物</button>
+            </div>
+            <div class="zoomseg" id="prodSideSeg">
+              <button data-s="front" class="on">前面</button>
+              <button data-s="back">背面</button>
             </div>
             <div class="zoomseg" id="prodZoomSeg">
               <button data-z="full" class="on">全体</button>
               <button data-z="zoom">プリント拡大</button>
             </div>
+            <label class="toggle"><input type="checkbox" id="dims" checked> 寸法</label>
           </div>
         </div>
         <div class="cv" style="flex:1"><canvas id="productCv" width="860" height="900"></canvas></div>
@@ -655,18 +747,41 @@ const state={
   sample:null,                   // 選択中サンプルキー
   repeat:'half', dropDen:2, arrange:'checker',
   sizeCm:7, density:45, rot:0, bg:'#f2ecdf', bgTouched:false, // bgTouched: ユーザーが明示的に色を選んだか（trueならプリセット切替でbgを上書きしない）
-  tol:50, skipCut:false, seed:20260710,
+  tol:50, skipCut:false, noSplit:false, seed:20260710, // noSplit: 切り抜き後にモチーフ分割しない（ロゴ・文字入り向け）
   filler:{type:'none',motifIdx:-1,motif:null}, // すき間の背景モチーフ: none/paw/motif/upload
   fillerScale:30,                              // 主役に対する大きさ%（15-50）
   patTab:'surface', zoom:1, showSeams:false, baseCm:3, // 実寸ルーラーの基準長さ(cm): 3/5/10
   panCmX:0, panCmY:0,            // 生地プレビューのスライド位置（実寸cm・ズーム非依存）
   product:'tshirt', prodZoom:'full',
+  showDims:true,                 // F21 寸法表示（着丈/身幅/肩幅/袖丈・レディースM基準）
+  prodSide:'front',              // F20 前面/背面切替（tshirt/kids/dogのみ）
+  fabricWidthCm:150,             // F22 生地幅表示（購入導線の150cm表記と同値・生地マスタ整備後に生地別へ）
+  textMotif:{text:'',font:'sans',scale:100,rot:0,color:'#3a2f23',stroke:false,shadow:false}, // F23 文字入れ
+  bgExtra:{type:'solid',c2:'#d8c49e',angle:'v',fg:'#c8b28c',cellCm:1.2,img:null,alpha:100},  // F24 背景強化（グラデ/パターン/画像/濃さ）
+  freeform:{items:[],sel:-1},    // F25 自由配置（items=[{mi,x,y,rot,sc}]・x,yはunit座標0..3・配列順=描画順=レイヤー）
   dpi:300,
   layout:null, autoBase:0,
 };
 const PPCM=28;              // プレビュー基準スケール(px/cm・zoom=1) ※2026-07-12: Retina(dpr=2)実効密度3.5→14px/cmへ引き上げ(7→28,×4)
 const CUT_MAX=700;          // 解析解像度
 const HI_MAX=2200;          // 入稿用切り抜きの上限解像度
+
+/* ---- 機能フラグ（F27: 単一システム＋機能開閉。要件定義v2 §3） ----
+   初期リリースは全機能無料開放（全true）。将来ゲートを閉じる時は
+   hasFeature の判定元を entitlement（Shopifyアンロック商品→コード→
+   Worker tier）に差し替える。UI・機能側の呼び出しは無改修で済む。
+   ※applySizeGuard等の品質保証ロジックとは独立に保つ（混在させない） */
+const FEATURES={
+  kidsTshirt:true,  // F19 キッズTシャツプレビュー
+  dogTshirt:true,   // F19 犬用Tシャツプレビュー
+  textMotif:true,   // F23 文字入れ（有料予定）
+  bgGradient:true,  // F24 背景グラデーション（有料予定）
+  bgPattern:true,   // F24 背景パターン（有料予定）
+  bgImage:true,     // F24 背景画像アップロード
+  bgOpacity:true,   // F24 背景透明度（有料予定）
+  multiMotif:true,  // F25 マルチモチーフ（自由配置・有料予定）
+};
+function hasFeature(k){return !!FEATURES[k];}
 
 /* ============================================================
    サンプル柄（2026トレンド準拠・シード固定・Canvas 2Dのみ）
@@ -1354,8 +1469,28 @@ function poissonTor(W,H,r,rand,seeds){
 }
 
 /* buildLayout: 正規化レイアウト {UW,UH,type,places[[x,y,mi,rot,flip,sc]],paws,pitch} */
+/* ---- F25 自由配置（freeform） ----
+   items をそのまま places=[x,y,mi,rot,flip,sc] に写すだけで、renderUnit の
+   3×3ラップ描画に乗る＝継ぎ目なしが自動で担保される。枠は UW=UH=FF_R（モチーフ
+   FF_R個分の正方形）。リピート全体の実寸は「柄の大きさ」sizeCm×FF_R。 */
+const FF_R=3;
+function ffEnsure(){
+  const ff=state.freeform;
+  ff.items=ff.items.filter(it=>it.mi<state.motifs.length);
+  if(ff.sel>=ff.items.length)ff.sel=-1;
+  if(!ff.items.length&&state.motifs.length){ // 初回: 現モチーフを緩い格子で1個ずつ
+    state.motifs.forEach((m,i)=>{
+      ff.items.push({mi:i,x:0.6+(i%3),y:(0.6+Math.floor(i/3))%FF_R,rot:0,sc:1});
+    });
+  }
+}
 function buildLayout(){
   /* リピートタイルモード: 取り込み画像そのものが1リピート。送りは矩形タイルに焼き込む */
+  if(state.mode!=='tile'&&state.repeat==='freeform'){ // F25
+    ffEnsure();
+    const places=state.freeform.items.map(it=>[it.x,it.y,it.mi,it.rot*Math.PI/180,1,it.sc]);
+    return{type:'freeform',UW:FF_R,UH:FF_R,places};
+  }
   if(state.mode==='tile'&&state.tileSrc){
     const a=state.tileSrc.canvas.height/state.tileSrc.canvas.width;
     const den=state.dropDen;
@@ -1414,7 +1549,7 @@ function buildLayout(){
   const order=main.map((_,i)=>i%L);
   for(let i2=order.length-1;i2>0;i2--){const j2=(rand()*(i2+1))|0;const t2=order[i2];order[i2]=order[j2];order[j2]=t2;}
   main.forEach((p,i)=>{
-    const sc=(1+(rand()-0.5)*0.24)*(rand()<0.12?0.72:1);
+    const sc=((1+(rand()-0.5)*0.24)/1.12)*(rand()<0.12?0.72:1); // 上限1=最大個体が「柄の大きさ」ぴったり（実寸ラベルからはみ出さない）
     p.sc=sc;p.exR=0.5*sc;p.flip=rand()<0.5?-1:1;
     const rr=(rand()*2-1);          // randは常に消費（決定論維持）
     p.rot=rotMax?rr*rotMax:0;       // 0°=整列（スライダーと連続な挙動）
@@ -1450,14 +1585,206 @@ function fillerMotif(){
   return null;
 }
 
+/* ---- F23 文字入れ（テキストモチーフ） ----
+   切り抜き処理(recut)を通らず、見本柄と同じ {pv, hi:px=>canvas} 経路で
+   state.motifs に注入する。相対サイズは pv のインク長辺比で決まるため、
+   「大きさ%」は pv の生成サイズに掛ける。フォントはWeb配布ライセンス
+   不要のシステム書体スタック（本命フォントは先方確認中）。 */
+const TM_FONTS={
+  sans:'-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif',
+  serif:'"Hiragino Mincho ProN","Noto Serif JP",serif',
+  round:'"Hiragino Maru Gothic ProN","Arial Rounded MT Bold",sans-serif',
+  script:'"Snell Roundhand","Brush Script MT","Segoe Script",cursive',
+};
+/* Google Fonts 厳選リスト（無料・商用可 OFL）。css2は unicode-range 分割配信の
+   ため実転送は使う文字ぶんだけ。リスト初回展開時にCSSを注入し、選択時に
+   document.fonts.load で確定→再描画。オフライン時は標準スタックにフォールバック */
+const TM_GF=[
+  {f:'Noto Sans JP',jp:1},{f:'Noto Serif JP',jp:1},{f:'M PLUS Rounded 1c',jp:1},
+  {f:'Zen Maru Gothic',jp:1},{f:'Zen Kaku Gothic New',jp:1},{f:'Zen Old Mincho',jp:1},
+  {f:'Shippori Mincho',jp:1},{f:'Kosugi Maru',jp:1},{f:'Kiwi Maru',jp:1},
+  {f:'Hachi Maru Pop',jp:1},{f:'Yusei Magic',jp:1},{f:'Klee One',jp:1},
+  {f:'Yomogi',jp:1},{f:'DotGothic16',jp:1},{f:'RocknRoll One',jp:1},
+  {f:'Reggae One',jp:1},{f:'Rampart One',jp:1},{f:'Dela Gothic One',jp:1},
+  {f:'Mochiy Pop One',jp:1},{f:'Potta One',jp:1},{f:'Train One',jp:1},
+  {f:'Yuji Syuku',jp:1},{f:'Kaisei Decol',jp:1},{f:'Stick',jp:1},
+  {f:'Pacifico',jp:0},{f:'Caveat',jp:0},{f:'Dancing Script',jp:0},
+  {f:'Great Vibes',jp:0},{f:'Playfair Display',jp:0},{f:'Bebas Neue',jp:0},
+  {f:'Anton',jp:0},{f:'Amatic SC',jp:0},{f:'Lobster',jp:0},{f:'Satisfy',jp:0},
+];
+let _gfInjected=false;
+function gfInject(){
+  if(_gfInjected)return;_gfInjected=true;
+  const fams=TM_GF.map(x=>'family='+encodeURIComponent(x.f).replace(/%20/g,'+'));
+  for(let i=0;i<fams.length;i+=10){
+    const l=document.createElement('link');l.rel='stylesheet';
+    l.href='https://fonts.googleapis.com/css2?'+fams.slice(i,i+10).join('&')+'&display=swap';
+    document.head.appendChild(l);
+  }
+}
+function tmFontCss(){
+  const f=state.textMotif.font;
+  if(f&&f.startsWith('gf:'))return '"'+f.slice(3)+'",'+TM_FONTS.sans;
+  if(f&&f.startsWith('custom:'))return '"'+f.slice(7)+'",'+TM_FONTS.sans;
+  return TM_FONTS[f]||TM_FONTS.sans;
+}
+function drawTextMotif(px){
+  const t=state.textMotif;
+  const f0=64,mc=makeCanvas(8,8),mx2=mc.getContext('2d');   // 仮サイズで実測→正規化
+  mx2.font='700 '+f0+'px '+tmFontCss();
+  const tw=Math.max(1,mx2.measureText(t.text).width),th=f0*1.32;
+  const fs=f0*(px/Math.max(tw,th));
+  const w0=tw/f0*fs,h0=th/f0*fs;
+  const rad=t.rot*Math.PI/180;
+  const bw=Math.ceil(Math.abs(w0*Math.cos(rad))+Math.abs(h0*Math.sin(rad)))+8;
+  const bh=Math.ceil(Math.abs(w0*Math.sin(rad))+Math.abs(h0*Math.cos(rad)))+8;
+  const c=makeCanvas(bw,bh),x=c.getContext('2d');
+  x.translate(bw/2,bh/2);x.rotate(rad);
+  x.font='700 '+fs+'px '+tmFontCss();
+  x.textAlign='center';x.textBaseline='middle';
+  if(t.shadow){x.shadowColor='rgba(40,32,22,.35)';x.shadowBlur=fs*0.10;x.shadowOffsetX=fs*0.03;x.shadowOffsetY=fs*0.05;}
+  if(t.stroke){x.lineJoin='round';x.lineWidth=fs*0.14;x.strokeStyle='#ffffff';x.strokeText(t.text,0,0);}
+  x.shadowColor='transparent';
+  x.fillStyle=t.color;x.fillText(t.text,0,0);
+  return c;
+}
+function syncTextMotif(re){
+  state.motifs=state.motifs.filter(m=>!m._isText);          // 旧テキストを除去
+  const t=state.textMotif;
+  if(hasFeature('textMotif')&&t.text.trim()){
+    const hi=p=>drawTextMotif(p);
+    state.motifs.push({pv:drawTextMotif(Math.max(24,Math.round(240*t.scale/100))),hi,_isText:true});
+  }
+  if(re!==false){updateArrange();rebuild();}
+}
+/* 文字だけの柄モード（絵なし・名入れ生地）。SAMPLE「文字だけ」カードとTEXT欄ボタンの共通処理。
+   見本柄/アップ絵を選び直せば従来どおり絵＋文字に戻る。jump=trueでTEXT入力欄へ誘導 */
+function applyTextOnly(jump){
+  state.sample='textOnly';state.rawFull=null;state.raw=null;
+  state.mode='motif';state.tileSrc=null;state.srcPxMax=Infinity;
+  state.motifs=[];
+  if(state.filler.type==='motif')state.filler={type:'none',motifIdx:-1,motif:null}; // recut()と同じ参照ズレガード
+  syncTextMotif();
+  updateModeUI();applySizeGuard();syncFillerUI();
+  $$('.samp').forEach(s=>s.classList.toggle('on',s.dataset.sample==='textOnly'));
+  const cc=$('#cutCv');cc.getContext('2d').clearRect(0,0,cc.width,cc.height);
+  $('#motifCount').textContent=state.textMotif.text.trim()
+    ?'文字だけの柄（絵は未使用）'
+    :'文字だけの柄 — TEXT欄に文字を入力してください';
+  if(jump){const ti=$('#tmText');ti.scrollIntoView({behavior:'smooth',block:'center'});ti.focus({preventScroll:true});}
+}
+/* F23/F24: state→UIの同期（レシピ復元・タイプ切替から共用） */
+function syncTextUI(){
+  const t=state.textMotif;if(!$('#tmText'))return;
+  $('#tmText').value=t.text||'';
+  $('#tmColor').value=t.color;$('#tmStroke').checked=!!t.stroke;$('#tmShadow').checked=!!t.shadow;
+  $('#tmScale').value=t.scale;$('#tmScaleV').textContent=t.scale+'%';
+  $('#tmRot').value=t.rot;$('#tmRotV').textContent=t.rot+'°';
+  fill($('#tmScale'));fill($('#tmRot'));
+  const nameEl=$('#tmFontName');
+  if(nameEl){
+    const f=t.font||'sans';
+    const fam=f.startsWith('gf:')?f.slice(3):f.startsWith('custom:')?f.slice(7):null;
+    nameEl.textContent=fam||({sans:'ゴシック（標準）',serif:'明朝（標準）',round:'丸ゴ（標準）',script:'筆記体（標準）'}[f]||f);
+    nameEl.style.fontFamily=fam?('"'+fam+'"'):(TM_FONTS[f]||'');
+  }
+}
+function syncBgUI(){
+  const e=state.bgExtra;if(!$('#bgTypeSeg'))return;
+  $$('#bgTypeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.t===e.type));
+  if($('#bg2Color'))$('#bg2Color').value=e.c2;
+  $$('#bgAngleSeg button').forEach(b=>b.classList.toggle('on',b.dataset.a===e.angle));
+  if($('#bgFgColor'))$('#bgFgColor').value=e.fg;
+  if($('#bgCell')){$('#bgCell').value=e.cellCm;$('#bgCellV').textContent=(+e.cellCm).toFixed(1)+'cm';fill($('#bgCell'));}
+  if($('#bgAlpha')){$('#bgAlpha').value=e.alpha;$('#bgAlphaV').textContent=e.alpha+'%';fill($('#bgAlpha'));}
+  if($('#bgImgName'))$('#bgImgName').textContent=e.img?'画像設定済み':'';
+  const t=e.type;
+  if($('#bgExtraRow'))$('#bgExtraRow').style.display=(t==='solid')?'none':'block';
+  if($('#bgGradRow'))$('#bgGradRow').style.display=(t==='grad')?'flex':'none';
+  if($('#bgPatRow'))$('#bgPatRow').style.display=(t==='dots'||t==='stripes'||t==='checks')?'block':'none';
+  if($('#bgImgRow'))$('#bgImgRow').style.display=(t==='image')?'block':'none';
+}
+
+
+/* モチーフの不透明画素(インク)bboxがcanvasに占める比率。pvで初回のみ実測しモチーフに刻む。
+   「柄の大きさ」をキャンバス寸でなく見た目のインク寸に効かせるための基礎値
+   （ベクター見本柄はcanvasに余白があり、丸などがラベルの実寸より小さく描かれていた） */
+function inkFracOf(m){
+  if(m._inkF)return m._inkF;
+  let f={w:1,h:1};
+  try{
+    const c=m.pv,d=c.getContext('2d').getImageData(0,0,c.width,c.height).data;
+    let x0=c.width,y0=c.height,x1=-1,y1=-1;
+    for(let y=0;y<c.height;y++)for(let x=0;x<c.width;x++)
+      if(d[(y*c.width+x)*4+3]>8){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}
+    if(x1>=0)f={w:(x1-x0+1)/c.width,h:(y1-y0+1)/c.height};
+  }catch(e){}
+  m._inkF=f;return f;
+}
 
 /* renderUnit: レイアウト×スケール(px/unit)→シームレスタイルcanvas */
 const unitCache={};
 let printCache={key:null,canvas:null}; // 印刷解像度の巨大canvasは1枠だけ保持（メモリ肥大防止）
+/* ---- F24 背景強化（リピート単位に焼き込む） ----
+   総柄＝1リピートの反復なので、グラデ・パターン・画像もタイル単位で
+   繰り返すのが印刷実体と一致する。ここに描けばプレビュー/製品/入稿TIFF/
+   各書き出しがすべて自動で追従する。継ぎ目対策: グラデはミラー往復、
+   パターンは整数セル割り、画像は2×2ミラー化（トーラス的に連続）。 */
+function bgSig(){const e=state.bgExtra;return e?[e.type,e.c2,e.angle,e.fg,e.cellCm,e.alpha,e.img?(e.img.width+'x'+e.img.height):0].join(','):'';}
+function paintUnitBg(uc,W,H,pxPerCm){
+  const e=state.bgExtra||{type:'solid'},bg=state.bg;
+  const a=(hasFeature('bgOpacity')?(e.alpha==null?100:e.alpha):100)/100;
+  uc.save();uc.globalAlpha=a;
+  if(bg!=='transparent'){uc.fillStyle=bg;uc.fillRect(0,0,W,H);}
+  if(e.type==='grad'&&hasFeature('bgGradient')){
+    const c1=(bg==='transparent')?'#ffffff':bg;
+    let g;
+    if(e.angle==='d'){
+      /* 斜めはタイル周期に合う勾配ベクトル（t=(x/W+y/H)/2）＋周期1/2ストップ。
+         x方向+W／y方向+H の移動で t が+1/2 ずれても同色＝継ぎ目なし */
+      const gx=2*W*H*H/(W*W+H*H),gy=2*W*W*H/(W*W+H*H);
+      g=uc.createLinearGradient(0,0,gx,gy);
+      g.addColorStop(0,c1);g.addColorStop(0.25,e.c2);g.addColorStop(0.5,c1);g.addColorStop(0.75,e.c2);g.addColorStop(1,c1);
+    }else{
+      g=(e.angle==='h')?uc.createLinearGradient(0,0,W,0):uc.createLinearGradient(0,0,0,H);
+      g.addColorStop(0,c1);g.addColorStop(0.5,e.c2);g.addColorStop(1,c1); // 往復＝継ぎ目なし
+    }
+    uc.fillStyle=g;uc.fillRect(0,0,W,H);
+  }else if((e.type==='dots'||e.type==='stripes'||e.type==='checks')&&hasFeature('bgPattern')){
+    const cell=Math.max(4,(e.cellCm||1.2)*pxPerCm);
+    const n=Math.max(2,2*Math.round(W/cell/2)),m=Math.max(2,2*Math.round(H/cell/2)); // 偶数割り＝継ぎ目なし
+    const cw=W/n,ch=H/m;
+    uc.fillStyle=e.fg;
+    if(e.type==='dots'){
+      const r=Math.min(cw,ch)*0.22;
+      for(let ry=0;ry<=m;ry++)for(let rx=0;rx<=n;rx++){
+        const off=(ry%2)?cw/2:0;
+        uc.beginPath();uc.arc(rx*cw+off,ry*ch,r,0,TAU);uc.fill();
+      }
+    }else if(e.type==='stripes'){
+      for(let rx=0;rx<n;rx++)uc.fillRect(rx*cw,0,cw*0.45,H);
+    }else{
+      for(let ry=0;ry<m;ry++)for(let rx=0;rx<n;rx++)
+        if((rx+ry)%2===0)uc.fillRect(rx*cw,ry*ch,cw+0.5,ch+0.5);
+    }
+  }else if(e.type==='image'&&e.img&&hasFeature('bgImage')){
+    /* 2×2ミラーで継ぎ目なし化: 画像を左上1/4にcoverで敷き、残り3面を反転複写 */
+    const hw=W/2,hh=H/2;
+    const k=Math.max(hw/e.img.width,hh/e.img.height);
+    const dw=e.img.width*k,dh=e.img.height*k;
+    const q=makeCanvas(Math.ceil(hw),Math.ceil(hh)),qc=q.getContext('2d');
+    qc.drawImage(e.img,(hw-dw)/2,(hh-dh)/2,dw,dh);
+    uc.drawImage(q,0,0);
+    uc.save();uc.translate(W,0);uc.scale(-1,1);uc.drawImage(q,0,0);uc.restore();
+    uc.save();uc.translate(0,H);uc.scale(1,-1);uc.drawImage(q,0,0);uc.restore();
+    uc.save();uc.translate(W,H);uc.scale(-1,-1);uc.drawImage(q,0,0);uc.restore();
+  }
+  uc.restore();
+}
 function renderUnit(pxPerU,opts){
   const lay=state.layout;if(!lay)return null;
   const isPrint=!!(opts&&opts.print);
-  const key=[Math.round(pxPerU*10),state.bg,(opts&&opts.flat)?1:0,isPrint?1:0].join('|');
+  const key=[Math.round(pxPerU*10),state.bg,bgSig(),(opts&&opts.flat)?1:0,isPrint?1:0].join('|');
   if(isPrint){if(printCache.key===key)return printCache.canvas;}
   else if(unitCache[key])return unitCache[key];
   const UWpx=Math.max(2,Math.round(lay.UW*pxPerU)),UHpx=Math.max(2,Math.round(lay.UH*pxPerU));
@@ -1466,8 +1793,8 @@ function renderUnit(pxPerU,opts){
   const u=makeCanvas(UWpx,UHpx),uc=u.getContext('2d');
   uc.imageSmoothingQuality='high';
   const bg=state.bg;
-  if(bg!=='transparent'){uc.fillStyle=bg;uc.fillRect(0,0,UWpx,UHpx);}
-  else if(opts&&opts.flat){uc.fillStyle='#ffffff';uc.fillRect(0,0,UWpx,UHpx);}
+  if(bg==='transparent'&&opts&&opts.flat){uc.fillStyle='#ffffff';uc.fillRect(0,0,UWpx,UHpx);}
+  paintUnitBg(uc,UWpx,UHpx,pxPerU/Math.max(0.1,state.sizeCm)); // F24 背景（単色/グラデ/パターン/画像・濃さ）
   /* リピートタイルモード: 取り込み画像を送り込みで焼き付け */
   if(lay.type==='tile'){
     const src=state.tileSrc.canvas;
@@ -1498,10 +1825,20 @@ function renderUnit(pxPerU,opts){
     if(isPrint)printCache={key,canvas:u};else unitCache[key]=u;
     return u;
   }
-  const M=mainMotifs().map(m=>{
+  /* 「柄の大きさ」=いちばん大きいモチーフのインク長辺（実寸ルーラーと一致）。
+     canvas余白と、モチーフ間の元寸比（主役とアクセント）を織り込んで正規化する */
+  const mains=mainMotifs();
+  const inkLong=mains.map(m=>{const f=inkFracOf(m);return Math.max(m.pv.width*f.w,m.pv.height*f.h);});
+  /* F23: 「柄の大きさ」の基準は絵柄のみ。文字を大きくしても絵柄が縮まない
+     （文字だけの柄のときは従来どおり文字が基準） */
+  const artInk=mains.map((m,i)=>m._isText?0:inkLong[i]).filter(v=>v>0);
+  const maxInk=Math.max(...(artInk.length?artInk:inkLong),1e-6);
+  const M=mains.map((m,i)=>{
     const c=motifCanvas(m,pxPerU*1.1,opts&&opts.print);
     const lo=Math.max(c.width,c.height);
-    return{c,dw:c.width/lo,dh:c.height/lo};
+    const f=inkFracOf(m);
+    const k=(inkLong[i]/maxInk)/Math.max(f.w,f.h,1e-6);
+    return{c,dw:c.width/lo*k,dh:c.height/lo*k,isText:!!m._isText};
   });
   if(lay.type==='mirror'){
     const pitchPx=lay.pitch*sx,m0=M[0];
@@ -1513,6 +1850,15 @@ function renderUnit(pxPerU,opts){
     uc.save();uc.translate(UWpx,0);uc.scale(-1,1);uc.drawImage(cell,0,0);uc.restore();
     uc.save();uc.translate(0,UHpx);uc.scale(1,-1);uc.drawImage(cell,0,0);uc.restore();
     uc.save();uc.translate(UWpx,UHpx);uc.scale(-1,-1);uc.drawImage(cell,0,0);uc.restore();
+    /* F23: ミラー配置でも文字は消さない・反転させない（位置はミラー・内容は非反転で上描き） */
+    for(let ti=0;ti<M.length;ti++){
+      if(!M[ti].isText)continue;
+      const tm=M[ti],tw2=tm.dw*pxPerU,th2=tm.dh*pxPerU;
+      for(const[tx2,ty2]of[[cell.width/2,cell.height/2],[UWpx-cell.width/2,cell.height/2],
+                           [cell.width/2,UHpx-cell.height/2],[UWpx-cell.width/2,UHpx-cell.height/2]]){
+        uc.drawImage(tm.c,tx2-tw2/2,ty2-th2/2,tw2,th2);
+      }
+    }
     if(isPrint)printCache={key,canvas:u};else unitCache[key]=u;
     return u;
   }
@@ -1522,7 +1868,8 @@ function renderUnit(pxPerU,opts){
       const fm=fillerMotif();
       if(fm){
         const fc=motifCanvas(fm,pxPerU*(state.fillerScale/100)*1.3,opts&&opts.print);
-        const lo=Math.max(fc.width,fc.height),fdw=fc.width/lo,fdh=fc.height/lo;
+        const ff=inkFracOf(fm),fk=1/Math.max(ff.w,ff.h,1e-6); // 背景モチーフも見た目のインク寸で%を効かせる
+        const lo=Math.max(fc.width,fc.height),fdw=fc.width/lo*fk,fdh=fc.height/lo*fk;
         for(const p of lay.paws){
           const dw=fdw*pxPerU*p.sc,dh=fdh*pxPerU*p.sc;
           const g2=Math.max(dw,dh)*0.75;
@@ -1542,7 +1889,7 @@ function renderUnit(pxPerU,opts){
     for(let ox=-1;ox<=1;ox++)for(let oy=-1;oy<=1;oy++){
       const px2=(pl[0]+ox*lay.UW)*sx,py2=(pl[1]+oy*lay.UH)*sy;
       if(px2+g<-2||px2-g>UWpx+2||py2+g<-2||py2-g>UHpx+2)continue;
-      uc.save();uc.translate(px2,py2);uc.rotate(pl[3]);uc.scale(pl[4],1);
+      uc.save();uc.translate(px2,py2);uc.rotate(mm.isText?0:pl[3]);uc.scale(mm.isText?1:pl[4],1); // F23: 文字は反転・自動回転させない（傾きはTEXTの回転スライダーで）
       uc.drawImage(mm.c,-dw/2,-dh/2,dw,dh);uc.restore();
     }
   }
@@ -1576,6 +1923,18 @@ function renderPattern(){
     ctx.restore();
     ctx.drawImage(u,ox,oy,dw,dh);
     ctx.save();ctx.strokeStyle='rgba(43,38,32,.5)';ctx.setLineDash([7,5]);ctx.lineWidth=1.5;ctx.strokeRect(ox+0.5,oy+0.5,dw,dh);ctx.restore();
+    /* F25: 自由配置の選択枠 */
+    if(lay.type==='freeform'&&state.freeform.sel>=0){
+      const it=state.freeform.items[state.freeform.sel];
+      if(it){
+        const r0=0.55*it.sc;
+        const rx=r0/lay.UW*dw,ry=r0/lay.UH*dh;
+        const px=ox+((it.x%lay.UW+lay.UW)%lay.UW)/lay.UW*dw;
+        const py=oy+((it.y%lay.UH+lay.UH)%lay.UH)/lay.UH*dh;
+        ctx.save();ctx.strokeStyle='rgba(176,103,63,.9)';ctx.setLineDash([5,4]);ctx.lineWidth=2;
+        ctx.strokeRect(px-rx,py-ry,rx*2,ry*2);ctx.restore();
+      }
+    }
     ctx.save();ctx.font='11px ui-monospace,monospace';ctx.fillStyle='rgba(43,38,32,.62)';
     const cmW=(lay.UW*state.sizeCm).toFixed(1),cmH=(lay.UH*state.sizeCm).toFixed(1);
     ctx.fillText(cmW+'cm',ox+dw/2-14,oy-8>12?oy-8:oy+dh+16);
@@ -1623,7 +1982,7 @@ function renderPattern(){
     ctx.restore();
     }
   }
-  const names={full:'ストレート',half:'ハーフドロップ',brick:'ブリック',diamond:'ダイヤモンド',sateen:'飛び柄（斜めずらし）',mirror:'ミラー',toss:'トス（散らし）'};
+  const names={full:'ストレート',half:'ハーフドロップ',brick:'ブリック',diamond:'ダイヤモンド',sateen:'飛び柄（斜めずらし）',mirror:'ミラー',toss:'トス（散らし）',freeform:'自由配置'};
   const cmW=(lay.UW*state.sizeCm).toFixed(1),cmH=(lay.UH*state.sizeCm).toFixed(1);
   const tail=state.mode==='tile'
     ?`取り込みタイル ${state.tileSrc.width}×${state.tileSrc.height}px`
@@ -1727,7 +2086,7 @@ function tsOutline(ctx){ // 外形（身頃＋袖の輪郭）
   ctx.quadraticCurveTo(mx(190),428,mx(svO.x),svO.y);
   ctx.quadraticCurveTo(mx(176),300,mx(sh.x),sh.y);
   ctx.quadraticCurveTo(mx(298),190,mx(neckL.x),neckL.y);
-  ctx.ellipse(TS.cx,neckL.y,neckRx,neckRy,0,0,Math.PI);       // 前襟ぐり
+  ctx.ellipse(TS.cx,neckL.y,neckRx,(state.prodSide==='back'?24:neckRy),0,0,Math.PI); // 襟ぐり（前=深い/背面=浅い）
   ctx.closePath();
 }
 function tsBody(ctx){ // 前身頃パネル（袖を除く）
@@ -1743,7 +2102,7 @@ function tsBody(ctx){ // 前身頃パネル（袖を除く）
   ctx.quadraticCurveTo(mx(242),470,mx(pit.x),pit.y);
   ctx.quadraticCurveTo(mx(258),300,mx(sh.x),sh.y);
   ctx.quadraticCurveTo(mx(298),190,mx(neckL.x),neckL.y);
-  ctx.ellipse(TS.cx,neckL.y,TS.neckRx,TS.neckRy,0,0,Math.PI);
+  ctx.ellipse(TS.cx,neckL.y,TS.neckRx,(state.prodSide==='back'?24:TS.neckRy),0,0,Math.PI);
   ctx.closePath();
 }
 function tsSleeve(ctx,side){ // 袖パネル（side=1:左, -1:右）
@@ -1759,6 +2118,8 @@ function tsSleeve(ctx,side){ // 袖パネル（side=1:左, -1:右）
 function drawTshirt(ctx,ppcm){
   const bg=(state.bg!=='transparent')?state.bg:'#ffffff';
   const{cx,mx,neckL,sh,svI,svO,pit,hem,hemC,neckRx,neckRy}=TS;
+  const backV=(state.prodSide==='back');           // F20 背面ビュー＝襟ぐりを浅く
+  const nRy=backV?24:neckRy;
   stageBase(ctx);
   softShadow(ctx,cx,880,330,54,0.30);
   ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
@@ -1793,7 +2154,7 @@ function drawTshirt(ctx,ppcm){
   let g=ctx.createLinearGradient(150,0,750,0);
   g.addColorStop(0,SH(0.16));g.addColorStop(0.3,SH(0));g.addColorStop(0.7,SH(0));g.addColorStop(1,SH(0.16));
   ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);                          // 円筒（両脇）
-  g=ctx.createRadialGradient(cx,neckL.y+neckRy,8,cx,neckL.y+neckRy,150);
+  g=ctx.createRadialGradient(cx,neckL.y+nRy,8,cx,neckL.y+nRy,150);
   g.addColorStop(0,SH(0.10));g.addColorStop(1,SH(0));ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H); // 襟下
   for(const px2 of[pit.x,mx(pit.x)]){
     g=ctx.createRadialGradient(px2,pit.y,4,px2,pit.y,100);
@@ -1816,15 +2177,15 @@ function drawTshirt(ctx,ppcm){
   g.addColorStop(0,'rgba(255,255,255,.55)');g.addColorStop(1,'rgba(90,74,56,.35)');
   ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);
   ctx.globalCompositeOperation='source-over';ctx.restore();
-  /* 首の開口部: 下=前襟ぐり(深いアーチ)・上=後ろ襟ぐり(浅いアーチ) */
-  const backRy=TS.backRy;
+  /* 首の開口部: 下=襟ぐり（前=深い/背面=浅い）・上=反対側の襟の覗き */
+  const backRy=backV?12:TS.backRy;
   const openPath=()=>{ctx.beginPath();
-    ctx.ellipse(cx,neckL.y,neckRx,backRy,0,Math.PI,0);        // 上辺（後ろ襟・上に浅く膨らむ）
-    ctx.ellipse(cx,neckL.y,neckRx,neckRy,0,0,Math.PI);         // 下辺（前襟・深い）
+    ctx.ellipse(cx,neckL.y,neckRx,backRy,0,Math.PI,0);        // 上辺（上に浅く膨らむ）
+    ctx.ellipse(cx,neckL.y,neckRx,nRy,0,0,Math.PI);            // 下辺
     ctx.closePath();};
   ctx.save();openPath();ctx.clip();
   ctx.fillStyle=bg;ctx.fillRect(0,0,DS_W,DS_H);                // 開口部＝後ろ身頃の内側
-  g=ctx.createLinearGradient(0,neckL.y-backRy,0,neckL.y+neckRy);
+  g=ctx.createLinearGradient(0,neckL.y-backRy,0,neckL.y+nRy);
   g.addColorStop(0,SH(0.34));g.addColorStop(0.45,SH(0.10));g.addColorStop(1,SH(0.02));
   ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);
   /* 内側の後ろ襟リブ（上辺沿いの帯） */
@@ -1833,28 +2194,28 @@ function drawTshirt(ctx,ppcm){
   ctx.beginPath();ctx.ellipse(cx,neckL.y+4,neckRx-10,backRy+6,0,Math.PI,0);
   ctx.lineWidth=10;ctx.strokeStyle=SH(0.14);ctx.stroke();
   ctx.restore();
-  /* リブ襟バンド（前襟ぐり沿い） */
+  /* リブ襟バンド（襟ぐり沿い） */
   (function(){
-    const bandW=15;
+    const bandW=backV?12:15;
     ctx.save();openPath();ctx.clip();
-    ctx.beginPath();ctx.ellipse(cx,neckL.y,neckRx-bandW/2,neckRy-bandW/2,0,-0.05*Math.PI,1.05*Math.PI);
+    ctx.beginPath();ctx.ellipse(cx,neckL.y,neckRx-bandW/2,nRy-bandW/2,0,-0.05*Math.PI,1.05*Math.PI);
     ctx.lineWidth=bandW;ctx.strokeStyle=bg;ctx.stroke();
-    ctx.beginPath();ctx.ellipse(cx,neckL.y,neckRx-bandW/2,neckRy-bandW/2,0,-0.05*Math.PI,1.05*Math.PI);
+    ctx.beginPath();ctx.ellipse(cx,neckL.y,neckRx-bandW/2,nRy-bandW/2,0,-0.05*Math.PI,1.05*Math.PI);
     ctx.lineWidth=bandW;ctx.strokeStyle='rgba(255,255,255,.14)';ctx.stroke();
     /* リブの縦線 */
     ctx.lineWidth=1;ctx.strokeStyle=SH(0.18);
     for(let t=0.04;t<=0.96;t+=1/26){
       const a=Math.PI*t;
-      const x1=cx+Math.cos(a)*(neckRx-bandW+1),y1=neckL.y+Math.sin(a)*(neckRy-bandW+1);
-      const x2=cx+Math.cos(a)*(neckRx-1),y2=neckL.y+Math.sin(a)*(neckRy-1);
+      const x1=cx+Math.cos(a)*(neckRx-bandW+1),y1=neckL.y+Math.sin(a)*(nRy-bandW+1);
+      const x2=cx+Math.cos(a)*(neckRx-1),y2=neckL.y+Math.sin(a)*(nRy-1);
       ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
     }
     ctx.restore();
     /* 襟の外周・内周の輪郭 */
     ctx.save();
-    ctx.beginPath();ctx.ellipse(cx,neckL.y,neckRx,neckRy,0,0,Math.PI);
+    ctx.beginPath();ctx.ellipse(cx,neckL.y,neckRx,nRy,0,0,Math.PI);
     ctx.lineWidth=1.4;ctx.strokeStyle='rgba(58,47,35,.4)';ctx.stroke();
-    ctx.beginPath();ctx.ellipse(cx,neckL.y,neckRx-bandW,neckRy-bandW,0,0.03*Math.PI,0.97*Math.PI);
+    ctx.beginPath();ctx.ellipse(cx,neckL.y,neckRx-bandW,nRy-bandW,0,0.03*Math.PI,0.97*Math.PI);
     ctx.lineWidth=1.1;ctx.strokeStyle='rgba(58,47,35,.30)';ctx.stroke();
     ctx.beginPath();ctx.ellipse(cx,neckL.y,neckRx,backRy,0,Math.PI,0);
     ctx.lineWidth=1.4;ctx.strokeStyle='rgba(58,47,35,.4)';ctx.stroke();
@@ -1871,6 +2232,181 @@ function drawTshirt(ctx,ppcm){
   ctx.restore();
   /* 輪郭（ソフトなエッジ・漫画的な硬い線は使わない） */
   ctx.beginPath();tsOutline(ctx);
+  ctx.lineWidth=1.6;ctx.strokeStyle='rgba(58,47,35,.34)';ctx.stroke();
+  ctx.restore();
+}
+
+/* ---- キッズTシャツ（F19・キッズ110想定） ----
+   大人Tシャツ(TS)の座標系を sx/sy 別掛けで写像し「身幅に対して着丈が
+   短い」子供のボックス比率を作る。襟は子供の頭身に合わせ縮小率を緩めて
+   相対的に大きく見せる。描画パイプラインは drawTshirt と同一の13段。 */
+const KTS=(()=>{
+  const cx=450,sx=0.78,sy=0.68,yPiv=505; // yPiv=大人シルエットの視覚重心（拡縮の不動点）
+  const X=x=>cx+(x-cx)*sx, Y=y=>yPiv+(y-yPiv)*sy, mx=x=>2*cx-x;
+  const neckS=0.86; // 襟の縮小率（全体の0.78より緩い＝子供は襟が相対的に大きい）
+  return{cx,sx,sy,X,Y,mx,
+    neckRx:(cx-TS.neckL.x)*neckS, neckRy:TS.neckRy*neckS,
+    backRy:Math.max(12,TS.backRy*neckS), neckY:Y(TS.neckL.y)+6};
+})();
+function ktsOutline(ctx){
+  const{X,Y,cx,mx,neckRx,neckRy,neckY}=KTS, nx=cx-neckRx;
+  ctx.moveTo(nx,neckY);
+  ctx.quadraticCurveTo(X(298),Y(190),X(232),Y(236));          // 肩線
+  ctx.quadraticCurveTo(X(176),Y(300),X(148),Y(394));          // 袖の外側
+  ctx.quadraticCurveTo(X(190),Y(428),X(248),Y(438));          // 袖口
+  ctx.quadraticCurveTo(X(246),Y(404),X(264),Y(360));          // 袖ぐり（凹）
+  ctx.quadraticCurveTo(X(242),Y(470),X(252),Y(600));          // 脇S字
+  ctx.quadraticCurveTo(X(246),Y(730),X(264),Y(824));          // 裾へ
+  ctx.quadraticCurveTo(X(350),Y(842),cx,Y(840));              // 裾（軽い曲線）
+  ctx.quadraticCurveTo(mx(X(350)),Y(842),mx(X(264)),Y(824));
+  ctx.quadraticCurveTo(mx(X(246)),Y(730),mx(X(252)),Y(600));
+  ctx.quadraticCurveTo(mx(X(242)),Y(470),mx(X(264)),Y(360));
+  ctx.quadraticCurveTo(mx(X(246)),Y(404),mx(X(248)),Y(438));
+  ctx.quadraticCurveTo(mx(X(190)),Y(428),mx(X(148)),Y(394));
+  ctx.quadraticCurveTo(mx(X(176)),Y(300),mx(X(232)),Y(236));
+  ctx.quadraticCurveTo(mx(X(298)),Y(190),mx(nx),neckY);
+  ctx.ellipse(cx,neckY,neckRx,(state.prodSide==='back'?20:neckRy),0,0,Math.PI); // 襟ぐり（前/背面）
+  ctx.closePath();
+}
+function ktsBody(ctx){
+  const{X,Y,cx,mx,neckRx,neckRy,neckY}=KTS, nx=cx-neckRx;
+  ctx.moveTo(nx,neckY);
+  ctx.quadraticCurveTo(X(298),Y(190),X(232),Y(236));
+  ctx.quadraticCurveTo(X(258),Y(300),X(264),Y(360));          // アームホール（身頃側・凹）
+  ctx.quadraticCurveTo(X(242),Y(470),X(252),Y(600));
+  ctx.quadraticCurveTo(X(246),Y(730),X(264),Y(824));
+  ctx.quadraticCurveTo(X(350),Y(842),cx,Y(840));
+  ctx.quadraticCurveTo(mx(X(350)),Y(842),mx(X(264)),Y(824));
+  ctx.quadraticCurveTo(mx(X(246)),Y(730),mx(X(252)),Y(600));
+  ctx.quadraticCurveTo(mx(X(242)),Y(470),mx(X(264)),Y(360));
+  ctx.quadraticCurveTo(mx(X(258)),Y(300),mx(X(232)),Y(236));
+  ctx.quadraticCurveTo(mx(X(298)),Y(190),mx(nx),neckY);
+  ctx.ellipse(cx,neckY,neckRx,(state.prodSide==='back'?20:neckRy),0,0,Math.PI);
+  ctx.closePath();
+}
+function ktsSleeve(ctx,side){
+  const{X,Y,mx}=KTS;
+  const M=side>0?(v=>v):(v=>mx(v));
+  ctx.moveTo(M(X(232)),Y(236));
+  ctx.quadraticCurveTo(M(X(176)),Y(300),M(X(148)),Y(394));
+  ctx.quadraticCurveTo(M(X(190)),Y(428),M(X(248)),Y(438));
+  ctx.quadraticCurveTo(M(X(246)),Y(404),M(X(264)),Y(360));
+  ctx.quadraticCurveTo(M(X(258)),Y(300),M(X(232)),Y(236));
+  ctx.closePath();
+}
+function drawKidsTee(ctx,ppcm){
+  const bg=(state.bg!=='transparent')?state.bg:'#ffffff';
+  const{X,Y,cx,mx,neckRx,neckRy:_fRy,backRy:_bRy0,neckY,sx,sy}=KTS;
+  const backV=(state.prodSide==='back');           // F20 背面ビュー＝襟ぐりを浅く
+  const neckRy=backV?20:_fRy, backRy=backV?11:_bRy0, bandW0=backV?11:13;
+  stageBase(ctx);
+  softShadow(ctx,cx,Y(880),330*sx,54*sy,0.30);
+  ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+  /* 生地ベース（全体） */
+  ctx.save();ctx.beginPath();ktsOutline(ctx);
+  ctx.shadowColor='rgba(74,64,52,.22)';ctx.shadowBlur=26;ctx.shadowOffsetY=12;
+  ctx.fillStyle=bg;ctx.fill();ctx.restore();
+  /* パネル別に柄（原点オフセット＋袖は微回転＝実物の柄ズレ） */
+  const panels=[
+    {clip:ktsBody,off:[0,0],rot:0},
+    {clip:c2=>ktsSleeve(c2,1),off:[101,44],rot:-0.06},
+    {clip:c2=>ktsSleeve(c2,-1),off:[-92,35],rot:0.055},
+  ];
+  for(const pn of panels){
+    const pat=patFor(ctx,ppcm,pn.off[0],pn.off[1],pn.rot);
+    ctx.save();ctx.beginPath();pn.clip(ctx);ctx.clip();
+    ctx.fillStyle=bg;ctx.fillRect(0,0,DS_W,DS_H);
+    if(pat){ctx.fillStyle=pat;ctx.fillRect(0,0,DS_W,DS_H);}
+    ctx.restore();
+  }
+  /* 縫い目シャドウバンド（アームホール沿い） */
+  for(const side of[1,-1]){
+    const M=side>0?(v=>v):(v=>mx(v));
+    ctx.save();ctx.beginPath();ktsOutline(ctx);ctx.clip();
+    ctx.strokeStyle=SH(0.20);ctx.lineWidth=6;ctx.filter='blur(3px)';
+    ctx.beginPath();ctx.moveTo(M(X(232)),Y(236));ctx.quadraticCurveTo(M(X(258)),Y(300),M(X(264)),Y(360));ctx.stroke();
+    ctx.filter='none';ctx.restore();
+  }
+  /* シェーディング（柄の上から乗算） */
+  ctx.save();ctx.beginPath();ktsOutline(ctx);ctx.clip();
+  ctx.globalCompositeOperation='multiply';
+  let g=ctx.createLinearGradient(X(150),0,X(750),0);
+  g.addColorStop(0,SH(0.15));g.addColorStop(0.3,SH(0));g.addColorStop(0.7,SH(0));g.addColorStop(1,SH(0.15));
+  ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);                          // 円筒（両脇）
+  g=ctx.createRadialGradient(cx,neckY+neckRy,8,cx,neckY+neckRy,120);
+  g.addColorStop(0,SH(0.10));g.addColorStop(1,SH(0));ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H); // 襟下
+  for(const px2 of[X(264),mx(X(264))]){
+    g=ctx.createRadialGradient(px2,Y(360),4,px2,Y(360),80);
+    g.addColorStop(0,SH(0.13));g.addColorStop(1,SH(0));ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H); // 脇下AO
+  }
+  /* ドレープ（淡い斜めバンド2本） */
+  for(const[dx0,dy0,dx1,dy1,al]of[[X(360),Y(500),X(300),Y(830),0.05],[X(560),Y(470),X(610),Y(820),0.045]]){
+    g=ctx.createLinearGradient(dx0,dy0,dx0+30,dy0);
+    g.addColorStop(0,SH(0));g.addColorStop(0.5,SH(al));g.addColorStop(1,SH(0));
+    ctx.save();ctx.translate(dx0,dy0);ctx.rotate(Math.atan2(dy1-dy0,dx1-dx0)-Math.PI/2);ctx.translate(-dx0,-dy0);
+    ctx.fillStyle=g;ctx.fillRect(dx0-36,dy0-50,72,340);ctx.restore();
+  }
+  ctx.globalCompositeOperation='source-over';
+  ctx.restore();
+  applyGrain(ctx,ktsOutline,0.16);
+  /* 光源（左上ソフトライト） */
+  ctx.save();ctx.beginPath();ktsOutline(ctx);ctx.clip();
+  ctx.globalCompositeOperation='soft-light';
+  g=ctx.createRadialGradient(X(340),Y(240),50,cx,Y(520),480);
+  g.addColorStop(0,'rgba(255,255,255,.55)');g.addColorStop(1,'rgba(90,74,56,.35)');
+  ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);
+  ctx.globalCompositeOperation='source-over';ctx.restore();
+  /* 首の開口部 */
+  const openPath=()=>{ctx.beginPath();
+    ctx.ellipse(cx,neckY,neckRx,backRy,0,Math.PI,0);
+    ctx.ellipse(cx,neckY,neckRx,neckRy,0,0,Math.PI);
+    ctx.closePath();};
+  ctx.save();openPath();ctx.clip();
+  ctx.fillStyle=bg;ctx.fillRect(0,0,DS_W,DS_H);
+  g=ctx.createLinearGradient(0,neckY-backRy,0,neckY+neckRy);
+  g.addColorStop(0,SH(0.34));g.addColorStop(0.45,SH(0.10));g.addColorStop(1,SH(0.02));
+  ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);
+  ctx.beginPath();ctx.ellipse(cx,neckY+4,neckRx-9,backRy+5,0,Math.PI,0);
+  ctx.lineWidth=9;ctx.strokeStyle=bg;ctx.stroke();
+  ctx.beginPath();ctx.ellipse(cx,neckY+4,neckRx-9,backRy+5,0,Math.PI,0);
+  ctx.lineWidth=9;ctx.strokeStyle=SH(0.14);ctx.stroke();
+  ctx.restore();
+  /* リブ襟バンド（前襟ぐり沿い） */
+  (function(){
+    const bandW=bandW0;
+    ctx.save();openPath();ctx.clip();
+    ctx.beginPath();ctx.ellipse(cx,neckY,neckRx-bandW/2,neckRy-bandW/2,0,-0.05*Math.PI,1.05*Math.PI);
+    ctx.lineWidth=bandW;ctx.strokeStyle=bg;ctx.stroke();
+    ctx.beginPath();ctx.ellipse(cx,neckY,neckRx-bandW/2,neckRy-bandW/2,0,-0.05*Math.PI,1.05*Math.PI);
+    ctx.lineWidth=bandW;ctx.strokeStyle='rgba(255,255,255,.14)';ctx.stroke();
+    ctx.lineWidth=1;ctx.strokeStyle=SH(0.18);
+    for(let t=0.04;t<=0.96;t+=1/24){
+      const a=Math.PI*t;
+      const x1=cx+Math.cos(a)*(neckRx-bandW+1),y1=neckY+Math.sin(a)*(neckRy-bandW+1);
+      const x2=cx+Math.cos(a)*(neckRx-1),y2=neckY+Math.sin(a)*(neckRy-1);
+      ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    }
+    ctx.restore();
+    ctx.save();
+    ctx.beginPath();ctx.ellipse(cx,neckY,neckRx,neckRy,0,0,Math.PI);
+    ctx.lineWidth=1.4;ctx.strokeStyle='rgba(58,47,35,.4)';ctx.stroke();
+    ctx.beginPath();ctx.ellipse(cx,neckY,neckRx-bandW,neckRy-bandW,0,0.03*Math.PI,0.97*Math.PI);
+    ctx.lineWidth=1.1;ctx.strokeStyle='rgba(58,47,35,.30)';ctx.stroke();
+    ctx.beginPath();ctx.ellipse(cx,neckY,neckRx,backRy,0,Math.PI,0);
+    ctx.lineWidth=1.4;ctx.strokeStyle='rgba(58,47,35,.4)';ctx.stroke();
+    ctx.restore();
+  })();
+  /* ステッチ（裾・袖口） */
+  ctx.save();ctx.setLineDash([3,2.5]);ctx.lineWidth=1.1;ctx.strokeStyle=SH(0.35);
+  ctx.beginPath();ctx.moveTo(X(264)+4,Y(824)-12);ctx.quadraticCurveTo(X(384),Y(838),cx,Y(840)-12);
+  ctx.quadraticCurveTo(mx(X(384)),Y(838),mx(X(264))-4,Y(824)-12);ctx.stroke();
+  for(const side of[1,-1]){
+    const M=side>0?(v=>v):(v=>mx(v));
+    ctx.beginPath();ctx.moveTo(M(X(148))+(side>0?7:-7),Y(394)-8);ctx.quadraticCurveTo(M(X(196)),Y(418),M(X(248))+(side>0?-4:4),Y(438)-8);ctx.stroke();
+  }
+  ctx.restore();
+  /* 輪郭 */
+  ctx.beginPath();ktsOutline(ctx);
   ctx.lineWidth=1.6;ctx.strokeStyle='rgba(58,47,35,.34)';ctx.stroke();
   ctx.restore();
 }
@@ -2017,12 +2553,187 @@ function drawBolt(ctx,ppcm){
   ctx.restore();
 }
 
-/* ---- 製品レジストリ（タブ・描画・実寸スケール・拡大時の中心） ---- */
+/* ---- 犬用タンクトップ（F19・小型犬・袖なし・平置き） ----
+   参考写真（社長支給 2026-07-12・DOG DEPT型タンク）を平置きフラットレイで再現。
+   特徴＝袖なしの太い肩ストラップ・深くえぐれたアームホール・
+   裾へ向かって広がるAライン・シャツテールの丸裾。
+   パイプラインは drawTshirt と同一（ステージ→柄→陰影→grain→リブ襟→ステッチ→輪郭）。 */
+const DG={cx:450, mx:x=>900-x, neckY:248, neckRx:92, neckRy:52, backRy:16};
+function dgOutline(ctx){
+  const{cx,mx,neckY,neckRx,neckRy}=DG, nx=cx-neckRx;
+  ctx.moveTo(nx,neckY);
+  ctx.quadraticCurveTo(310,250,262,268);                      // 肩ストラップ
+  ctx.quadraticCurveTo(322,386,292,474);                      // アームホール（深い凹＝くびれ）
+  ctx.quadraticCurveTo(258,584,240,694);                      // 脇（Aラインに広がる）
+  ctx.quadraticCurveTo(300,776,450,786);                      // 裾（シャツテールの丸み）
+  ctx.quadraticCurveTo(mx(300),776,mx(240),694);
+  ctx.quadraticCurveTo(mx(258),584,mx(292),474);
+  ctx.quadraticCurveTo(mx(322),386,mx(262),268);
+  ctx.quadraticCurveTo(mx(310),250,mx(nx),neckY);
+  ctx.ellipse(cx,neckY,neckRx,(state.prodSide==='back'?26:neckRy),0,0,Math.PI); // 襟ぐり（前/背面）
+  ctx.closePath();
+}
+function drawDogTee(ctx,ppcm){
+  const bg=(state.bg!=='transparent')?state.bg:'#ffffff';
+  const{cx,mx,neckY,neckRx,neckRy:_fRy,backRy:_bRy0}=DG;
+  const backV=(state.prodSide==='back');           // F20 背面ビュー＝襟ぐりを浅く
+  const neckRy=backV?26:_fRy, backRy=backV?12:_bRy0, bandW0=backV?11:13;
+  stageBase(ctx);
+  softShadow(ctx,cx,824,300,48,0.30);
+  ctx.save();ctx.lineJoin='round';ctx.lineCap='round';
+  /* 生地ベース（全体・落ち影つき） */
+  ctx.save();ctx.beginPath();dgOutline(ctx);
+  ctx.shadowColor='rgba(74,64,52,.22)';ctx.shadowBlur=28;ctx.shadowOffsetY=13;
+  ctx.fillStyle=bg;ctx.fill();ctx.restore();
+  /* 柄（袖なし＝1パネル） */
+  ctx.save();ctx.beginPath();dgOutline(ctx);ctx.clip();
+  ctx.fillStyle=bg;ctx.fillRect(0,0,DS_W,DS_H);
+  const pat=patFor(ctx,ppcm,0,0,0);
+  if(pat){ctx.fillStyle=pat;ctx.fillRect(0,0,DS_W,DS_H);}
+  /* シェーディング（柄の上から乗算） */
+  ctx.globalCompositeOperation='multiply';
+  let g=ctx.createLinearGradient(240,0,660,0);
+  g.addColorStop(0,SH(0.16));g.addColorStop(0.3,SH(0));g.addColorStop(0.7,SH(0));g.addColorStop(1,SH(0.16));
+  ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);                          // 円筒（両脇）
+  g=ctx.createRadialGradient(cx,neckY+neckRy,8,cx,neckY+neckRy,140);
+  g.addColorStop(0,SH(0.10));g.addColorStop(1,SH(0));ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H); // 襟下
+  for(const px2 of[298,mx(298)]){                                       // アームホール下AO
+    g=ctx.createRadialGradient(px2,462,4,px2,462,90);
+    g.addColorStop(0,SH(0.12));g.addColorStop(1,SH(0));ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);
+  }
+  for(const[dx0,dy0,dx1,dy1,al]of[[380,470,330,760,0.05],[540,450,580,750,0.045]]){ // ドレープ2本
+    g=ctx.createLinearGradient(dx0,dy0,dx0+32,dy0);
+    g.addColorStop(0,SH(0));g.addColorStop(0.5,SH(al));g.addColorStop(1,SH(0));
+    ctx.save();ctx.translate(dx0,dy0);ctx.rotate(Math.atan2(dy1-dy0,dx1-dx0)-Math.PI/2);ctx.translate(-dx0,-dy0);
+    ctx.fillStyle=g;ctx.fillRect(dx0-38,dy0-56,76,400);ctx.restore();
+  }
+  ctx.globalCompositeOperation='source-over';
+  ctx.restore();
+  applyGrain(ctx,dgOutline,0.16);
+  /* 光源（左上ソフトライト） */
+  ctx.save();ctx.beginPath();dgOutline(ctx);ctx.clip();
+  ctx.globalCompositeOperation='soft-light';
+  g=ctx.createRadialGradient(350,300,60,450,520,560);
+  g.addColorStop(0,'rgba(255,255,255,.55)');g.addColorStop(1,'rgba(90,74,56,.35)');
+  ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);
+  ctx.globalCompositeOperation='source-over';ctx.restore();
+  /* 首の開口部（前襟深い・後ろ襟浅い） */
+  const openPath=()=>{ctx.beginPath();
+    ctx.ellipse(cx,neckY,neckRx,backRy,0,Math.PI,0);
+    ctx.ellipse(cx,neckY,neckRx,neckRy,0,0,Math.PI);
+    ctx.closePath();};
+  ctx.save();openPath();ctx.clip();
+  ctx.fillStyle=bg;ctx.fillRect(0,0,DS_W,DS_H);
+  g=ctx.createLinearGradient(0,neckY-backRy,0,neckY+neckRy);
+  g.addColorStop(0,SH(0.34));g.addColorStop(0.45,SH(0.10));g.addColorStop(1,SH(0.02));
+  ctx.fillStyle=g;ctx.fillRect(0,0,DS_W,DS_H);
+  ctx.beginPath();ctx.ellipse(cx,neckY+4,neckRx-9,backRy+5,0,Math.PI,0);
+  ctx.lineWidth=9;ctx.strokeStyle=bg;ctx.stroke();
+  ctx.beginPath();ctx.ellipse(cx,neckY+4,neckRx-9,backRy+5,0,Math.PI,0);
+  ctx.lineWidth=9;ctx.strokeStyle=SH(0.14);ctx.stroke();
+  ctx.restore();
+  /* リブ襟バンド（前襟ぐり沿い） */
+  (function(){
+    const bandW=bandW0;
+    ctx.save();openPath();ctx.clip();
+    ctx.beginPath();ctx.ellipse(cx,neckY,neckRx-bandW/2,neckRy-bandW/2,0,-0.05*Math.PI,1.05*Math.PI);
+    ctx.lineWidth=bandW;ctx.strokeStyle=bg;ctx.stroke();
+    ctx.beginPath();ctx.ellipse(cx,neckY,neckRx-bandW/2,neckRy-bandW/2,0,-0.05*Math.PI,1.05*Math.PI);
+    ctx.lineWidth=bandW;ctx.strokeStyle='rgba(255,255,255,.14)';ctx.stroke();
+    ctx.lineWidth=1;ctx.strokeStyle=SH(0.18);
+    for(let t=0.04;t<=0.96;t+=1/24){
+      const a=Math.PI*t;
+      const x1=cx+Math.cos(a)*(neckRx-bandW+1),y1=neckY+Math.sin(a)*(neckRy-bandW+1);
+      const x2=cx+Math.cos(a)*(neckRx-1),y2=neckY+Math.sin(a)*(neckRy-1);
+      ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    }
+    ctx.restore();
+    ctx.save();
+    ctx.beginPath();ctx.ellipse(cx,neckY,neckRx,neckRy,0,0,Math.PI);
+    ctx.lineWidth=1.4;ctx.strokeStyle='rgba(58,47,35,.4)';ctx.stroke();
+    ctx.beginPath();ctx.ellipse(cx,neckY,neckRx-bandW,neckRy-bandW,0,0.03*Math.PI,0.97*Math.PI);
+    ctx.lineWidth=1.1;ctx.strokeStyle='rgba(58,47,35,.30)';ctx.stroke();
+    ctx.beginPath();ctx.ellipse(cx,neckY,neckRx,backRy,0,Math.PI,0);
+    ctx.lineWidth=1.4;ctx.strokeStyle='rgba(58,47,35,.4)';ctx.stroke();
+    ctx.restore();
+  })();
+  /* ステッチ（アームホールの縁取り・裾） */
+  ctx.save();ctx.setLineDash([3,2.5]);ctx.lineWidth=1.1;ctx.strokeStyle=SH(0.35);
+  for(const side of[1,-1]){
+    const M=side>0?(v=>v):(v=>mx(v));
+    ctx.beginPath();ctx.moveTo(M(272),276);ctx.quadraticCurveTo(M(330),388,M(302),470);ctx.stroke();
+  }
+  ctx.beginPath();ctx.moveTo(248,684);ctx.quadraticCurveTo(306,762,450,772);
+  ctx.quadraticCurveTo(mx(306),762,mx(248),684);ctx.stroke();
+  ctx.restore();
+  /* 輪郭 */
+  ctx.beginPath();dgOutline(ctx);
+  ctx.lineWidth=1.6;ctx.strokeStyle='rgba(58,47,35,.34)';ctx.stroke();
+  ctx.restore();
+}
+
+/* ---- 製品レジストリ（タブ・描画・実寸スケール・拡大時の中心・寸法表示） ----
+   dims＝F21 寸法表示のスペック値（レディースM/キッズ110/小型犬・すべて仮値＝
+   先方確認中）。線の座標は各製品ジオメトリの該当点、ラベルはスペック表記。 */
 const PRODUCTS={
-  tshirt:{lb:'Tシャツ',ppcm:7.15,zoomOff:90,draw:drawTshirt}, // 身幅52cm(実物比)÷座標pit点372px=7.15。旧8.8は座標と不整合な決め打ち値だった(+23%過大)
-  tote:{lb:'トート',ppcm:10.42,zoomOff:40,draw:drawTote},     // 一般的なコットントート相場・幅38cm÷座標幅396px=10.42。コード内に実寸根拠なく社長確認のうえ採用
-  bolt:{lb:'反物',ppcm:3.73,zoomOff:40,draw:drawBolt},        // 生地幅150cm(571行目の購入UI表記と同一)÷ロール軸長560px=3.73。旧5.6は不整合な決め打ち値だった(+50%過大)
+  tshirt:{lb:'Tシャツ',ppcm:8.09,zoomOff:90,draw:drawTshirt,hasSides:true, // レディースM基準: 身幅46cm(仮値・先方確認中)÷座標pit幅372px=8.09（旧7.15=身幅52cm想定から変更 2026-07-12）
+    dims:[
+      {x1:232,y1:200,x2:668,y2:200,label:'肩幅 39cm'},
+      {x1:264,y1:392,x2:636,y2:392,label:'身幅 46cm'},
+      {x1:800,y1:170,x2:800,y2:840,label:'着丈 62cm'},
+      {x1:214,y1:224,x2:130,y2:386,label:'袖丈 16cm',lx:-56},
+    ]},
+  kids:{lb:'キッズT',ppcm:8.29,zoomOff:70,draw:drawKidsTee,hasSides:true,  // F19: キッズ110想定・身幅35cm(仮値・先方確認中)÷pit幅290px=8.29
+    dims:[
+      {x1:280,y1:284,x2:620,y2:284,label:'肩幅 29cm'},
+      {x1:305,y1:428,x2:595,y2:428,label:'身幅 35cm'},
+      {x1:728,y1:277,x2:728,y2:733,label:'着丈 42cm'},
+      {x1:262,y1:302,x2:196,y2:418,label:'袖丈 12cm',lx:-52},
+    ]},
+  dog:{lb:'犬服',ppcm:15.8,zoomOff:80,draw:drawDogTee,hasSides:true,       // F19: 小型犬タンク平置き・胴回り40cm→平置き身幅20cm(仮値・先方確認中)÷pit幅316px=15.8
+    dims:[
+      {x1:292,y1:492,x2:608,y2:492,label:'身幅 20cm'},
+      {x1:750,y1:248,x2:750,y2:786,label:'着丈 28cm'},
+    ]},
+  tote:{lb:'トート',ppcm:10.42,zoomOff:40,draw:drawTote,      // 一般的なコットントート相場・幅38cm÷座標幅396px=10.42。コード内に実寸根拠なく社長確認のうえ採用
+    dims:[
+      {x1:252,y1:912,x2:648,y2:912,label:'幅 38cm'},
+      {x1:700,y1:352,x2:700,y2:872,label:'高さ 41cm'},
+    ]},
+  bolt:{lb:'反物',ppcm:3.73,zoomOff:40,draw:drawBolt,         // 生地幅150cm(571行目の購入UI表記と同一)÷ロール軸長560px=3.73。旧5.6は不整合な決め打ち値だった(+50%過大)
+    dims:[
+      {x1:170,y1:172,x2:730,y2:172,label:'生地幅 150cm'},
+    ]},
 };
+/* F21 寸法オーバーレイ（renderProduct専用。drawProductには乗せない＝
+   仕上がりモックJPG(dlMockJpg)とミニプレビューには写り込まない） */
+function drawDims(ctx,P){
+  if(!P.dims)return;
+  ctx.save();
+  ctx.font='600 17px system-ui,-apple-system,sans-serif';
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  for(const d of P.dims){
+    const dx=d.x2-d.x1,dy=d.y2-d.y1,L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
+    ctx.strokeStyle='rgba(58,47,35,.55)';ctx.lineWidth=1.3;
+    ctx.beginPath();ctx.moveTo(d.x1,d.y1);ctx.lineTo(d.x2,d.y2);
+    for(const[px,py]of[[d.x1,d.y1],[d.x2,d.y2]]){ // 両端のT字
+      ctx.moveTo(px+nx*8,py+ny*8);ctx.lineTo(px-nx*8,py-ny*8);
+    }
+    ctx.stroke();
+    const mxp=(d.x1+d.x2)/2+(d.lx||0),myp=(d.y1+d.y2)/2+(d.ly||0);
+    const w=ctx.measureText(d.label).width+16;
+    ctx.fillStyle='rgba(252,250,245,.92)';ctx.fillRect(mxp-w/2,myp-13,w,26);
+    ctx.strokeStyle='rgba(58,47,35,.25)';ctx.lineWidth=1;ctx.strokeRect(mxp-w/2,myp-13,w,26);
+    ctx.fillStyle='#2b2620';ctx.fillText(d.label,mxp,myp);
+  }
+  /* 実寸スケールバー（10cm・柄の大きさの物差し） */
+  const L10=10*P.ppcm;
+  ctx.strokeStyle='rgba(58,47,35,.7)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(40,956);ctx.lineTo(40+L10,956);
+  ctx.moveTo(40,948);ctx.lineTo(40,964);ctx.moveTo(40+L10,948);ctx.lineTo(40+L10,964);ctx.stroke();
+  ctx.fillStyle='#2b2620';ctx.textAlign='left';ctx.fillText('10cm（実寸）',40+L10+10,957);
+  ctx.restore();
+}
 function drawProduct(octx){
   const P=PRODUCTS[state.product]||PRODUCTS.tshirt;
   P.draw(octx,P.ppcm);
@@ -2030,12 +2741,26 @@ function drawProduct(octx){
 }
 
 function renderProduct(){
+  /* F20: 前面/背面セグは対応製品でのみ表示 */
+  const seg=$('#prodSideSeg');
+  if(seg)seg.style.display=(PRODUCTS[state.product]&&PRODUCTS[state.product].hasSides)?'':'none';
   const cv=$('#productCv'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
   ctx.clearRect(0,0,W,H); // レイアウト未定でも無地の製品を描く（patFor→renderUnitがnullを返し柄なしになる）
   const off=makeCanvas(DS_W,DS_H),octx=off.getContext('2d');
   octx.imageSmoothingQuality='high';
-  /* 製品ごとの px/cm（実寸感の基準: Tシャツ身幅52cm＝座標pit点372px。各製品の根拠はPRODUCTS定義のコメント参照） */
+  /* 製品ごとの px/cm（実寸感の基準: TシャツはレディースM身幅46cm＝座標pit幅372px。各製品の根拠はPRODUCTS定義のコメント参照） */
   const P=drawProduct(octx);
+  /* スマホ用の固定ミニプレビューへ先に複写（寸法線が乗る前の素の状態） */
+  const mp=$('#miniProdCv');
+  if(mp){
+    const mx3=mp.getContext('2d');
+    mx3.clearRect(0,0,mp.width,mp.height);
+    const s2=Math.min(DS_W,DS_H)*0.86; // 余白を詰めて主役を大きく
+    mx3.drawImage(off,(DS_W-s2)/2,(DS_H-s2)/2,s2,s2,0,0,mp.width,mp.height);
+    const lb=$('#miniProdLb');
+    if(lb)lb.textContent=P.lb;
+  }
+  if(state.showDims&&P.dims&&state.prodZoom!=='zoom')drawDims(octx,P); // F21 寸法表示（全体表示時のみ）
   if(state.prodZoom==='zoom'){
     /* プリント拡大（中心部2.4倍・生地グレインが見える） */
     const z=2.4;let cw=DS_W/z,ch=cw*H/W;
@@ -2053,16 +2778,6 @@ function renderProduct(){
     ctx.fillStyle=gbg;ctx.fillRect(0,0,W,H);
     const s=Math.min(W/DS_W,H/DS_H);
     ctx.drawImage(off,(W-DS_W*s)/2,(H-DS_H*s)/2,DS_W*s,DS_H*s);
-  }
-  /* スマホ用の固定ミニプレビューへ複写（右=完成形・中央正方形を切り出し） */
-  const mp=$('#miniProdCv');
-  if(mp){
-    const mx3=mp.getContext('2d');
-    mx3.clearRect(0,0,mp.width,mp.height);
-    const s2=Math.min(DS_W,DS_H)*0.86; // 余白を詰めて主役を大きく
-    mx3.drawImage(off,(DS_W-s2)/2,(DS_H-s2)/2,s2,s2,0,0,mp.width,mp.height);
-    const lb=$('#miniProdLb');
-    if(lb)lb.textContent=P.lb;
   }
 }
 
@@ -2183,7 +2898,7 @@ function recut(){
   const t0=performance.now();
   const res=cutoutPro(state.raw,tolToMul(state.tol),state.skipCut);
   state.autoBase=res.auto;
-  const parts=splitMotifs(res.canvas,6);
+  const parts=state.noSplit?[]:splitMotifs(res.canvas,6); // noSplit: 空parts→下のフォールバックで全体を1モチーフとして扱う
   const pw=res.canvas.width,ph=res.canvas.height;
   /* 入稿用の原寸切り抜きは「全モチーフ共有の遅延メモ化」＝書き出し時に1回だけ実行。
      tol/skipCut変更のたびに recut() が走りクロージャごと作り直される＝自動で無効化 */
@@ -2194,7 +2909,7 @@ function recut(){
         hiShared={parts,W:pw,H:ph,whole:res.canvas}; // 原寸=解析解像度なら再計算しない
       }else{
         const resF=cutoutPro(state.rawFull,tolToMul(state.tol),state.skipCut);
-        const partsF=splitMotifs(resF.canvas,6);
+        const partsF=state.noSplit?[]:splitMotifs(resF.canvas,6);
         hiShared={parts:partsF,W:resF.canvas.width,H:resF.canvas.height,whole:resF.canvas};
       }
     }
@@ -2220,6 +2935,7 @@ function recut(){
     return m;
   };
   state.motifs=parts.length?parts.map(p=>mk(p.canvas,p.rect)):[mk(res.canvas,null)];
+  syncTextMotif(false); // F23: 切り抜きやり直しでも文字モチーフを維持
   /* 解像度ガード用: 最大モチーフの原寸換算px（レイアウトはsizeCm=最大モチーフの長辺） */
   {
     const scaleF=(state.rawFull&&state.raw)?Math.max(state.rawFull.width,state.rawFull.height)/Math.max(state.raw.width,state.raw.height):1;
@@ -2312,7 +3028,7 @@ function updateModeUI(){
     state.sizeCm=20;$('#size').value=20;$('#sizeN').value=20;
     $('#sizeV').innerHTML='20<small>cm・大柄</small>';fill($('#size'));
   }
-  $('#sizeLb').textContent=tile?'タイルの実寸幅':'柄の大きさ（実寸）';
+  $('#sizeLb').textContent=tile?'タイルの実寸幅':'柄の大きさ（主役の実寸）';
   const tossOn=(!tile&&state.repeat==='toss');
   $('#tossShuffleRow').style.display=tossOn?'block':'none';
   $('#fillerBox').classList.toggle('dis',!tossOn);
@@ -2421,6 +3137,7 @@ function applyPreset(key){
   const m0=state.motifs[0].pv,s=Math.min(cc.width/m0.width,cc.height/m0.height)*0.85;
   x.drawImage(m0,(cc.width-m0.width*s)/2,(cc.height-m0.height*s)/2,m0.width*s,m0.height*s);
   $('#motifCount').textContent=`サンプル「${P.name}」 モチーフ ${state.motifs.length}点`;
+  syncTextMotif(false); // F23: プリセット切替でも文字モチーフを維持
   updateArrange();rebuild();
 }
 
@@ -2443,6 +3160,47 @@ function fill(el){const mn=+el.min||0,mx=+el.max||100;el.style.setProperty('--f'
 function updateArrange(){
   const lattice=['full','half','brick','diamond','sateen'].includes(state.repeat);
   $('#arrangeRow').style.display=(lattice&&state.motifs.length>1)?'block':'none';
+  ffSyncUI(); // F25: 自由配置パネルの表示・パレット・F26ゲートを同期
+}
+/* ---- F25 自由配置の編集UI ---- */
+let ffPaletteSel=0;
+function ffSyncUI(){
+  const box=$('#freeformBox');if(!box)return;
+  const on=(state.repeat==='freeform'&&state.mode!=='tile');
+  box.style.display=on?'block':'none';
+  if(!on)return;
+  const g=$('#ffPalette');g.innerHTML='';
+  if(ffPaletteSel>=state.motifs.length)ffPaletteSel=0;
+  const empty=!state.motifs.length;
+  $('#ffAdd').disabled=empty;$('#ffAdd').style.opacity=empty?0.45:1;   // F26 ベースゲート
+  $('#ffGateMsg').style.display=empty?'block':'none';
+  state.motifs.forEach((m,i)=>{
+    const b=document.createElement('button');b.className='samp'+(i===ffPaletteSel?' on':'');b.type='button';
+    const cv=makeCanvas(64,64),x=cv.getContext('2d');
+    const s=Math.min(56/m.pv.width,56/m.pv.height);
+    x.drawImage(m.pv,(64-m.pv.width*s)/2,(64-m.pv.height*s)/2,m.pv.width*s,m.pv.height*s);
+    b.appendChild(cv);
+    b.onclick=()=>{ffPaletteSel=i;ffSyncUI();};
+    g.appendChild(b);
+  });
+  const it=state.freeform.items[state.freeform.sel];
+  $('#ffSel').style.display=it?'block':'none';
+  if(it){
+    $('#ffSc').value=Math.round(it.sc*100);$('#ffScV').textContent=Math.round(it.sc*100)+'%';
+    $('#ffRot').value=it.rot;$('#ffRotV').textContent=Math.round(it.rot)+'°';
+    fill($('#ffSc'));fill($('#ffRot'));
+  }
+}
+/* 1リピート表示のビュー座標（renderPatternのunit分岐と同一計算） */
+function ffViewGeom(){
+  const cv=$('#patternCv'),w=cv.width,h=cv.height;
+  const lay=state.layout;if(!lay)return null;
+  let ppu=state.sizeCm*PPCM*state.zoom;
+  const maxPpu=Math.min(12000/lay.UW,12000/lay.UH);
+  if(ppu>maxPpu)ppu=maxPpu;
+  const uw=Math.max(2,Math.round(lay.UW*ppu)),uh=Math.max(2,Math.round(lay.UH*ppu));
+  const s=Math.min((w*0.8)/uw,(h*0.8)/uh,1.6);
+  return{ox:(w-uw*s)/2,oy:(h-uh*s)/2,dw:uw*s,dh:uh*s,lay};
 }
 const REPEATS=[
   {id:'full',name:'ストレート'},
@@ -2452,6 +3210,7 @@ const REPEATS=[
   {id:'sateen',name:'飛び柄（斜めずらし）'},
   {id:'mirror',name:'ミラー'},
   {id:'toss',name:'トス（散らし）'},
+  {id:'freeform',name:'自由配置'},   // F25（hasFeature('multiMotif')でゲート）
 ];
 /* リピート方式チップ: ミニプレビューを実描画（葉の粒で図解） */
 function repeatThumb(id){
@@ -2468,12 +3227,21 @@ function repeatThumb(id){
   else if(id==='mirror'){const rnd=mulberry32(5);for(const[qx,qy,fx,fy]of[[20,20,1,1],[60,20,-1,1],[20,60,1,-1],[60,60,-1,-1]]){
     x.save();x.translate(qx,qy);x.scale(fx,fy);x.fillStyle='#b0673f';
     x.beginPath();x.moveTo(-8,6);x.quadraticCurveTo(0,-12,9,4);x.quadraticCurveTo(0,10,-8,6);x.fill();x.restore();}}
+  else if(id==='freeform'){ // 大小ばらばら＋移動カーソル風の十字
+    dot(24,26,8);dot(56,20,4.5,0.6);dot(46,54,6.5,-0.4);dot(18,58,4);
+    x.strokeStyle='#6a5f50';x.lineWidth=1.6;
+    x.beginPath();x.moveTo(62,48);x.lineTo(62,68);x.moveTo(52,58);x.lineTo(72,58);
+    x.moveTo(62,48);x.lineTo(58,52);x.moveTo(62,48);x.lineTo(66,52);
+    x.moveTo(62,68);x.lineTo(58,64);x.moveTo(62,68);x.lineTo(66,64);
+    x.moveTo(52,58);x.lineTo(56,54);x.moveTo(52,58);x.lineTo(56,62);
+    x.moveTo(72,58);x.lineTo(68,54);x.moveTo(72,58);x.lineTo(68,62);x.stroke();}
   else{const rnd=mulberry32(9);for(let i=0;i<9;i++)dot(8+rnd()*64,8+rnd()*64,r*(0.8+rnd()*0.5),rnd()*3,rnd()<0.5?-1:1);}
   return c;
 }
 function buildRepeatSeg(){
   const seg=$('#repeatSeg');seg.innerHTML='';
   REPEATS.forEach(r=>{
+    if(r.id==='freeform'&&!hasFeature('multiMotif'))return; // F27ゲート
     const b=document.createElement('button');b.dataset.id=r.id;
     const cv=repeatThumb(r.id);cv.style.width='40px';cv.style.height='40px';
     b.appendChild(cv);
@@ -2485,6 +3253,9 @@ function buildRepeatSeg(){
       $('#dropRow').style.display=(r.id==='half'||r.id==='brick')?'block':'none';
       $('#tossShuffleRow').style.display=r.id==='toss'?'block':'none';
       $('#fillerBox').classList.toggle('dis',r.id!=='toss');
+      if(r.id==='freeform'&&state.patTab!=='unit'){ // F25: 編集しやすい1リピート表示へ誘導
+        state.patTab='unit';$$('#patTabs button').forEach(x2=>x2.classList.toggle('on',x2.dataset.t==='unit'));
+      }
       updateArrange();rebuild();
     };
     seg.appendChild(b);
@@ -2537,7 +3308,7 @@ const PURCHASE_URL='https://rekuredool.myshopify.com/cart/45843205062716:1';
 const STORAGE_URL='https://gararie-recipes.rekuredool.workers.dev';
 /* 柄エンジンのビルドID。tools/freeze_designer.mjs が中身のSHA-256から書き換える。
    レシピに刻まれ、印刷時に「顧客が見たのと同じエンジン」で描いたことを保証する。 */
-const BUILD='a9a7382ffa5d';
+const BUILD='04f85792565d';
 /* デザインコード: レシピ内容から決定論で生成する短い照合キー。
    注文（Shopify属性）とレシピファイル名の突き合わせに使う */
 function designCode(str){
@@ -2671,13 +3442,26 @@ function buildRecipe(){
     params:{repeat:state.repeat,dropDen:state.dropDen,arrange:state.arrange,
       sizeCm:state.sizeCm,density:state.density,rot:state.rot,bg:state.bg,seed:state.seed,
       filler:{type:state.filler.type,motifIdx:state.filler.motifIdx},fillerScale:state.fillerScale,
-      product:state.product}};
+      product:state.product,
+      /* F23/F24/F25（2026-07-12追加。Worker/orders-deskの指紋は汎用JSON正規化のため追記だけで整合） */
+      textMotif:{text:state.textMotif.text,font:state.textMotif.font,scale:state.textMotif.scale,
+        rot:state.textMotif.rot,color:state.textMotif.color,stroke:state.textMotif.stroke,shadow:state.textMotif.shadow},
+      bgExtra:{type:state.bgExtra.type,c2:state.bgExtra.c2,angle:state.bgExtra.angle,
+        fg:state.bgExtra.fg,cellCm:state.bgExtra.cellCm,alpha:state.bgExtra.alpha},
+      freeform:{items:state.freeform.items.map(it=>({mi:it.mi,x:it.x,y:it.y,rot:it.rot,sc:it.sc}))}}};
   if(state.mode==='tile'&&state.tileSrc){
     r.tile={img:state.tileSrc.canvas.toDataURL('image/png'),cmW:state.tileSrc.cmW,dpi:state.tileSrc.dpi,info:state.tileSrc.info};
   }else{
     r.motifs=state.motifs.map(m=>(m.hi?m.hi(2048):m.pv).toDataURL('image/png'));
+    r.textIdx=state.motifs.findIndex(m=>m._isText); // 復元時に_isTextを立て直す（画素は上のmotifsに確定済み）
   }
   if(state.filler.type==='upload'&&state.filler.motif)r.fillerImg=state.filler.motif.pv.toDataURL('image/png');
+  if(state.bgExtra.type==='image'&&state.bgExtra.img){ // 背景画像は長辺≤1024pxに縮小して同梱（Worker 15MB上限に配慮）
+    const im=state.bgExtra.img,k=Math.min(1,1024/Math.max(im.width,im.height));
+    const c=makeCanvas(Math.max(1,Math.round(im.width*k)),Math.max(1,Math.round(im.height*k)));
+    c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+    r.bgImg=c.toDataURL('image/png');
+  }
   return r;
 }
 /* いま画面にある柄のデザインコード。
@@ -2719,6 +3503,9 @@ async function loadRecipe(obj,srcCode){
       pv.getContext('2d').drawImage(c,0,0,pv.width,pv.height);
       return{pv,_expensive:true,hi:()=>c};
     });
+    /* F23: 文字モチーフのフラグを立て直す（配置エンジンの反転・自動回転除外を維持）。
+       画素はレシピのものを使う＝フォント未ロード環境でも「見た柄＝刷る柄」を守る */
+    if(typeof obj.textIdx==='number'&&obj.textIdx>=0&&state.motifs[obj.textIdx])state.motifs[obj.textIdx]._isText=true;
     /* 解像度ガード: 復元モチーフの原寸（最大の長辺）から上限cmを再計算 */
     state.srcPxMax=Math.max(...cs.map(c=>Math.max(c.width,c.height)));
     $$('.samp').forEach(s=>s.classList.remove('on'));
@@ -2742,6 +3529,26 @@ async function loadRecipe(obj,srcCode){
     if(p.filler.type==='upload'&&obj.fillerImg){state.filler.motif={pv:await dataUrlToCanvas(obj.fillerImg)};}
     if(p.filler.type==='upload'&&!obj.fillerImg)state.filler={type:'none',motifIdx:-1,motif:null};
   }
+  /* F23/F24/F25 の復元（旧レシピはフィールドが無い＝既定値のまま） */
+  if(p.textMotif){
+    state.textMotif={...state.textMotif,...p.textMotif};
+    if((state.textMotif.font||'').startsWith('custom:')){
+      state.textMotif.font='sans'; // アップロードフォントは復元不可→標準へ（画素はmotifs側で保全済み）
+      $('#freeMsg').textContent='※レシピの追加フォントは復元できないため標準書体に戻しました（柄の見た目は保存時のまま）';
+    }
+    if((state.textMotif.font||'').startsWith('gf:')){
+      gfInject();
+      document.fonts.load('700 32px "'+state.textMotif.font.slice(3)+'"','あアAa09').catch(()=>{});
+    }
+  }
+  if(p.bgExtra){
+    state.bgExtra={...state.bgExtra,...p.bgExtra,img:null};
+    if(p.bgExtra.type==='image'&&obj.bgImg)state.bgExtra.img=await dataUrlToCanvas(obj.bgImg);
+    else if(p.bgExtra.type==='image')state.bgExtra.type='solid'; // 画像なしの画像指定は単色へ安全側フォールバック
+  }
+  if(p.freeform&&Array.isArray(p.freeform.items)){
+    state.freeform={items:p.freeform.items.map(it=>({mi:it.mi|0,x:+it.x||0,y:+it.y||0,rot:+it.rot||0,sc:+it.sc||1})),sel:-1};
+  }
   /* UI同期 */
   $$('#repeatSeg button').forEach(b=>b.classList.toggle('on',b.dataset.id===state.repeat));
   $$('#dropSeg button').forEach(b=>b.classList.toggle('on',+b.dataset.d===state.dropDen));
@@ -2757,6 +3564,7 @@ async function loadRecipe(obj,srcCode){
   $('#rot').value=state.rot;$('#rotV').textContent=state.rot+'°';
   $('#fillerScale').value=state.fillerScale;$('#fillerScaleV').textContent=state.fillerScale+'%';
   if(state.bg&&state.bg!=='transparent')$('#bgColor').value=state.bg;
+  syncTextUI();syncBgUI(); // F23/F24 のUI同期
   buildSwatchUI();syncFillerUI();updateModeUI();updateArrange();redrawSamples();
   applySizeGuard(); /* 復元後の絵の解像度で上限を締め直す（sizeCmが超えていれば自動クランプ） */
   $$('input[type=range]').forEach(fill);
@@ -2780,6 +3588,27 @@ function buildSamples(){
     g.appendChild(d);
     setTimeout(()=>drawSampleTile(cv,P),0);
   });
+  /* 文字だけ（名入れ・テキストパターン）の入口カード。選ぶとTEXT入力欄へ誘導 */
+  if(hasFeature('textMotif')){
+    const d=document.createElement('button');d.className='samp';d.dataset.sample='textOnly';
+    const cv=makeCanvas(120,120);d.appendChild(cv);
+    const nm=document.createElement('span');nm.className='nm';nm.textContent='文字だけ';d.appendChild(nm);
+    d.onclick=()=>applyTextOnly(true);
+    g.appendChild(d);
+    setTimeout(()=>drawTextOnlyTile(cv),0);
+  }
+}
+/* 「文字だけ」カードのサムネ（背景色に追従・redrawSamples()からも再塗り） */
+function drawTextOnlyTile(cv){
+  const bg=(state.bg!=='transparent')?state.bg:'#ffffff';
+  const x=cv.getContext('2d');
+  x.fillStyle=bg;x.fillRect(0,0,120,120);
+  const t=(state.textMotif.text||'').trim()||'ガラリエ';
+  const s=[...t].slice(0,5).join('');
+  x.fillStyle='#3a2f23';x.font='700 19px '+tmFontCss();x.textAlign='center';x.textBaseline='middle';
+  for(const[cx,cy,r]of[[64,30,-0.10],[36,68,0.08],[92,102,-0.06]]){
+    x.save();x.translate(cx,cy);x.rotate(r);x.fillText(s,0,0);x.restore();
+  }
 }
 /* プリセット1件分のサムネ描画。buildSamples()の初期表示とredrawSamples()の再塗りで共用する。
    P.bgではなくstate.bgで塗る（transparentは白で代替＝他の描画箇所と同じ慣例）。 */
@@ -2837,6 +3666,7 @@ function wire(){
   $('#tileToMotif').onclick=()=>{if(state.tileSrc)setRaw(state.tileSrc.canvas);};
   $('#tol').oninput=e=>{state.tol=+e.target.value;$('#tolV').textContent=(state.tol===50?'±0':(state.tol>50?'+':'')+(state.tol-50));fill(e.target);if(state.raw)recut();};
   $('#skipCut').onchange=e=>{state.skipCut=e.target.checked;if(state.raw)recut();};
+  $('#noSplit').onchange=e=>{state.noSplit=e.target.checked;if(state.raw)recut();};
   $('#dropSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{
     state.dropDen=+b.dataset.d;$('#dropSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));rebuild();});
   $('#arrangeSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>{
@@ -2870,26 +3700,89 @@ function wire(){
   (function(){
     const cv=$('#patternCv');
     let dragging=false,lx=0,ly=0,rafP=false;
+    let ffDrag=-1; // F25: ドラッグ中のアイテムindex（-1=パンモード）
     const paint=()=>{if(rafP)return;rafP=true;requestAnimationFrame(()=>{rafP=false;renderPattern();});};
+    const ffPaint=()=>{if(rafP)return;rafP=true;requestAnimationFrame(()=>{rafP=false;
+      state.layout=buildLayout();clearUnitCache();renderPattern();});};
+    const toCanvasXY=e=>{
+      const r=cv.getBoundingClientRect(),f=cv.width/cv.clientWidth;
+      return[(e.clientX-r.left)*f,(e.clientY-r.top)*f];
+    };
+    const ffHit=(cx2,cy2)=>{ // 1リピート表示のヒット判定（トーラス距離・上のレイヤー優先）
+      const g=ffViewGeom();if(!g||g.lay.type!=='freeform')return-1;
+      const ux=(cx2-g.ox)/g.dw*g.lay.UW,uy=(cy2-g.oy)/g.dh*g.lay.UH;
+      const tor=(d,R)=>{d=((d%R)+R)%R;return d>R/2?d-R:d;};
+      for(let i=state.freeform.items.length-1;i>=0;i--){
+        const it=state.freeform.items[i],r0=Math.max(0.3,0.55*it.sc);
+        if(Math.abs(tor(ux-it.x,g.lay.UW))<=r0&&Math.abs(tor(uy-it.y,g.lay.UH))<=r0)return i;
+      }
+      return-1;
+    };
     cv.addEventListener('pointerdown',e=>{
+      /* F25: 1リピート表示×自由配置ではモチーフのタップ選択＆ドラッグ */
+      if(state.patTab==='unit'&&state.repeat==='freeform'&&state.mode!=='tile'){
+        const[cx2,cy2]=toCanvasXY(e);
+        const hit=ffHit(cx2,cy2);
+        state.freeform.sel=hit;ffSyncUI();renderPattern();
+        if(hit>=0){
+          ffDrag=hit;dragging=true;lx=e.clientX;ly=e.clientY;
+          cv.classList.add('panning');cv.setPointerCapture(e.pointerId);
+        }
+        return;
+      }
       if(state.patTab!=='surface')return;
-      dragging=true;lx=e.clientX;ly=e.clientY;
+      ffDrag=-1;dragging=true;lx=e.clientX;ly=e.clientY;
       cv.classList.add('panning');cv.setPointerCapture(e.pointerId);
     });
     cv.addEventListener('pointermove',e=>{
       if(!dragging)return;
       const f=cv.width/cv.clientWidth; // 表示px→キャンバスpx
+      if(ffDrag>=0){ // F25: モチーフ移動（トーラス上を巡回）
+        const g=ffViewGeom();const it=state.freeform.items[ffDrag];
+        if(g&&it){
+          it.x=(((it.x+(e.clientX-lx)*f/g.dw*g.lay.UW)%g.lay.UW)+g.lay.UW)%g.lay.UW;
+          it.y=(((it.y+(e.clientY-ly)*f/g.dh*g.lay.UH)%g.lay.UH)+g.lay.UH)%g.lay.UH;
+        }
+        lx=e.clientX;ly=e.clientY;
+        ffPaint();
+        return;
+      }
       const k=PPCM*state.zoom;
       state.panCmX+=(e.clientX-lx)*f/k;
       state.panCmY+=(e.clientY-ly)*f/k;
       lx=e.clientX;ly=e.clientY;
       paint();
     });
-    const end=e=>{if(!dragging)return;dragging=false;cv.classList.remove('panning');};
+    const end=e=>{if(!dragging)return;dragging=false;cv.classList.remove('panning');
+      if(ffDrag>=0){ffDrag=-1;rebuild();}}; // ドラッグ確定で製品プレビューも更新
     cv.addEventListener('pointerup',end);
     cv.addEventListener('pointercancel',end);
     cv.addEventListener('dblclick',()=>{state.panCmX=0;state.panCmY=0;renderPattern();}); // 位置リセット
   })();
+  /* F25 自由配置の操作ボタン */
+  if($('#ffAdd')){
+    const ffre=()=>{state.layout=buildLayout();clearUnitCache();rerender();};
+    $('#ffAdd').onclick=()=>{
+      if(!state.motifs.length)return; // F26 ベースゲート
+      const mi=Math.min(ffPaletteSel,state.motifs.length-1);
+      state.freeform.items.push({mi,x:FF_R/2,y:FF_R/2,rot:0,sc:1});
+      state.freeform.sel=state.freeform.items.length-1;
+      ffSyncUI();ffre();
+    };
+    $('#ffSc').oninput=e=>{const it=state.freeform.items[state.freeform.sel];if(!it)return;
+      it.sc=+e.target.value/100;fill(e.target);$('#ffScV').textContent=e.target.value+'%';ffre();};
+    $('#ffRot').oninput=e=>{const it=state.freeform.items[state.freeform.sel];if(!it)return;
+      it.rot=+e.target.value;fill(e.target);$('#ffRotV').textContent=e.target.value+'°';ffre();};
+    $('#ffDup').onclick=()=>{const it=state.freeform.items[state.freeform.sel];if(!it)return;
+      state.freeform.items.push({...it,x:(it.x+0.4)%FF_R,y:(it.y+0.4)%FF_R});
+      state.freeform.sel=state.freeform.items.length-1;ffSyncUI();ffre();};
+    $('#ffDel').onclick=()=>{const s=state.freeform.sel;if(s<0)return;
+      state.freeform.items.splice(s,1);state.freeform.sel=-1;ffSyncUI();ffre();};
+    $('#ffUp').onclick=()=>{const s=state.freeform.sel,a=state.freeform.items;if(s<0||s>=a.length-1)return;
+      [a[s],a[s+1]]=[a[s+1],a[s]];state.freeform.sel=s+1;ffre();};
+    $('#ffDown').onclick=()=>{const s=state.freeform.sel,a=state.freeform.items;if(s<=0)return;
+      [a[s],a[s-1]]=[a[s-1],a[s]];state.freeform.sel=s-1;ffre();};
+  }
   $$('#patTabs button').forEach(b=>b.onclick=()=>{state.patTab=b.dataset.t;$$('#patTabs button').forEach(x=>x.classList.toggle('on',x===b));renderPattern();});
   $$('#zoomSeg button').forEach(b=>b.onclick=()=>{state.zoom=+b.dataset.z;$$('#zoomSeg button').forEach(x=>x.classList.toggle('on',x===b));
     $('#patternCv').classList.toggle('zoomed',state.zoom>1); // ズーム時のみタッチスクロールを奪う
@@ -2898,6 +3791,90 @@ function wire(){
     renderPattern();});
   $$('#prodTabs button').forEach(b=>b.onclick=()=>{state.product=b.dataset.prod;$$('#prodTabs button').forEach(x=>x.classList.toggle('on',x===b));renderProduct();});
   $$('#prodZoomSeg button').forEach(b=>b.onclick=()=>{state.prodZoom=b.dataset.z;$$('#prodZoomSeg button').forEach(x=>x.classList.toggle('on',x===b));renderProduct();});
+  if($('#dims'))$('#dims').onchange=e=>{state.showDims=e.target.checked;renderProduct();}; // F21 寸法表示トグル
+  $$('#prodSideSeg button').forEach(b=>b.onclick=()=>{state.prodSide=b.dataset.s;$$('#prodSideSeg button').forEach(x=>x.classList.toggle('on',x===b));renderProduct();}); // F20 前面/背面
+  /* F23 文字入れ */
+  if($('#tmText')){
+    const tmUI=()=>{$('#tmScaleV').textContent=state.textMotif.scale+'%';$('#tmRotV').textContent=state.textMotif.rot+'°';};
+    $('#tmText').oninput=e=>{state.textMotif.text=e.target.value;syncTextMotif();};
+    /* 文字だけの柄（絵なし・名入れ生地）。SAMPLEの「文字だけ」カードと同じ処理 */
+    $('#tmOnly').onclick=()=>{
+      if(!state.textMotif.text.trim()){$('#tmText').focus();return;} // 未入力なら入力欄へ誘導
+      applyTextOnly(false); // ここは既にTEXT欄にいるのでジャンプ不要
+    };
+    /* フォントピッカー（標準4＋Google Fonts＋アップロード） */
+    const selectFont=async(v,label,fam)=>{
+      state.textMotif.font=v;
+      const nameEl=$('#tmFontName');
+      nameEl.textContent=label;
+      nameEl.style.fontFamily=fam?('"'+fam+'"'):(TM_FONTS[v]||'');
+      $$('#tmFontList .tmfi').forEach(x=>x.style.background=(x.dataset.font===v)?'rgba(79,122,82,.10)':'');
+      if(fam){try{await document.fonts.load('700 32px "'+fam+'"','あアAa09'+state.textMotif.text);}catch(_){/* オフライン時はフォールバック描画 */}}
+      syncTextMotif();
+    };
+    const buildFontList=()=>{
+      const box=$('#tmFontList');if(box.dataset.built)return;box.dataset.built='1';
+      gfInject();
+      const items=[
+        {v:'sans',lb:'ゴシック（標準）',css:TM_FONTS.sans,jp:1},
+        {v:'serif',lb:'明朝（標準）',css:TM_FONTS.serif,jp:1},
+        {v:'round',lb:'丸ゴ（標準）',css:TM_FONTS.round,jp:1},
+        {v:'script',lb:'筆記体（標準）',css:TM_FONTS.script,jp:0},
+        ...TM_GF.map(x=>({v:'gf:'+x.f,lb:x.f,css:'"'+x.f+'",sans-serif',jp:x.jp})),
+      ];
+      box.innerHTML=items.map(it=>
+        `<div class="tmfi" data-font="${it.v}" style="font-family:${it.css.replace(/"/g,'&quot;')};padding:7px 10px;cursor:pointer;font-size:16px;border-bottom:1px solid rgba(0,0,0,.05)">${it.jp?'あア Aa':'Aa Gg'} <small style="color:#8a8377;font-size:11px">${it.lb}</small></div>`
+      ).join('');
+      $$('#tmFontList .tmfi').forEach(el=>el.onclick=()=>{
+        const v=el.dataset.font;
+        selectFont(v,el.querySelector('small').textContent,v.startsWith('gf:')?v.slice(3):null);
+      });
+    };
+    $('#tmFontBtn').onclick=()=>{
+      const b=$('#tmFontList');buildFontList();
+      b.style.display=(b.style.display==='none'||!b.style.display)?'block':'none';
+    };
+    if($('#tmFontUpBtn')){
+      $('#tmFontUpBtn').onclick=()=>$('#tmFontFile').click();
+      $('#tmFontFile').onchange=async e=>{
+        const f=e.target.files&&e.target.files[0];if(!f)return;
+        try{
+          const buf=await f.arrayBuffer();
+          const fam='GararieUp'+((Math.random()*1e6)|0);
+          const face=new FontFace(fam,buf);
+          await face.load();document.fonts.add(face);
+          selectFont('custom:'+fam,f.name.replace(/\.(ttf|otf|woff2?)$/i,''),fam);
+        }catch(err){alert('フォントを読み込めませんでした（対応形式: ttf/otf/woff/woff2）');}
+      };
+    }
+    $('#tmColor').oninput=e=>{state.textMotif.color=e.target.value;syncTextMotif();};
+    $('#tmStroke').onchange=e=>{state.textMotif.stroke=e.target.checked;syncTextMotif();};
+    $('#tmShadow').onchange=e=>{state.textMotif.shadow=e.target.checked;syncTextMotif();};
+    $('#tmScale').oninput=e=>{state.textMotif.scale=+e.target.value;fill(e.target);tmUI();syncTextMotif();};
+    $('#tmRot').oninput=e=>{state.textMotif.rot=+e.target.value;fill(e.target);tmUI();syncTextMotif();};
+  }
+  /* F24 背景強化 */
+  if($('#bgTypeSeg')){
+    $$('#bgTypeSeg button').forEach(b=>b.onclick=()=>{
+      state.bgExtra.type=b.dataset.t;state.bgTouched=true;
+      syncBgUI();rebuild();
+    });
+    if($('#bg2Color'))$('#bg2Color').oninput=e=>{state.bgExtra.c2=e.target.value;state.bgTouched=true;rebuild();};
+    $$('#bgAngleSeg button').forEach(b=>b.onclick=()=>{state.bgExtra.angle=b.dataset.a;$$('#bgAngleSeg button').forEach(x=>x.classList.toggle('on',x===b));rebuild();});
+    if($('#bgFgColor'))$('#bgFgColor').oninput=e=>{state.bgExtra.fg=e.target.value;state.bgTouched=true;rebuild();};
+    if($('#bgCell'))$('#bgCell').oninput=e=>{state.bgExtra.cellCm=+e.target.value;fill(e.target);$('#bgCellV').textContent=state.bgExtra.cellCm.toFixed(1)+'cm';rebuild();};
+    if($('#bgAlpha'))$('#bgAlpha').oninput=e=>{state.bgExtra.alpha=+e.target.value;fill(e.target);$('#bgAlphaV').textContent=state.bgExtra.alpha+'%';rebuild();};
+    if($('#bgImgBtn')){
+      $('#bgImgBtn').onclick=()=>$('#bgImgFile').click();
+      $('#bgImgFile').onchange=e=>{
+        const f=e.target.files&&e.target.files[0];if(!f)return;
+        const img=new Image();
+        img.onload=()=>{state.bgExtra.img=img;state.bgTouched=true;$('#bgImgName').textContent=f.name;rebuild();};
+        img.src=URL.createObjectURL(f);
+      };
+    }
+    syncBgUI();
+  }
   if(document.getElementById('exTif')){ // 入稿ツールUIがある場合のみ（公開版には存在しない）
     $$('#dpiSeg button').forEach(b=>b.onclick=()=>{state.dpi=+b.dataset.dpi;$$('#dpiSeg button').forEach(x=>x.classList.toggle('on',x===b));updateExportInfo();});
     $('#exTif').onclick=()=>{
@@ -3186,6 +4163,8 @@ function wire(){
 ============================================================ */
 function init(){
   buildRepeatSeg();buildSwatchUI();buildSamples();wire();
+  $$('[data-feature]').forEach(el=>{if(!hasFeature(el.dataset.feature))el.remove();}); // F27: 機能フラグOFFのUIを畳む
+  if($('#fabricWInfo'))$('#fabricWInfo').textContent='生地幅 約'+state.fabricWidthCm+'cm'; // F22 生地幅表示（仮・先方確認中）
   const Q=new URLSearchParams(location.search);
   if(Q.get('scrollto'))setTimeout(()=>{const el=document.querySelector(Q.get('scrollto'));if(el)el.scrollIntoView();},400); // 検証用
 
