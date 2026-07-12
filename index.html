@@ -125,7 +125,11 @@
   .segline button:hover{background:var(--n3)}
   .segline button.on{border:1.5px solid var(--accent);background:var(--accent-wash);color:var(--ink);padding:5px 0}
   .segline button .sans{font-family:var(--sans);font-size:12.5px}
-  #dropRow,#arrangeRow,#tossOpts{margin-top:12px;display:none}
+  #dropRow,#arrangeRow,#tossShuffleRow{margin-top:12px;display:none}
+  #fillerBox{margin-top:12px}
+  #fillerBox.dis #fillerControls{opacity:.35;pointer-events:none}
+  #fillerBox .lockhint{display:none;font-size:11px;color:var(--muted);margin:2px 0 8px}
+  #fillerBox.dis .lockhint{display:block}
   .ghost{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--n2);border-radius:var(--r-xs);padding:7px 12px;font-size:13px;color:var(--sec)}
   .ghost:hover{background:var(--n3)}
   .ghost .ic{width:14px;height:14px;stroke:var(--muted)}
@@ -402,22 +406,27 @@
           <button data-a="random"><span class="sans">ランダム</span></button>
         </div>
       </div>
-      <div id="tossOpts">
+      <div id="tossShuffleRow">
         <button class="ghost" id="shuffle" type="button"><svg class="ic" viewBox="0 0 24 24"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>散らしをシャッフル</button>
+      </div>
+      <div id="fillerBox" class="dis">
         <label class="lb" style="margin-top:13px">すき間に散らす背景モチーフ</label>
-        <div class="segline" id="fillerSeg">
-          <button data-f="none" class="on"><span class="sans">なし</span></button>
-          <button data-f="motif"><span class="sans">モチーフから</span></button>
-          <button data-f="upload"><span class="sans">絵をアップ</span></button>
-        </div>
-        <input type="file" id="fillerFile" accept="image/*,.tif,.tiff" hidden>
-        <div id="fillerPick" style="display:none;margin-top:10px">
-          <label class="lb">背景に回すモチーフ</label>
-          <div class="sampgrid" id="fillerPickGrid" style="grid-template-columns:repeat(6,1fr)"></div>
-        </div>
-        <div id="fillerScaleRow" style="display:none;margin-top:12px">
-          <label class="lb">背景モチーフの大きさ <span class="val num" id="fillerScaleV" style="min-width:auto">30%</span></label>
-          <div class="range"><input type="range" id="fillerScale" min="15" max="50" value="30"></div>
+        <div class="lockhint">※「トス（散らし）」を選択すると使用できます</div>
+        <div id="fillerControls">
+          <div class="segline" id="fillerSeg">
+            <button data-f="none" class="on"><span class="sans">なし</span></button>
+            <button data-f="motif"><span class="sans">モチーフから</span></button>
+            <button data-f="upload"><span class="sans">絵をアップ</span></button>
+          </div>
+          <input type="file" id="fillerFile" accept="image/*,.tif,.tiff" hidden>
+          <div id="fillerPick" style="display:none;margin-top:10px">
+            <label class="lb">背景に回すモチーフ</label>
+            <div class="sampgrid" id="fillerPickGrid" style="grid-template-columns:repeat(6,1fr)"></div>
+          </div>
+          <div id="fillerScaleRow" style="display:none;margin-top:12px">
+            <label class="lb">背景モチーフの大きさ <span class="val num" id="fillerScaleV" style="min-width:auto">30%</span></label>
+            <div class="range"><input type="range" id="fillerScale" min="15" max="50" value="30"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -655,7 +664,7 @@ const state={
   dpi:300,
   layout:null, autoBase:0,
 };
-const PPCM=7;               // プレビュー基準スケール(px/cm・zoom=1)
+const PPCM=28;              // プレビュー基準スケール(px/cm・zoom=1) ※2026-07-12: Retina(dpr=2)実効密度3.5→14px/cmへ引き上げ(7→28,×4)
 const CUT_MAX=700;          // 解析解像度
 const HI_MAX=2200;          // 入稿用切り抜きの上限解像度
 
@@ -1590,22 +1599,29 @@ function renderPattern(){
        角(cx,cy)は旧バーの始点(28,h-24)を継承し、両腕とも実寸state.baseCm(3/5/10cm)を
        state.zoomと連動させて描画（bar式は旧実装のPPCM*state.zoom係数をそのまま流用）。
        箱サイズはbarとラベル幅(ctx.measureText実測)の大きい方に追従＝旧実装は箱幅がbar
-       固定でテキストがはみ出す不具合があったため、ここで併せて修正する。 */
+       固定でテキストがはみ出す不具合があったため、ここで併せて修正する。
+       2026-07-12追改修: PPCM 7→28に伴い視認性パラメータを再調整。font 10→22はdpr=2
+       CSS換算で約11px相当を狙ったもの。bh/ラベルy位置の定数(25→44 / 11→26)はフォント
+       拡大に合わせた再計算値（ascent/descent実測ベース、旧デザインの余白比率を踏襲）。
+       PPCM引き上げで基準長さ×ズームの組み合わせ次第ではbarがcanvasより大きくなり得る
+       ため、画面に収まらない場合は誤解を招く表示（切れたルーラー）を避けて省略する。 */
     const bar=state.baseCm*PPCM*state.zoom;
+    if(bar<=Math.min(w,h)*0.7){
     ctx.save();
-    ctx.font='10px ui-monospace,monospace';
+    ctx.font='22px ui-monospace,monospace';
     const label=state.baseCm+'cm（実寸）';
     const tw=ctx.measureText(label).width;
     const cw=Math.max(bar,tw);
-    const bw=cw+24,bh=bar+25,bx=16,by=h-14-bh;
+    const bw=cw+24,bh=bar+44,bx=16,by=h-14-bh;
     ctx.fillStyle='rgba(252,250,245,.85)';ctx.fillRect(bx,by,bw,bh);
-    ctx.strokeStyle='rgba(43,38,32,.2)';ctx.strokeRect(bx+0.5,by+0.5,bw-1,bh-1);
-    ctx.strokeStyle='#2b2620';ctx.lineWidth=1.5;
+    ctx.strokeStyle='rgba(43,38,32,.4)';ctx.strokeRect(bx+0.5,by+0.5,bw-1,bh-1);
+    ctx.strokeStyle='#2b2620';ctx.lineWidth=3;
     const cx=bx+12,cy=h-24;
     ctx.beginPath();ctx.moveTo(cx+bar,cy);ctx.lineTo(cx,cy);ctx.lineTo(cx,cy-bar);ctx.stroke();
     ctx.beginPath();ctx.moveTo(cx+bar,cy-5);ctx.lineTo(cx+bar,cy+5);ctx.moveTo(cx-5,cy-bar);ctx.lineTo(cx+5,cy-bar);ctx.stroke();
-    ctx.fillStyle='#2b2620';ctx.fillText(label,cx,by+11);
+    ctx.fillStyle='#2b2620';ctx.fillText(label,cx,by+26);
     ctx.restore();
+    }
   }
   const names={full:'ストレート',half:'ハーフドロップ',brick:'ブリック',diamond:'ダイヤモンド',sateen:'飛び柄（斜めずらし）',mirror:'ミラー',toss:'トス（散らし）'};
   const cmW=(lay.UW*state.sizeCm).toFixed(1),cmH=(lay.UH*state.sizeCm).toFixed(1);
@@ -2297,7 +2313,9 @@ function updateModeUI(){
     $('#sizeV').innerHTML='20<small>cm・大柄</small>';fill($('#size'));
   }
   $('#sizeLb').textContent=tile?'タイルの実寸幅':'柄の大きさ（実寸）';
-  $('#tossOpts').style.display=(!tile&&state.repeat==='toss')?'block':'none';
+  const tossOn=(!tile&&state.repeat==='toss');
+  $('#tossShuffleRow').style.display=tossOn?'block':'none';
+  $('#fillerBox').classList.toggle('dis',!tossOn);
 }
 /* ---- 背景モチーフのUI同期・アップロード ---- */
 function syncFillerUI(){
@@ -2392,7 +2410,8 @@ function applyPreset(key){
   $$('#dropSeg button').forEach(b=>b.classList.toggle('on',+b.dataset.d===state.dropDen));
   $$('#arrangeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.a===state.arrange));
   $('#dropRow').style.display=(P.repeat==='half'||P.repeat==='brick')?'block':'none';
-  $('#tossOpts').style.display=P.repeat==='toss'?'block':'none';
+  $('#tossShuffleRow').style.display=P.repeat==='toss'?'block':'none';
+  $('#fillerBox').classList.toggle('dis',P.repeat!=='toss');
   syncFillerUI();
   if(!state.bgTouched)$('#bgColor').value=P.bg;
   buildSwatchUI();
@@ -2464,7 +2483,8 @@ function buildRepeatSeg(){
       state.repeat=r.id;
       $$('#repeatSeg button').forEach(x2=>x2.classList.toggle('on',x2.dataset.id===r.id));
       $('#dropRow').style.display=(r.id==='half'||r.id==='brick')?'block':'none';
-      $('#tossOpts').style.display=r.id==='toss'?'block':'none';
+      $('#tossShuffleRow').style.display=r.id==='toss'?'block':'none';
+      $('#fillerBox').classList.toggle('dis',r.id!=='toss');
       updateArrange();rebuild();
     };
     seg.appendChild(b);
@@ -2517,7 +2537,7 @@ const PURCHASE_URL='https://rekuredool.myshopify.com/cart/45843205062716:1';
 const STORAGE_URL='https://gararie-recipes.rekuredool.workers.dev';
 /* 柄エンジンのビルドID。tools/freeze_designer.mjs が中身のSHA-256から書き換える。
    レシピに刻まれ、印刷時に「顧客が見たのと同じエンジン」で描いたことを保証する。 */
-const BUILD='748776e5a34a';
+const BUILD='a9a7382ffa5d';
 /* デザインコード: レシピ内容から決定論で生成する短い照合キー。
    注文（Shopify属性）とレシピファイル名の突き合わせに使う */
 function designCode(str){
@@ -2572,7 +2592,7 @@ function watermark(ctx,w,h,strength){
 function dlPatternJpg(){
   const lay=state.layout;if(!lay)return;
   const W2=1200,H2=1200,c=makeCanvas(W2,H2),x=c.getContext('2d');
-  const ppu=state.sizeCm*PPCM*1.35;
+  const ppu=state.sizeCm*PPCM*0.3375; // =1.35×(7/28)。PPCM引き上げ前と出力サイズを完全一致させる補正
   const u=renderUnit(ppu,{flat:true});
   if(!u)return;
   x.fillStyle=(state.bg!=='transparent')?state.bg:'#ffffff';x.fillRect(0,0,W2,H2);
@@ -2588,7 +2608,7 @@ function makeKeepCard(code,cb){
   /* 上2/3=柄（透かし入り・無料JPGと同ポリシー） */
   x.fillStyle='#f7f3ed';x.fillRect(0,0,W2,H2);
   const patH=820;
-  const ppu=state.sizeCm*PPCM*1.35;
+  const ppu=state.sizeCm*PPCM*0.3375; // =1.35×(7/28)。PPCM引き上げ前と出力サイズを完全一致させる補正
   const u=renderUnit(ppu,{flat:true});
   if(u){
     x.save();x.beginPath();x.rect(0,0,W2,patH);x.clip();
@@ -2728,7 +2748,9 @@ async function loadRecipe(obj,srcCode){
   $$('#arrangeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.a===state.arrange));
   $$('#prodTabs button').forEach(b=>b.classList.toggle('on',b.dataset.prod===state.product));
   $('#dropRow').style.display=(state.repeat==='half'||state.repeat==='brick')?'block':'none';
-  $('#tossOpts').style.display=(state.mode!=='tile'&&state.repeat==='toss')?'block':'none';
+  const tossOn2=(state.mode!=='tile'&&state.repeat==='toss');
+  $('#tossShuffleRow').style.display=tossOn2?'block':'none';
+  $('#fillerBox').classList.toggle('dis',!tossOn2);
   $('#size').value=state.sizeCm;$('#sizeN').value=state.sizeCm;
   $('#sizeV').innerHTML=state.sizeCm+'<small>cm・'+(state.mode==='tile'?'タイル幅':sizeLabel(state.sizeCm))+'</small>';
   $('#dens').value=state.density;$('#densV').textContent=state.density+'%';
@@ -3192,7 +3214,7 @@ function init(){
     (window.__ktReadyQ=window.__ktReadyQ||[]).push(()=>{
       const lay=state.layout;if(!lay)return;
       const W2=1200,H2=1200,c=makeCanvas(W2,H2),x=c.getContext('2d');
-      const u=renderUnit(state.sizeCm*PPCM*1.35,{flat:true});
+      const u=renderUnit(state.sizeCm*PPCM*0.3375,{flat:true}); // =1.35×(7/28)。PPCM引き上げ前と出力サイズを完全一致させる補正
       x.fillStyle=(state.bg!=='transparent')?state.bg:'#ffffff';x.fillRect(0,0,W2,H2);
       const p=x.createPattern(u,'repeat');
       if(p.setTransform){try{p.setTransform(new DOMMatrix().translate(u.width*0.37,u.height*0.61));}catch(e){}}
@@ -3219,7 +3241,8 @@ function init(){
     (window.__ktReadyQ=window.__ktReadyQ||[]).push(()=>{
       state.repeat='toss';
       $$('#repeatSeg button').forEach(b=>b.classList.toggle('on',b.dataset.id==='toss'));
-      $('#tossOpts').style.display='block';$('#dropRow').style.display='none';
+      $('#tossShuffleRow').style.display='block';$('#dropRow').style.display='none';
+      $('#fillerBox').classList.remove('dis');
       if(fl.startsWith('motif')&&state.motifs.length>1){
         const idx=+(fl.split(':')[1]??(state.motifs.length-1));
         state.filler={type:'motif',motifIdx:Math.min(idx,state.motifs.length-1),motif:null};
