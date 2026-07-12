@@ -447,7 +447,7 @@
       </div>
       <div class="samples" data-feature="textMotif">
         <div class="cap"><span>TEXT</span><em>文字を柄に入れる（オプション・空欄で消える）</em></div>
-        <input type="text" id="tmText" placeholder="例: RYOKO / ガラリエ" style="width:100%;padding:8px 10px;border:1px solid #d8d2c6;border-radius:8px;font-size:14px;background:#fdfcf9">
+        <input type="text" id="tmText" placeholder="例: rekuredool / ガラリエ" style="width:100%;padding:8px 10px;border:1px solid #d8d2c6;border-radius:8px;font-size:14px;background:#fdfcf9">
         <button class="ghost" id="tmOnly" type="button" style="margin-top:8px">文字だけの柄にする</button>
         <div style="margin-top:8px">
           <button id="tmFontBtn" type="button" style="width:100%;text-align:left;font-size:13px;padding:8px 10px;border:1px solid #d8d2c6;border-radius:8px;background:#fdfcf9;cursor:pointer">フォント: <span id="tmFontName">ゴシック（標準）</span><span style="float:right;color:#8a8377">▾</span></button>
@@ -869,14 +869,14 @@ function hasFeature(k){return !!FEATURES[k];}
    kind:'tile'  ＝モチーフが密接に連結し分離不能なデザイン（完成タイルをそのまま敷き詰め）
    motifPre+motifN → GA_ASSETS+motifPre+n+'.png' の透過PNG群。repeat/sizeCm/density/rot/bg は選択時の既定値 */
 const GA_ASSETS='https://miyajima-art.github.io/kt-demo-w7x2/assets/';
-const TILE_SAMPLES={
+const TILE_SAMPLES={ /* 定義順＝ギャラリー表示順（切り抜きモチーフ型→「柄そのまま」タイル型→この後に文字だけカード） */
   fd0201:{key:'fd0201',kind:'motifs',name:'さくらんぼ',       thumb:'gararie-samp-fd0201-thumb.jpg', motifPre:'gararie-motif-fd0201-',motifN:5, repeat:'toss',sizeCm:4,  density:55,rot:160,bg:'#fef9f3'},
-  fd0301:{key:'fd0301',kind:'tile',  name:'ベリーミックス',   thumb:'gararie-samp-fd0301-thumb.jpg', url:'gararie-samp-fd0301.jpg', cmW:27.5},
-  plum:  {key:'plum',  kind:'tile',  name:'梅の花（ブルー）', thumb:'gararie-samp-plum-thumb.jpg',   url:'gararie-samp-plum.jpg',   cmW:15.0},
   sm0301:{key:'sm0301',kind:'motifs',name:'トイプードル',     thumb:'gararie-samp-sm0301-thumb.jpg', motifPre:'gararie-motif-sm0301-',motifN:4, repeat:'toss',sizeCm:4.5,density:52,rot:25, bg:'#ffffff'},
   sm0501:{key:'sm0501',kind:'motifs',name:'豆柴',             thumb:'gararie-samp-sm0501-thumb.jpg', motifPre:'gararie-motif-sm0501-',motifN:4, repeat:'toss',sizeCm:4.5,density:52,rot:25, bg:'#ffffff'},
   sm3502:{key:'sm3502',kind:'motifs',name:'グミベア',         thumb:'gararie-samp-sm3502-thumb.jpg', motifPre:'gararie-motif-sm3502-',motifN:6, repeat:'toss',sizeCm:2.6,density:55,rot:30, bg:'#ffffff'},
   sm3601:{key:'sm3601',kind:'motifs',name:'バルーンアニマル', thumb:'gararie-samp-sm3601-thumb.jpg', motifPre:'gararie-motif-sm3601-',motifN:4, repeat:'toss',sizeCm:9,  density:55,rot:20, bg:'#ffffff'},
+  fd0301:{key:'fd0301',kind:'tile',  name:'ベリーミックス',   thumb:'gararie-samp-fd0301-thumb.jpg', url:'gararie-samp-fd0301.jpg', cmW:27.5},
+  plum:  {key:'plum',  kind:'tile',  name:'梅の花（ブルー）', thumb:'gararie-samp-plum-thumb.jpg',   url:'gararie-samp-plum.jpg',   cmW:15.0},
   sm3801:{key:'sm3801',kind:'tile',  name:'ボルダリング',     thumb:'gararie-samp-sm3801-thumb.jpg', url:'gararie-samp-sm3801.jpg', cmW:32.8},
 };
 function sampleMotifUrls(spec){const a=[];for(let i=1;i<=spec.motifN;i++)a.push(GA_ASSETS+spec.motifPre+i+'.png');return a;}
