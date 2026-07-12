@@ -3860,11 +3860,14 @@ async function loadRecipe(obj,srcCode){
   $('#freeMsg').textContent='✓ レシピを読み込みました';
 }
 /* 見本柄名ラベルの改行位置（自然な語の区切り。未指定＝1行に収まる想定でそのまま） */
-const SAMP_NAME_BREAK={ // 意味の区切りでのみ改行（word-break:keep-all併用・語の途中で割れるのを防ぐ）
+const SAMP_NAME_BREAK={ // 意味の区切りでのみ改行（word-break:keep-all併用・語の途中で割れるのを防ぐ）。
+  // 320px幅（狭いスマホ）でも見切れないよう、区切り後の各セグメントは4文字以内に統一
+  fd0201:3,  // さくら｜んぼ
   sm0301:2,  // トイ｜プードル
   sm3502:2,  // グミ｜ベア
   sm3601:4,  // バルーン｜アニマル
   fd0301:3,  // ベリー｜ミックス
+  plum:4,    // 梅の花（｜ブルー）
   sm3801:3,  // ボルダ｜リング
 };
 function setSampName(nm,text,breakAt){
