@@ -448,7 +448,6 @@
       <div class="samples" data-feature="textMotif">
         <div class="cap"><span>TEXT</span><em>文字を柄に入れる（オプション・空欄で消える）</em></div>
         <input type="text" id="tmText" placeholder="例: rekuredool / ガラリエ" style="width:100%;padding:8px 10px;border:1px solid #d8d2c6;border-radius:8px;font-size:14px;background:#fdfcf9">
-        <button class="ghost" id="tmOnly" type="button" style="margin-top:8px">文字だけの柄にする</button>
         <div style="margin-top:8px">
           <button id="tmFontBtn" type="button" style="width:100%;text-align:left;font-size:13px;padding:8px 10px;border:1px solid #d8d2c6;border-radius:8px;background:#fdfcf9;cursor:pointer">フォント: <span id="tmFontName">ゴシック（標準）</span><span style="float:right;color:#8a8377">▾</span></button>
           <div id="tmFontList" style="display:none;max-height:210px;overflow-y:auto;border:1px solid #d8d2c6;border-radius:8px;margin-top:6px;background:#fdfcf9"></div>
@@ -4105,11 +4104,6 @@ function wire(){
     $('#tmText').oninput=e=>{state.textMotif.text=e.target.value;syncTextMotif();
       if(state.sample==='textOnly')$('#motifCount').textContent=state.textMotif.text.trim()
         ?'文字だけの柄（絵は未使用）':'文字だけの柄 — TEXT欄に文字を入力してください';};
-    /* 文字だけの柄（絵なし・名入れ生地）。SAMPLEの「文字だけ」カードと同じ処理 */
-    $('#tmOnly').onclick=()=>{
-      if(!state.textMotif.text.trim()){$('#tmText').focus();return;} // 未入力なら入力欄へ誘導
-      applyTextOnly(false); // ここは既にTEXT欄にいるのでジャンプ不要
-    };
     /* フォントピッカー（標準4＋Google Fonts＋アップロード） */
     const selectFont=async(v,label,fam)=>{
       state.textMotif.font=v;
