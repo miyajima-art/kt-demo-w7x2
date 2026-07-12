@@ -87,7 +87,7 @@
   .samp:hover{border-color:var(--accent);transform:translateY(-1px)}
   .samp.on{border:1.5px solid var(--accent);box-shadow:0 0 0 3px var(--ring)}
   .samp canvas{width:100%;aspect-ratio:1;display:block}
-  .samp .nm{display:block;font-size:12.5px;color:var(--muted);text-align:center;padding:3px 2px 4px;line-height:1.2;background:var(--n1)}
+  .samp .nm{display:block;font-size:12.5px;color:var(--muted);text-align:center;padding:3px 2px 4px;line-height:1.2;background:var(--n1);word-break:keep-all} /* 改行は<wbr>の位置のみ（語の途中で割れるのを防ぐ） */
 
   /* cutout */
   .cutrow{display:flex;gap:14px;align-items:flex-start}
@@ -580,11 +580,7 @@
               <button data-z="2">200%</button>
               <button data-z="5">500%</button>
             </div>
-            <div class="zoomseg" id="baseSeg">
-              <button data-cm="3" class="on">3cm</button>
-              <button data-cm="5">5cm</button>
-              <button data-cm="10">10cm</button>
-            </div>
+            <label class="toggle"><input type="checkbox" id="grid"> グリッド</label>
             <label class="toggle"><input type="checkbox" id="seams"> 継ぎ目</label>
           </div>
         </div>
@@ -788,7 +784,7 @@ const state={
   tol:50, skipCut:false, noSplit:false, seed:20260710, // noSplit: 切り抜き後にモチーフ分割しない（ロゴ・文字入り向け）
   filler:{type:'none',motifIdx:-1,motif:null}, // すき間の背景モチーフ: none/paw/motif/upload
   fillerScale:30,                              // 主役に対する大きさ%（15-50）
-  patTab:'surface', zoom:1, showSeams:false, baseCm:3, // 実寸ルーラーの基準長さ(cm): 3/5/10
+  patTab:'surface', zoom:1, showSeams:false, showGrid:false, // showGrid: 1cm/5cm方眼グリッド線の表示
   panCmX:0, panCmY:0,            // 生地プレビューのスライド位置（実寸cm・ズーム非依存）
   product:'tshirt', prodZoom:'full',
   showDims:true,                 // F21 寸法表示（着丈/身幅/肩幅/袖丈・レディースM基準）
@@ -881,37 +877,6 @@ function drawDaisy(size,petal,center,seed){
   x.restore();
   // 花芯（非同心）
   x.fillStyle=center;x.beginPath();x.arc(size*0.012,size*0.02,r0*1.18,0,TAU);x.fill();
-  return c;
-}
-/* 北欧スワッグ（S字枝・互生非対称葉・歪み楕円の実） */
-function drawSwag(size,seed){
-  const c=makeCanvas(Math.round(size*0.72),size),x=c.getContext('2d'),rnd=mulberry32(seed);
-  const W=c.width,L=size*0.84,x0=W*0.5,y0=size*0.08,bend=L*0.16*(1+0.4*(rnd()-0.5));
-  const leafCols=['#4a6b57','#97a578'],berry='#d9a441',branch='#5d5340';
-  // 枝（緩いS字）
-  x.strokeStyle=branch;x.lineWidth=size*0.030;x.lineCap='round';
-  x.beginPath();x.moveTo(x0,y0);x.quadraticCurveTo(x0+bend,y0+L*0.5,x0+bend*0.3,y0+L);x.stroke();
-  const bx=t=>x0+2*(1-t)*t*bend+t*t*bend*0.3, by=t=>y0+L*t;
-  // 葉（互生・左右交互・先端へ漸減・非対称制御点）
-  const nl=8;
-  for(let i=0;i<nl;i++){
-    const t=0.10+0.80*i/(nl-1)+(rnd()-0.5)*0.04,side=i%2?1:-1;
-    const ll=size*0.26*lerp(1,0.68,i/(nl-1))*(1+0.18*(rnd()-0.5)),lw=ll*0.46;
-    x.save();x.translate(bx(t),by(t));
-    // 枝から斜め下向きに生える（垂れ枝スワッグの定番角度）
-    x.rotate(side*(1.05+rnd()*0.3)-Math.PI*0.5);
-    x.fillStyle=leafCols[(rnd()*2)|0];
-    x.beginPath();x.moveTo(0,0);
-    x.quadraticCurveTo(lw,ll*0.35,0,ll);
-    x.quadraticCurveTo(-lw*0.85,ll*0.6,0,0);
-    x.fill();x.restore();
-  }
-  // 実（枝先に3個・歪み楕円）
-  for(let i=0;i<3;i++){
-    const t=0.88+(rnd()-0.5)*0.12,r=size*0.045*(1+0.25*(rnd()-0.5));
-    x.fillStyle=berry;x.beginPath();
-    x.ellipse(bx(t)+(rnd()-0.5)*size*0.14,by(t)+(rnd()-0.3)*size*0.08,r*(1+0.1*(rnd()-0.5)),r*(1-0.1*(rnd()-0.5)),rnd()*Math.PI,0,TAU);x.fill();
-  }
   return c;
 }
 /* 木版スタンプa: 花十字（太ストローク4本・二度打ちにじみ） */
@@ -1036,10 +1001,6 @@ const PRESETS={
     make:px=>[
       {hi:p=>drawDaisy(p,'#e8b4a8','#8a5a44',21)},
       {hi:p=>drawDaisy(p,'#ebcb7c','#8a5a44',22)},
-    ]},
-  swag:{name:'北欧スワッグ', bg:'#f2ecdf', repeat:'half', dropDen:2, sizeCm:8, density:66, rot:5,
-    make:px=>[
-      {hi:p=>drawSwag(p,31)},
     ]},
   block:{name:'木版スタンプ', bg:'#f2ecdf', repeat:'full', dropDen:2, sizeCm:4.5, density:62, rot:0, arrange:'checker',
     make:px=>[
@@ -1992,33 +1953,50 @@ function renderPattern(){
       for(let y=y0-uh2;y<=h;y+=uh2){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
       ctx.restore();
     }
-    /* スケールバー: L字型（2026-07-12改修・横=右方向／縦=上方向、角=左下）。
-       角(cx,cy)は旧バーの始点(28,h-24)を継承し、両腕とも実寸state.baseCm(3/5/10cm)を
-       state.zoomと連動させて描画（bar式は旧実装のPPCM*state.zoom係数をそのまま流用）。
-       箱サイズはbarとラベル幅(ctx.measureText実測)の大きい方に追従＝旧実装は箱幅がbar
-       固定でテキストがはみ出す不具合があったため、ここで併せて修正する。
-       2026-07-12追改修: PPCM 7→28に伴い視認性パラメータを再調整。font 10→22はdpr=2
-       CSS換算で約11px相当を狙ったもの。bh/ラベルy位置の定数(25→44 / 11→26)はフォント
-       拡大に合わせた再計算値（ascent/descent実測ベース、旧デザインの余白比率を踏襲）。
-       PPCM引き上げで基準長さ×ズームの組み合わせ次第ではbarがcanvasより大きくなり得る
-       ため、画面に収まらない場合は誤解を招く表示（切れたルーラー）を避けて省略する。 */
-    const bar=state.baseCm*PPCM*state.zoom;
-    if(bar<=Math.min(w,h)*0.7){
-    ctx.save();
-    ctx.font='22px ui-monospace,monospace';
-    const label=state.baseCm+'cm（実寸）';
-    const by=h-14-(bar+44),cx=16+12,cy=h-24;
-    /* 背景の板は廃止（柄が隠れて見にくいため）。白ハロー(太い縁取り→細い本線の2度描き)で
-       どんな柄の上でも視認できるようにし、ルーラー周りの柄もそのまま透けて見える形にする。 */
-    ctx.lineJoin='round';ctx.lineCap='round';
-    const drawBar=(w2,c)=>{ctx.strokeStyle=c;ctx.lineWidth=w2;
-      ctx.beginPath();ctx.moveTo(cx+bar,cy);ctx.lineTo(cx,cy);ctx.lineTo(cx,cy-bar);ctx.stroke();
-      ctx.beginPath();ctx.moveTo(cx+bar,cy-5);ctx.lineTo(cx+bar,cy+5);ctx.moveTo(cx-5,cy-bar);ctx.lineTo(cx+5,cy-bar);ctx.stroke();};
-    drawBar(6,'rgba(255,255,255,.9)');drawBar(3,'#2b2620');
-    ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=4;ctx.strokeText(label,cx,by+26);
-    ctx.fillStyle='#2b2620';ctx.fillText(label,cx,by+26);
-    ctx.restore();
+    /* メモリー定規＋グリッド線（2026-07-12改修・旧L字スケールバー＋3/5/10cm切替を置き換え）。
+       定規（上端＋左端に常設）・グリッド（トグル）ともキャンバス固定＝パン非追従。
+       透明の方眼シートを生地に重ねる考え方で、柄をドラッグして0点に当てて測る。
+       継ぎ目線（パン追従）とは役割が異なる。目盛り間隔は柄と同じPPCM*state.zoomを共有。
+       1cm間隔が18px未満になる低ズーム(50%時14px)では1cm目盛り・1cm線を省き5cm刻みのみ。
+       フォント22px・帯幅36pxはdpr=2のCSS換算で約11px/18px相当（既存ラベル類と同基準）。 */
+    const cmPx=PPCM*state.zoom,RW=36,minor=cmPx>=18;
+    if(state.showGrid){
+      ctx.save();ctx.lineWidth=1;
+      for(let i=0,x=RW;x<=w;i++,x=RW+i*cmPx){
+        if(!minor&&i%5)continue;
+        ctx.strokeStyle=i%5?'rgba(43,38,32,.15)':'rgba(43,38,32,.35)';
+        ctx.beginPath();ctx.moveTo(Math.round(x)+0.5,RW);ctx.lineTo(Math.round(x)+0.5,h);ctx.stroke();
+      }
+      for(let i=0,y=RW;y<=h;i++,y=RW+i*cmPx){
+        if(!minor&&i%5)continue;
+        ctx.strokeStyle=i%5?'rgba(43,38,32,.15)':'rgba(43,38,32,.35)';
+        ctx.beginPath();ctx.moveTo(RW,Math.round(y)+0.5);ctx.lineTo(w,Math.round(y)+0.5);ctx.stroke();
+      }
+      ctx.restore();
     }
+    ctx.save();
+    ctx.fillStyle='rgba(255,255,255,.88)';
+    ctx.fillRect(0,0,w,RW);ctx.fillRect(0,RW,RW,h-RW);
+    ctx.strokeStyle='rgba(43,38,32,.45)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(0,RW-0.5);ctx.lineTo(w,RW-0.5);ctx.moveTo(RW-0.5,RW);ctx.lineTo(RW-0.5,h);ctx.stroke();
+    ctx.font='22px ui-monospace,monospace';
+    const lblEvery=(5*cmPx>=56)?5:10; // 数値ラベルの間引き（低ズームで数字が重なるなら10cmごと）
+    for(let i=0,x=RW;x<=w;i++,x=RW+i*cmPx){
+      if(!minor&&i%5)continue;
+      const major=i%5===0,xx=Math.round(x)+0.5;
+      ctx.strokeStyle='#2b2620';ctx.lineWidth=major?2:1;
+      ctx.beginPath();ctx.moveTo(xx,RW);ctx.lineTo(xx,RW-(major?14:8));ctx.stroke();
+      if(major&&i%lblEvery===0&&i>0){ctx.fillStyle='#2b2620';ctx.fillText(String(i),xx+4,RW-16);}
+    }
+    for(let i=0,y=RW;y<=h;i++,y=RW+i*cmPx){
+      if(!minor&&i%5)continue;
+      const major=i%5===0,yy=Math.round(y)+0.5;
+      ctx.strokeStyle='#2b2620';ctx.lineWidth=major?2:1;
+      ctx.beginPath();ctx.moveTo(RW,yy);ctx.lineTo(RW-(major?14:8),yy);ctx.stroke();
+      if(major&&i%lblEvery===0&&i>0){ctx.fillStyle='#2b2620';ctx.fillText(String(i),3,yy-5);}
+    }
+    ctx.fillStyle='#2b2620';ctx.fillText('cm',5,25);
+    ctx.restore();
   }
   const names={full:'ストレート',half:'ハーフドロップ',brick:'ブリック',diamond:'ダイヤモンド',sateen:'飛び柄（斜めずらし）',mirror:'ミラー',toss:'トス（散らし）',freeform:'自由配置'};
   const cmW=(lay.UW*state.sizeCm).toFixed(1),cmH=(lay.UH*state.sizeCm).toFixed(1);
@@ -3393,7 +3371,7 @@ const PURCHASE_URL='https://rekuredool.myshopify.com/cart/45843205062716:1';
 const STORAGE_URL='https://gararie-recipes.rekuredool.workers.dev';
 /* 柄エンジンのビルドID。tools/freeze_designer.mjs が中身のSHA-256から書き換える。
    レシピに刻まれ、印刷時に「顧客が見たのと同じエンジン」で描いたことを保証する。 */
-const BUILD='ca756a7c84aa';
+const BUILD='622d1b0c1e63';
 /* デザインコード: レシピ内容から決定論で生成する短い照合キー。
    注文（Shopify属性）とレシピファイル名の突き合わせに使う */
 function designCode(str){
@@ -3662,13 +3640,19 @@ async function loadRecipe(obj,srcCode){
   else { state.srcCode=null; state.srcFp=null; }
   $('#freeMsg').textContent='✓ レシピを読み込みました';
 }
+/* 見本柄名ラベルの改行位置（自然な語の区切り。未指定＝1行に収まる想定でそのまま） */
+const SAMP_NAME_BREAK={matisse:4, daisy:3, block:2, cherry:3, mame:2};
+function setSampName(nm,text,breakAt){
+  if(breakAt){nm.textContent='';nm.append(text.slice(0,breakAt),document.createElement('wbr'),text.slice(breakAt));}
+  else nm.textContent=text;
+}
 function buildSamples(){
   const g=$('#sampGrid');g.innerHTML='';
   Object.entries(PRESETS).forEach(([k,P])=>{
     const d=document.createElement('button');d.className='samp';d.dataset.sample=k;
     const cv=makeCanvas(120,120);
     d.appendChild(cv);
-    const nm=document.createElement('span');nm.className='nm';nm.textContent=P.name;d.appendChild(nm);
+    const nm=document.createElement('span');nm.className='nm';setSampName(nm,P.name,SAMP_NAME_BREAK[k]);d.appendChild(nm);
     d.onclick=()=>applyPreset(k);
     g.appendChild(d);
     setTimeout(()=>drawSampleTile(cv,P),0);
@@ -3878,8 +3862,7 @@ function wire(){
   $$('#zoomSeg button').forEach(b=>b.onclick=()=>{state.zoom=+b.dataset.z;$$('#zoomSeg button').forEach(x=>x.classList.toggle('on',x===b));
     $('#patternCv').classList.toggle('zoomed',state.zoom>1); // ズーム時のみタッチスクロールを奪う
     renderPattern();});
-  $$('#baseSeg button').forEach(b=>b.onclick=()=>{state.baseCm=+b.dataset.cm;$$('#baseSeg button').forEach(x=>x.classList.toggle('on',x===b));
-    renderPattern();});
+  $('#grid').onchange=e=>{state.showGrid=e.target.checked;renderPattern();};
   $$('#prodTabs button').forEach(b=>b.onclick=()=>{state.product=b.dataset.prod;$$('#prodTabs button').forEach(x=>x.classList.toggle('on',x===b));renderProduct();});
   $$('#prodZoomSeg button').forEach(b=>b.onclick=()=>{state.prodZoom=b.dataset.z;$$('#prodZoomSeg button').forEach(x=>x.classList.toggle('on',x===b));renderProduct();});
   if($('#dims'))$('#dims').onchange=e=>{state.showDims=e.target.checked;renderProduct();}; // F21 寸法表示トグル
