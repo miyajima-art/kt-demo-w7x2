@@ -1610,15 +1610,15 @@ function renderPattern(){
     ctx.save();
     ctx.font='22px ui-monospace,monospace';
     const label=state.baseCm+'cm（実寸）';
-    const tw=ctx.measureText(label).width;
-    const cw=Math.max(bar,tw);
-    const bw=cw+24,bh=bar+44,bx=16,by=h-14-bh;
-    ctx.fillStyle='rgba(252,250,245,.85)';ctx.fillRect(bx,by,bw,bh);
-    ctx.strokeStyle='rgba(43,38,32,.4)';ctx.strokeRect(bx+0.5,by+0.5,bw-1,bh-1);
-    ctx.strokeStyle='#2b2620';ctx.lineWidth=3;
-    const cx=bx+12,cy=h-24;
-    ctx.beginPath();ctx.moveTo(cx+bar,cy);ctx.lineTo(cx,cy);ctx.lineTo(cx,cy-bar);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(cx+bar,cy-5);ctx.lineTo(cx+bar,cy+5);ctx.moveTo(cx-5,cy-bar);ctx.lineTo(cx+5,cy-bar);ctx.stroke();
+    const by=h-14-(bar+44),cx=16+12,cy=h-24;
+    /* 背景の板は廃止（柄が隠れて見にくいため）。白ハロー(太い縁取り→細い本線の2度描き)で
+       どんな柄の上でも視認できるようにし、ルーラー周りの柄もそのまま透けて見える形にする。 */
+    ctx.lineJoin='round';ctx.lineCap='round';
+    const drawBar=(w2,c)=>{ctx.strokeStyle=c;ctx.lineWidth=w2;
+      ctx.beginPath();ctx.moveTo(cx+bar,cy);ctx.lineTo(cx,cy);ctx.lineTo(cx,cy-bar);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(cx+bar,cy-5);ctx.lineTo(cx+bar,cy+5);ctx.moveTo(cx-5,cy-bar);ctx.lineTo(cx+5,cy-bar);ctx.stroke();};
+    drawBar(6,'rgba(255,255,255,.9)');drawBar(3,'#2b2620');
+    ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=4;ctx.strokeText(label,cx,by+26);
     ctx.fillStyle='#2b2620';ctx.fillText(label,cx,by+26);
     ctx.restore();
     }
@@ -2019,9 +2019,9 @@ function drawBolt(ctx,ppcm){
 
 /* ---- 製品レジストリ（タブ・描画・実寸スケール・拡大時の中心） ---- */
 const PRODUCTS={
-  tshirt:{lb:'Tシャツ',ppcm:8.8,zoomOff:90,draw:drawTshirt},
-  tote:{lb:'トート',ppcm:9.2,zoomOff:40,draw:drawTote},
-  bolt:{lb:'反物',ppcm:5.6,zoomOff:40,draw:drawBolt},
+  tshirt:{lb:'Tシャツ',ppcm:7.15,zoomOff:90,draw:drawTshirt}, // 身幅52cm(実物比)÷座標pit点372px=7.15。旧8.8は座標と不整合な決め打ち値だった(+23%過大)
+  tote:{lb:'トート',ppcm:10.42,zoomOff:40,draw:drawTote},     // 一般的なコットントート相場・幅38cm÷座標幅396px=10.42。コード内に実寸根拠なく社長確認のうえ採用
+  bolt:{lb:'反物',ppcm:3.73,zoomOff:40,draw:drawBolt},        // 生地幅150cm(571行目の購入UI表記と同一)÷ロール軸長560px=3.73。旧5.6は不整合な決め打ち値だった(+50%過大)
 };
 function drawProduct(octx){
   const P=PRODUCTS[state.product]||PRODUCTS.tshirt;
@@ -2034,7 +2034,7 @@ function renderProduct(){
   ctx.clearRect(0,0,W,H); // レイアウト未定でも無地の製品を描く（patFor→renderUnitがnullを返し柄なしになる）
   const off=makeCanvas(DS_W,DS_H),octx=off.getContext('2d');
   octx.imageSmoothingQuality='high';
-  /* 製品ごとの px/cm（実寸感の基準: Tシャツ身幅52cm≒画面456px） */
+  /* 製品ごとの px/cm（実寸感の基準: Tシャツ身幅52cm＝座標pit点372px。各製品の根拠はPRODUCTS定義のコメント参照） */
   const P=drawProduct(octx);
   if(state.prodZoom==='zoom'){
     /* プリント拡大（中心部2.4倍・生地グレインが見える） */
