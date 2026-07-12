@@ -26,8 +26,9 @@
   h3{font-size:14.5px;font-weight:700;margin:20px 0 8px;color:var(--navy)}
   p{margin:8px 0}
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin:14px 0}
-  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:18px 0}
-  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(186px,1fr));gap:11px;margin:18px 0}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 16px}
+  .kpi.hl{border:1.5px solid var(--navy);background:linear-gradient(180deg,#fbfcfe,#fff)}
   .kpi .lbl{font-size:11.5px;color:var(--faint);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
   .kpi .val{font-size:20px;font-weight:800;margin-top:4px;letter-spacing:-.01em}
   .kpi .note{font-size:12px;color:var(--muted);margin-top:4px}
@@ -72,6 +73,17 @@
   .lD .lh{background:#eef4fd}.lE .lh{background:#fdf1ec}.lF .lh{background:#f1f3f8}
   .legend{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;font-size:12px;color:var(--muted);align-items:center}
   .foot{margin-top:50px;color:var(--faint);font-size:12px;border-top:1px solid var(--line);padding-top:14px}
+  /* 事業優位性 */
+  .advgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0}
+  .adv{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;border-top:3px solid var(--navy)}
+  .advno{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--faint)}
+  .advt{font-size:15.5px;font-weight:800;margin:2px 0 8px;letter-spacing:-.01em}
+  .advnum{font-size:19px;font-weight:800;color:var(--navy);letter-spacing:-.01em;margin-bottom:10px;
+    padding-bottom:10px;border-bottom:1px solid var(--line)}
+  .advnum .vs{font-size:12px;color:var(--faint);font-weight:700;margin:0 4px}
+  .advd{font-size:13px;color:var(--muted);line-height:1.75}
+  .advd b{color:var(--ink)}
+  @media(max-width:820px){.advgrid{grid-template-columns:1fr}}
   .prio{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:16px 0}
   .pcol{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
   .pcol h4{font-size:14px;font-weight:800;margin-bottom:8px}
@@ -86,11 +98,12 @@
 <div class="wrap">
 
   <span class="scope">🟧 コンサル案件 — 土屋商店（レクレドール）</span>
-  <h1>事業展開マップ <span style="font-size:15px;color:var(--faint)">v1.1 — マーケットプレイス化を含む全選択肢</span></h1>
-  <div class="sub">2026-07-13 ／ 既存正典（システム構想A〜G・realfabric対抗マップM1〜M3・勝ち筋/市場分析）の構想済み案 ＋ 新規提案を1枚に統合。<b>v1.1で competitor 実態調査＋自動柄送りのコモディティ度調査を反映</b>（§2下段・§3・還元率を訂正）。意思決定は土屋さん協議後。</div>
+  <h1>事業展開マップ <span style="font-size:15px;color:var(--faint)">v1.2 — 事業優位性とマーケットプレイス化を含む全選択肢</span></h1>
+  <div class="sub">2026-07-13 ／ 既存正典（システム構想A〜G・realfabric対抗マップM1〜M3・勝ち筋/市場分析）の構想済み案 ＋ 新規提案を1枚に統合。<b>v1.1で競合実態調査＋自動柄送りのコモディティ度調査を反映</b>（§3下段・§4・還元率を訂正）。<b>v1.2で「§1 事業優位性」を新設</b>（ガラリエ システム開発報告書＝コード実測15,288行・6日間・人間換算400〜960万円 を統合）。意思決定は土屋さん協議後。</div>
 
   <div class="kpis">
-    <div class="kpi"><div class="lbl">選択肢</div><div class="val">27案 / 6レイヤー</div><div class="note">2026-07-13 競合実態調査を反映（v1.1）</div></div>
+    <div class="kpi hl"><div class="lbl">事業優位性</div><div class="val">6日 vs 4ヶ月</div><div class="note">同等システムの外部発注＝450〜960万円。速度と原価が桁違い（§1）</div></div>
+    <div class="kpi"><div class="lbl">選択肢</div><div class="val">27案 / 6レイヤー</div><div class="note">競合実態調査＋開発報告書を反映（v1.2）</div></div>
     <div class="kpi"><div class="lbl">本丸（堀）</div><div class="val">柄マーケット</div><div class="note">realfabricの堀へ、講座×ライブの独自供給源で挑む</div></div>
     <div class="kpi"><div class="lbl">最速の現金</div><div class="val">入園入学 1〜3月</div><div class="note">名入れ×キッズT×ガラリエ。仕込みは今秋から</div></div>
     <div class="kpi"><div class="lbl">絶対制約</div><div class="val">固定費を増やさない</div><div class="note">リスケ局面。前受け・委託・在庫レス優先</div></div>
@@ -107,7 +120,43 @@
     </div>
   </div>
 
-  <h2>1. 全体地図（6レイヤー×27案）</h2>
+  <h2>1. 事業優位性 — なぜ土屋商店が勝てるのか（4つの非対称）</h2>
+  <p style="color:var(--muted);font-size:13.5px;margin-bottom:4px">機能が優れているから勝てるのではない。<b>「同じものを、桁違いに速く・安く作り続けられる」という構造</b>が優位の正体。根拠＝<code>ガラリエ システム開発報告書（2026-07-13・コード実測）</code>＋競合/技術調査2本。</p>
+
+  <div class="advgrid">
+    <div class="adv">
+      <div class="advno">非対称 ①</div>
+      <div class="advt">開発の速度と原価が桁違い</div>
+      <div class="advnum">6日間 <span class="vs">vs</span> 3.5〜4.5ヶ月</div>
+      <div class="advd">現行稼働コード<b>15,288行</b>（柄配置エンジン4,713行・受注コンソール3,206行・LP/マーケ資産5,349行 ほか）を<b>6日間の集中実装</b>で構築。同等仕様を外部発注すれば<b>10〜14週・400〜810万円</b>（実機検証込みで<b>3.5〜4.5ヶ月・450〜960万円</b>）。<br><b>金を積んでも縮まらない</b>：エンジニア3〜5人を並行投入した人間側の物理的下限が<b>2〜4週・900〜1,500万円</b>。6日間は「特急料金」で買える範囲の外にある。</div>
+    </div>
+    <div class="adv">
+      <div class="advno">非対称 ②</div>
+      <div class="advt">ライブと開発が同じ速さで回る</div>
+      <div class="advnum">18時間で12回改修</div>
+      <div class="advd">柄エンジンの凍結ログ実測＝<b>平均1.5時間に1回、稼働に影響する改修が入っている</b>。人間チームの「試す→見る→直す」は最低半日〜1日で、同じ反復には数週間かかる。<br>意味するところは単純で、<b>今夜のライブで客が言ったことが、翌朝には機能になっている</b>。realfabricにもSpoonflowerにも、この回転速度は構造的に出せない。</div>
+    </div>
+    <div class="adv">
+      <div class="advno">非対称 ③</div>
+      <div class="advt">人材市場に存在しない掛け合わせ</div>
+      <div class="advnum">目利き × 現場知識 × AI実行速度</div>
+      <div class="advd">技術面＝<b>トロイダル・ポアソン円盤サンプリング</b>（輪環空間で点を均等かつ非規則に散らす生成グラフィックスの専門領域）× <b>朱子送り</b>など繊維の伝統的な柄送り技法。「プロシージャルグラフィックス × 繊維パターン知識」の人材は市場にほぼいない。<br>事業面＝報告書の結論どおり、再現のボトルネックは<b>AIの操作方法ではなく「何を作るべきかを判断する現場知識と目利き」</b>。<b>土屋社長（生地の目利き・実演）× 宮島（AI実装）の組み合わせそのもの</b>が模倣困難。realfabricは印刷通販の会社で「生地の目利き」を持たず、Pointcarré等のCADは技術はあっても「客」も「ライブ」も持たない。</div>
+    </div>
+    <div class="adv">
+      <div class="advno">非対称 ④</div>
+      <div class="advt">最後の一マイルを持っている</div>
+      <div class="advnum">絵 → 柄 → <b>刷って届ける</b></div>
+      <div class="advd">「1枚絵→自動シームレス→実寸cm→印刷TIFF→反物の長さ込み」を<b>一気通貫でやる製品は国内外で発見できず</b>（2026-07-13調査）。生成AIもプロ用CADも、<b>刷って届けるところを持っていない</b>。<br>土屋商店は<b>自社Mimaki＝外注固定費ゼロ・在庫ゼロ・1mから7営業日</b>。しかも売っているのは「一点物の残反」×「一点物のオリジナル柄」という<b>二重の宝探し性</b>で、これ自体が他店にない。</div>
+    </div>
+  </div>
+
+  <div class="box info"><b>相手側の構造（2026-07-13 競合調査）</b>realfabric運営＝株式会社ティクーン（印刷通販EC）。realfabricは<b>同社が持つ40以上のグループサイトのうちの1つ</b>で、生地専業の本気ではない。つまり<b>この1サイトに数百万〜1,000万円規模の開発投資を集中させる意思決定は構造的に出にくい</b>。一方こちらは同じ規模の機能追加を数日で回せる。<b>「機能で並ばれる」より先に、こちらが次の機能に移れる</b>——これが①②の実利。</div>
+
+  <div class="box err"><b>⚠ 正直な留保①：この優位は今のところ「土屋商店の資産」ではない</b>開発速度の優位は<b>宮島（マクロズ）に属人化</b>しており、土屋商店単体では再現できない。関係が切れれば消える性質のもの。<b>だから優位が生きているうちに、土屋商店側の恒久資産へ変換しなければ意味がない。</b><br>変換先は4つ＝<b>①ライブとLINEの客 ②実際に刷った色の実績データ（自社Mimakiでしか貯まらない） ③作者（講座卒業生） ④柄在庫</b>。この4つは誰にも真似できず、土屋商店に残る。<br>※マクロズは出資先・送客元でもあるため、この価値提供は<b>利益相反の開示とセット</b>で扱う。</div>
+
+  <div class="box warn"><b>⚠ 正直な留保②：技術優位には賞味期限がある</b>Pointcarréが2024-03に「画像→即シームレスリピート」AIを実装、豊島が2024-01にAI柄提案システムを発表（プリント屋への外部提供を明言）。<b>「シームレス総柄を作れること」自体は数年で追いつかれる</b>。永続するのは①②③の<b>速度と掛け合わせ</b>であって、エンジンの機能そのものではない。エンジンを温存するのではなく、<b>回し続けて客と実績に変える</b>のが唯一の正しい使い方。</div>
+
+  <h2>2. 全体地図（6レイヤー×27案）</h2>
 
   <div class="layer lA">
     <div class="lh">A. いまの商売を太らせる <span class="tag" style="background:var(--ok-soft);color:var(--ok)">既存売上の取りこぼし回収</span></div>
@@ -147,7 +196,7 @@
   <div class="layer lD">
     <div class="lh">D. B2B・受託 <span class="tag" style="background:var(--accent-soft);color:var(--accent)">設備と目利きの外販</span></div>
     <div class="lb">
-      <div class="item"><div class="n">D-1 小ロット印刷受託＋自動柄送り<span class="src">新規（Mimaki稼働率＋エンジンの外販）</span></div><div class="d">ブランド・作家・同人向け「1mから・7営業日」の国内小ロット印刷。<b>売り物は「柄を作れること」ではなく「1枚絵を刷れる反物データにして刷って届けるまで」</b>（→§2下段の調査結果）。ガラリエの受注基盤をそのまま流用。</div><div class="t"><span class="b b-next">次</span><span class="b b-rare">希少</span><span class="b b-new">新規提案</span></div></div>
+      <div class="item"><div class="n">D-1 小ロット印刷受託＋自動柄送り<span class="src">新規（Mimaki稼働率＋エンジンの外販）</span></div><div class="d">ブランド・作家・同人向け「1mから・7営業日」の国内小ロット印刷。<b>売り物は「柄を作れること」ではなく「1枚絵を刷れる反物データにして刷って届けるまで」</b>（→§4の調査結果）。ガラリエの受注基盤をそのまま流用。</div><div class="t"><span class="b b-next">次</span><span class="b b-rare">希少</span><span class="b b-new">新規提案</span></div></div>
       <div class="item"><div class="n">D-5 キャラIP総柄グッズのOEM<span class="src">新規（2026-07-13 調査で発見・B2Bの本命）</span></div><div class="d">アニメ/ゲームIPの総柄アイテム（アロハ・スカーフ・トート）は定番だが、<b>調査範囲で総柄化は全て手作業・自動生成の実例ゼロ</b>（PAIKAJI×ドラゴンボール, COSPA×鬼滅 等）。<b>キャラ立ち絵→総柄を自動で出せるのは強い</b>。しかも<b>権利は版元が持つ＝柄マーケットの著作権リスクが逆に消える</b>・単価が高い。ただし版元監修フローが重く営業が長い＝<b>D-1の実績を数本積んでから</b>。</div><div class="t"><span class="b b-moat">堀（D-1の後）</span><span class="b b-rare">希少</span><span class="b b-new">新規提案</span></div></div>
       <div class="item"><div class="n">D-2 サンプル・試作サービス<span class="src">新規（D-1の入口商品）</span></div><div class="d">アパレル/雑貨ブランドの柄試作を色校スワッチ付きで即納。<b>C2（スワッチ商品化）と同じ仕組みで両取り</b>。</div><div class="t"><span class="b b-next">次</span><span class="b b-ext">拡張</span><span class="b b-new">新規提案</span></div></div>
       <div class="item"><div class="n">D-3 ライブコマース支援・代行<span class="src">新規（実演ノウハウの外販）</span></div><div class="d">土屋実演の型を他社に提供。単価は高いが<b>属人・時間切り売りで再生局面と相性が悪い</b>。帯番組の型化が済んでから検討。</div><div class="t"><span class="b b-no">張らない(今は)</span><span class="b b-ext">拡張</span><span class="b b-new">新規提案</span></div></div>
@@ -172,7 +221,7 @@
     </div>
   </div>
 
-  <h2>2. マーケットプレイス化の設計（本丸の解像度を上げる）</h2>
+  <h2>3. マーケットプレイス化の設計（本丸の解像度を上げる）</h2>
 
   <div class="box info"><b>なぜ「柄マーケット単体」では勝てないか</b>realfabricは既にユーザー柄41,362件・ランキング・作者ロイヤリティを持つ（＝あちらの堀）。同じものを後追いで作るのは「拡張」。土屋が勝てる形は<b>供給源の独自性</b>＝①講座受講生（E-1/E-2が作者養成所）②ライブ視聴者（「あなたの柄、今夜のライブで売ります」ができるのは土屋だけ）③残反×柄×型紙が同じ店にある、の3点接続。正典の判断基準どおり<b>「Phase1-2の売上と供給源（講座/ライブ)の伸びを見てから張る」</b>。</div>
 
@@ -194,7 +243,7 @@
     <p>① <b>ポイント制にしない</b>。独自ポイントで貯めさせると資金決済法（前払式・資金移動）の射程に入る。<b>現金の売上分配（業務委託報酬）を月次締めで銀行振込</b>が最も軽い。② 源泉徴収の要否（デザイン報酬の区分）と支払調書を税理士確認。③ 最低支払額（例: ¥3,000未満は繰越）で振込コストを制御。④ 出品規約に<b>著作権の表明保証・侵害時の即時取下げ（ノーティス&テイクダウン）・キャラクター/ロゴ柄の禁止明記</b>。アップロード柄の権利リスクは現状もあるが「他人に販売」で一段重くなる＝マーケット開始前に規約整備が必須ゲート。</p>
   </div>
 
-  <h2>3. 自動柄送りのB2B展開 — 判定</h2>
+  <h2>4. 自動柄送りのB2B展開 — 判定</h2>
   <div class="box err"><b>結論: エンジンを売るな。「刷って届けるまで」を売れ。</b>「シームレス総柄を自動生成する」こと自体は<b>もうコモディティ</b>。エンジン単体をライセンス/SaaSで売ると、<b>相場¥4,000の市場で戦うことになる</b>。</div>
   <div class="tblwrap"><table>
     <tr><th>論点</th><th>事実（2026-07-13 調査）</th><th>意味</th></tr>
@@ -208,7 +257,7 @@
   <div class="box warn"><b>⚠ これは「技術の堀」ではなく「時間制限つきの先行者優位」</b>生成AIもプロ用CADも、まだ<b>刷って届けるところ（反物データ・色再現・7営業日）を持っていない</b>。土屋はそこを持っている。ただしPointcarré・豊島の動きを見れば、この差は数年で埋まる。<b>優位が生きているうちに、真似できない資産（ライブの客・刷った色の実績・作者）に変換する</b>のが唯一の使い道。エンジンを機能として温存しても価値は目減りするだけ。</div>
   <p>したがってB2Bの売り物は<b>D-1（エンジン込みの印刷受託＝裏方/ホワイトレーベル）</b>、その先の本命が<b>D-5（キャラIP総柄グッズOEM）</b>。IPグッズの総柄化は<b>調査した範囲で全て手作業・自動生成の実例ゼロ</b>で、しかも権利は版元が持つため<b>柄マーケット最大の弱点だった著作権リスクが逆に消える</b>。単価も高い。ただし版元監修が重く営業サイクルが長いので、<b>D-1の実績を数本積んでから</b>。</p>
 
-  <h2>4. 優先順位（結論）</h2>
+  <h2>5. 優先順位（結論）</h2>
   <div class="prio">
     <div class="pcol"><h4>🟢 今（移管前後・現金と土台）</h4><ol>
       <li><b>A-8 信頼カタログ整備</b> <span class="why">機能追加より先。色不安を消さないと最初の1mが売れない</span></li>
@@ -240,7 +289,7 @@
   </div>
   <div class="box ok"><b>順番の芯</b>「今」で現金と入口を太らせる → 「次」で会員・B2Bのストックを重ねる → その売上と講座/ライブの伸び（先行指標）が基準を超えたら「堀」＝マーケットプレイスに張る。<b>マーケット一番手は技術が最も軽く芯（残反×目利き×ライブ）に最も近いC-3残反委託</b>。C-1柄マーケットはrealfabricの正面なので、供給源（作者）が育つ前に開けない。</div>
 
-  <h2>5. 法務・前提ゲート（マーケット化はここを跨いでから）</h2>
+  <h2>6. 法務・前提ゲート（マーケット化はここを跨いでから）</h2>
   <div class="tblwrap"><table>
     <tr><th>ゲート</th><th>対象</th><th>内容</th></tr>
     <tr><td>ストア移管・プラン契約</td><td>全部</td><td>開発ストアは実決済不可。移管＋Cloudflare譲渡が全展開の前提0号</td></tr>
@@ -251,17 +300,20 @@
     <tr><td>不利益変更の告知</td><td>B-1</td><td>無料機能を閉じる際は2週間前告知＋経過措置（会員設計v1.1に記載済み）</td></tr>
   </table></div>
 
-  <h2>6. 次の一手（3つだけ）</h2>
+  <h2>7. 次の一手（3つだけ）</h2>
   <div class="card">
     <p><b>① 土屋さんと「この地図の丸付け」30分</b> — 27案に○△×を付けてもらう。特に「今」の6つと、マーケット一番手をC-3にする順番の合意。</p>
     <p><b>② A-8信頼カタログ＋B-5福袋＋A-7商用可否明示を今月中に</b> — <b>ガラリエの機能追加はいったん止めて、色見本・生地スペック・スワッチに手を入れる</b>。福袋と商用可否明示はシステム不要で即現金・即差別化。</p>
     <p><b>③ A-1ライブ資産化の要件定義に着手</b> — ピースユーのアーカイブ取得可否ヒアリング（正典の未解決項目）から。ここが月700万の取りこぼし回収の入口。</p>
   </div>
+  <div class="box ok"><b>そして §1 の優位を「使い切る」こと</b>開発速度の優位（6日 vs 4ヶ月）は、放っておけば目減りする。<b>この速度で回せるうちに、ライブの客・刷った色の実績・作者・柄在庫という「土屋商店に残る資産」へ変換する</b>——27案の優先順位はすべてこの一点から逆算している。<b>いま急ぐ理由は競合が強いからではなく、こちらの優位に賞味期限があるから</b>。</div>
 
   <div class="foot">
-    土屋商店 事業展開マップ v1.1 ／ 2026-07-13 ／ 🟧コンサル案件（マクロズ自社事業とは分離）<br>
+    土屋商店 事業展開マップ v1.2 ／ 2026-07-13 ／ 🟧コンサル案件（マクロズ自社事業とは分離）<br>
     出典正典: <code>00_システム構想_日本一の生地屋_v1.md</code>（機能A〜G）・<code>kirutile_03_realfabric上位互換マップ_v1.md</code>（M1〜M3・Phase判断基準）・<code>03_勝ち筋・顧客獲得戦略_v1.md</code>・<code>02_市場分析・勝てる穴_v1.md</code>・<code>ガラリエ_有料会員設計_2026-07-13.html</code><br>
     <b>v1.1の新規出典</b>: <code>02_分析・提案/競合調査_リアルファブリック_20260713.md</code>（運営＝ティクーン・還元率10%・B2Bメニュー無し）／<code>02_分析・提案/技術調査_総柄生成エンジンB2B展開可能性_20260713.md</code>（コモディティ度・Pointcarré/豊島の動き・外注相場・IPグッズの空白）<br>
+    <b>v1.2の新規出典（§1 事業優位性）</b>: <b>ガラリエ システム開発報告書（2026-07-13）</b> — 現行稼働コード15,288行を <code>wc -l</code> 実測、開発期間はファイル更新日時ログ実測、人間換算は4職種（LPデザイナー／LPコピーライター／生成アルゴリズムエンジニア／Shopify専門エンジニア）の相場からの積み上げ。<br>
+    <span style="color:var(--err)"><b>数字の性格</b>：15,288行は「書かれたコード」であって「動くと証明されたシステム」ではない（RIP実機連携・通し決済・色校正は未検証）。人間換算の期間・費用は相場からの見積りであり入札額の保証ではない。§1はこの前提のうえで読むこと。</span><br>
     市場数字は正典・調査記載の公表値。取り分は依然たたき台（<b>還元率のみ調査済み実数＝業界相場10%</b>）。本書は選択肢の地図であり、実行判断は土屋さん合意＋法務ゲート通過後。
   </div>
 </div>
