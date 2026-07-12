@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>土屋商店 事業展開マップ v1（2026-07-13）</title>
+<style>
+  :root{
+    --bg:#f7f8fa; --card:#ffffff; --ink:#1a2233; --muted:#5c6577; --faint:#8b93a5;
+    --line:#e4e7ee; --navy:#1e3a5f; --accent:#2563eb; --accent-soft:#eff4ff;
+    --ok:#0f7b4d; --ok-soft:#e9f6f0; --warn:#9a6700; --warn-soft:#fdf3d7;
+    --err:#b42318; --err-soft:#fdecea; --gold:#8a6d1f; --gold-soft:#faf4e2;
+    --purple:#6d28d9; --purple-soft:#f3efff;
+    --mono:"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.7;font-size:14.5px;padding:32px 20px 80px}
+  .wrap{max-width:1060px;margin:0 auto}
+  .scope{display:inline-block;background:#fff3e6;color:#b45309;border:1px solid #f5d0a0;
+    border-radius:6px;padding:2px 10px;font-size:12px;font-weight:700}
+  h1{font-size:26px;font-weight:800;letter-spacing:-.01em;margin:10px 0 4px}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:26px}
+  h2{font-size:17px;font-weight:800;margin:46px 0 14px;padding-left:12px;border-left:4px solid var(--navy)}
+  h3{font-size:14.5px;font-weight:700;margin:20px 0 8px;color:var(--navy)}
+  p{margin:8px 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin:14px 0}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:18px 0}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .kpi .lbl{font-size:11.5px;color:var(--faint);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+  .kpi .val{font-size:20px;font-weight:800;margin-top:4px;letter-spacing:-.01em}
+  .kpi .note{font-size:12px;color:var(--muted);margin-top:4px}
+  table{width:100%;border-collapse:collapse;margin:12px 0;background:var(--card);
+    border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13px}
+  th{background:#f1f3f8;text-align:left;padding:8px 11px;font-size:11.5px;color:var(--muted);
+    font-weight:700;letter-spacing:.03em;border-bottom:1px solid var(--line)}
+  td{padding:8px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  .tblwrap{overflow-x:auto}
+  code{font-family:var(--mono);font-size:12px;background:#eef1f6;border-radius:4px;padding:1px 6px;color:#334}
+  .b{display:inline-block;border-radius:5px;padding:1px 8px;font-size:11px;font-weight:700;white-space:nowrap;margin:1px 2px 1px 0}
+  .b-now{background:var(--ok-soft);color:var(--ok)}
+  .b-next{background:var(--accent-soft);color:var(--accent)}
+  .b-moat{background:var(--purple-soft);color:var(--purple)}
+  .b-no{background:#eef0f4;color:var(--faint)}
+  .b-rare{background:var(--gold-soft);color:var(--gold)}
+  .b-ext{background:#eef0f4;color:var(--muted)}
+  .b-done{background:var(--ok-soft);color:var(--ok)}
+  .b-proto{background:var(--accent-soft);color:var(--accent)}
+  .b-plan{background:var(--warn-soft);color:var(--warn)}
+  .b-new{background:var(--err-soft);color:var(--err)}
+  .box{border-radius:10px;padding:14px 18px;margin:14px 0;font-size:13.5px;border:1px solid}
+  .box b:first-child{display:block;margin-bottom:4px;font-size:13px}
+  .box.warn{background:var(--warn-soft);border-color:#ecd9a0;color:#6b4e00}
+  .box.err{background:var(--err-soft);border-color:#f2c4be;color:#7a2018}
+  .box.ok{background:var(--ok-soft);border-color:#bfe3d2;color:#0a5c39}
+  .box.info{background:var(--accent-soft);border-color:#c9daf8;color:#1e3a8a}
+  /* レイヤーカード */
+  .layer{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:16px 0;overflow:hidden}
+  .layer .lh{padding:13px 20px;font-weight:800;font-size:15px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line)}
+  .layer .lh .tag{font-size:11px;font-weight:700;border-radius:5px;padding:1px 8px}
+  .layer .lb{padding:6px 20px 14px}
+  .item{display:grid;grid-template-columns:230px 1fr 200px;gap:14px;padding:11px 0;border-bottom:1px dashed var(--line);font-size:13px}
+  .item:last-child{border-bottom:none}
+  .item .n{font-weight:700}
+  .item .n .src{display:block;font-size:11px;color:var(--faint);font-weight:500}
+  .item .d{color:var(--muted)}
+  .item .d b{color:var(--ink)}
+  .item .t{text-align:right}
+  .lA .lh{background:#f0f7f2}.lB .lh{background:#fbf7ea}.lC .lh{background:#f3efff}
+  .lD .lh{background:#eef4fd}.lE .lh{background:#fdf1ec}.lF .lh{background:#f1f3f8}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;font-size:12px;color:var(--muted);align-items:center}
+  .foot{margin-top:50px;color:var(--faint);font-size:12px;border-top:1px solid var(--line);padding-top:14px}
+  .prio{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:16px 0}
+  .pcol{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .pcol h4{font-size:14px;font-weight:800;margin-bottom:8px}
+  .pcol ol{padding-left:20px;font-size:13px}
+  .pcol li{margin:6px 0}
+  .pcol .why{font-size:11.5px;color:var(--faint)}
+  @media(max-width:820px){.item{grid-template-columns:1fr}.item .t{text-align:left}}
+  @media print{body{background:#fff;padding:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="scope">🟧 コンサル案件 — 土屋商店（レクレドール）</span>
+  <h1>事業展開マップ <span style="font-size:15px;color:var(--faint)">v1 — マーケットプレイス化を含む全選択肢</span></h1>
+  <div class="sub">2026-07-13 ／ 既存正典（システム構想A〜G・realfabric対抗マップM1〜M3・勝ち筋/市場分析）の構想済み案 ＋ 新規提案を1枚に統合。閲覧用・意思決定は土屋さん協議後。</div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="lbl">選択肢</div><div class="val">24案 / 6レイヤー</div><div class="note">構想済13・試作/実装済4・新規提案7</div></div>
+    <div class="kpi"><div class="lbl">本丸（堀）</div><div class="val">柄マーケット</div><div class="note">realfabricの堀へ、講座×ライブの独自供給源で挑む</div></div>
+    <div class="kpi"><div class="lbl">最速の現金</div><div class="val">入園入学 1〜3月</div><div class="note">名入れ×キッズT×ガラリエ。仕込みは今秋から</div></div>
+    <div class="kpi"><div class="lbl">絶対制約</div><div class="val">固定費を増やさない</div><div class="note">リスケ局面。前受け・委託・在庫レス優先</div></div>
+  </div>
+
+  <h2>0. 前提（この地図の読み方）</h2>
+  <div class="card">
+    <p><b>土屋商店の正体は「アパレル残反の目利き売り切り屋」</b>（品揃えでなく在庫回転×実演が優位）。市場の空白＝<b>「一点物（残反）×実演×相談できる人」の三点交差</b>で、ここに競合はいない。全ての展開案は、この芯を強くするか・薄めるかで評価する。</p>
+    <p>リスケ局面の制約3つ：<b>①固定費を増やさない</b>（委託・成果報酬・在庫レス優先）<b>②前受け・入金先行</b>（サブスク/講座/福袋はこの点で優秀）<b>③攻めの新規事業は別法人</b>（Tシャツ講座の前例。本体は再生に集中）。</p>
+    <div class="legend">
+      優先度: <span class="b b-now">今</span><span class="b b-next">次</span><span class="b b-moat">堀（Phase3）</span><span class="b b-no">張らない</span>
+      ／ 希少性: <span class="b b-rare">希少</span><span class="b b-ext">拡張</span>
+      ／ 状態: <span class="b b-done">実装済</span><span class="b b-proto">試作済</span><span class="b b-plan">構想済</span><span class="b b-new">新規提案</span>
+    </div>
+  </div>
+
+  <h2>1. 全体地図（6レイヤー×24案）</h2>
+
+  <div class="layer lA">
+    <div class="lh">A. いまの商売を太らせる <span class="tag" style="background:var(--ok-soft);color:var(--ok)">既存売上の取りこぼし回収</span></div>
+    <div class="lb">
+      <div class="item"><div class="n">A-1 ライブ資産化<span class="src">機能マップA・入口の本命</span></div><div class="d">ライブを生地ごとの商品ページ＋切り抜きに自動変換。<b>月700万の「流れて消える」取りこぼしを回収</b>。見逃し客が後から買える。</div><div class="t"><span class="b b-now">今</span><span class="b b-rare">希少</span><span class="b b-plan">構想済</span></div></div>
+      <div class="item"><div class="n">A-2 AI生地ソムリエ<span class="src">機能マップB</span></div><div class="d">作りたい物→最適生地・用尺・難易度を24h提案。相談ログ＝<b>需要センサーとして仕入れの目利きに還元</b>（在庫非連動版から）。</div><div class="t"><span class="b b-now">今</span><span class="b b-rare">希少</span><span class="b b-proto">試作済</span></div></div>
+      <div class="item"><div class="n">A-3 用尺シミュレーター<span class="src">機能マップC</span></div><div class="d">「2mで何が作れる」を自動計算。顧客の穴①「買う前に選べない」を潰す。A-2に統合可。</div><div class="t"><span class="b b-next">次</span><span class="b b-ext">拡張</span><span class="b b-plan">構想済</span></div></div>
+      <div class="item"><div class="n">A-4 入園入学・名入れ攻勢<span class="src">新規（ガラリエ資産の季節転用）</span></div><div class="d">最大商機1〜3月に<b>文字入れ×キッズT×総柄</b>で「世界に1枚の入園グッズ生地」。作家とママの2〜4ヶ月ズレで同じ柄を二度売る。仕込みは10月から。</div><div class="t"><span class="b b-now">今</span><span class="b b-rare">希少</span><span class="b b-new">新規提案</span></div></div>
+      <div class="item"><div class="n">A-5 うちの子（ペット）vertical<span class="src">新規（犬タンク実装済みの延長）</span></div><div class="d">ペット写真→切り抜き→総柄→犬服・飼い主お揃いT。<b>ぬい活・ペット市場は成長側</b>（ぬい活450億・+15%）。ギフト単価が高い。</div><div class="t"><span class="b b-next">次</span><span class="b b-rare">希少</span><span class="b b-new">新規提案</span></div></div>
+      <div class="item"><div class="n">A-6 再入荷予約・在庫アラート<span class="src">機能マップE</span></div><div class="d">残反は一点物ゆえ「似た反入荷」通知として設計（同一再入荷は原理的に無い）。LINEセグメント配信と一体化。</div><div class="t"><span class="b b-next">次</span><span class="b b-ext">拡張</span><span class="b b-plan">構想済</span></div></div>
+      <div class="item"><div class="n">A-7 商用利用可否の明示・保証<span class="src">市場分析・穴③</span></div><div class="d">生地ごとに商用可否を表示する<b>だけで差別化になる</b>（作家の最大不安・やる店がない）。ガラリエは「自作品販売OK」明示済み＝先行。</div><div class="t"><span class="b b-now">今</span><span class="b b-rare">希少</span><span class="b b-plan">構想済</span></div></div>
+    </div>
+  </div>
+
+  <div class="layer lB">
+    <div class="lh">B. 継続収益（ストック化） <span class="tag" style="background:var(--gold-soft);color:var(--gold)">前受け・LTV・資金繰り直結</span></div>
+    <div class="lb">
+      <div class="item"><div class="n">B-1 ガラリエメンバー（有料会員）<span class="src">設計済v1.1（別紙HTML）</span></div><div class="d">Shopify標準会員＋タグ判定・編集機能ゲート・キープ30日・登録費免除。<b>発動はストア移管後</b>。</div><div class="t"><span class="b b-next">次</span><span class="b b-ext">拡張</span><span class="b b-done">設計済</span></div></div>
+      <div class="item"><div class="n">B-2 生地の定期便サブスク<span class="src">機能マップD</span></div><div class="d">毎月テーマ残反＋型紙＋動画。<b>前受け×継続＝資金繰りに最も効く</b>が、正典どおり「財務が落ち着いてから」。目利き属人化に注意。</div><div class="t"><span class="b b-next">次</span><span class="b b-ext">拡張</span><span class="b b-plan">構想済</span></div></div>
+      <div class="item"><div class="n">B-3 マイ生地棚（積み生地管理）<span class="src">機能マップF・長期の核</span></div><div class="d">手持ち生地登録→作れる物を提案。顧客の穴②「積み生地の罪悪感」は<b>最も未開拓</b>。毎日開く理由＝スイッチングコスト＝堀。</div><div class="t"><span class="b b-moat">堀</span><span class="b b-rare">希少</span><span class="b b-plan">構想済</span></div></div>
+      <div class="item"><div class="n">B-4 生地勉強会・有料コミュニティ<span class="src">勝ち筋④＋MARELY再資産化</span></div><div class="d">「布の先生/駆け込み寺」ポジション。スワニーの強み（コミュニティLTV）の穴埋め。<b>宗教化は避け機能価値で</b>（生地のM教訓）。</div><div class="t"><span class="b b-next">次</span><span class="b b-ext">拡張</span><span class="b b-plan">構想済</span></div></div>
+      <div class="item"><div class="n">B-5 積み生地福袋・予約販売<span class="src">市場分析§5</span></div><div class="d">谷（4-5月・8-9月）を埋める企画＋<b>前受けの現金</b>。在庫の現金化と客の宝探し欲を同時に満たす。システム不要で今すぐ可。</div><div class="t"><span class="b b-now">今</span><span class="b b-ext">拡張</span><span class="b b-plan">構想済</span></div></div>
+    </div>
+  </div>
+
+  <div class="layer lC">
+    <div class="lh">C. マーケットプレイス化 <span class="tag" style="background:var(--purple-soft);color:var(--purple)">本丸・Phase3の堀（詳細は§2）</span></div>
+    <div class="lb">
+      <div class="item"><div class="n">C-1 柄マーケット<span class="src">realfabric対抗M1〜M2</span></div><div class="d">ユーザーが作った柄を出品→他の客が生地として購入→<b>作者にロイヤリティ</b>。realfabricの堀（4.1万柄）に、<b>講座受講生＋ライブ視聴者を"作者"にする独自供給源</b>で挑む。</div><div class="t"><span class="b b-moat">堀</span><span class="b b-rare">希少*</span><span class="b b-plan">構想済</span></div></div>
+      <div class="item"><div class="n">C-2 型紙マーケット×自動グレーディング<span class="src">新規（パターンチーム×グレーディングエンジン）</span></div><div class="d">型紙作家がLサイズ1枚を出品→<b>エンジンがS〜3L自動展開</b>→5サイズの売り物に（原価ゼロ・在庫ゼロ）。世界的にも例が薄い。パタンナー検品を品質ゲートに。</div><div class="t"><span class="b b-moat">堀</span><span class="b b-rare">希少</span><span class="b b-new">新規提案</span></div></div>
+      <div class="item"><div class="n">C-3 残反委託マーケット<span class="src">勝ち筋①の受け皿を市場化</span></div><div class="d">メルカリを締め出された同業・作家・工場の残反を<b>委託販売</b>（在庫リスクゼロ）。土屋の目利き＝キュレーションが看板。ライブで売る場まである。</div><div class="t"><span class="b b-moat">堀</span><span class="b b-rare">希少</span><span class="b b-new">新規提案</span></div></div>
+      <div class="item"><div class="n">C-4 作品ギャラリー/UGC<span class="src">機能マップG＝M3</span></div><div class="d">「#この生地で作りました」。UGCで生地が売れる・指名の源泉。<b>完成品の販売までは踏み込まない</b>（minne/Creemaと正面衝突するため展示まで）。</div><div class="t"><span class="b b-moat">堀</span><span class="b b-ext">拡張</span><span class="b b-plan">構想済</span></div></div>
+    </div>
+  </div>
+
+  <div class="layer lD">
+    <div class="lh">D. B2B・受託 <span class="tag" style="background:var(--accent-soft);color:var(--accent)">設備と目利きの外販</span></div>
+    <div class="lb">
+      <div class="item"><div class="n">D-1 小ロットテキスタイル印刷受託<span class="src">新規（Mimaki稼働率の外販）</span></div><div class="d">ブランド・作家・同人向け「1mから・7営業日」の国内小ロット印刷。<b>ガラリエの受注基盤をそのまま流用</b>。B2Bは客単価と再現性が高い。</div><div class="t"><span class="b b-next">次</span><span class="b b-ext">拡張</span><span class="b b-new">新規提案</span></div></div>
+      <div class="item"><div class="n">D-2 サンプル・試作サービス<span class="src">新規（D-1の入口商品）</span></div><div class="d">アパレル/雑貨ブランドの柄試作を色校スワッチ付きで即納。<b>C2（スワッチ商品化）と同じ仕組みで両取り</b>。</div><div class="t"><span class="b b-next">次</span><span class="b b-ext">拡張</span><span class="b b-new">新規提案</span></div></div>
+      <div class="item"><div class="n">D-3 ライブコマース支援・代行<span class="src">新規（実演ノウハウの外販）</span></div><div class="d">土屋実演の型を他社に提供。単価は高いが<b>属人・時間切り売りで再生局面と相性が悪い</b>。帯番組の型化が済んでから検討。</div><div class="t"><span class="b b-no">張らない(今は)</span><span class="b b-ext">拡張</span><span class="b b-new">新規提案</span></div></div>
+      <div class="item"><div class="n">D-4 スワニー・生地のM相互送客<span class="src">勝ち筋＋正典に記載済</span></div><div class="d">初心者=スワニー/玄人=土屋の棲み分け送客。生地のM（マクロズ）は<b>利害関係開示前提</b>のダブルオプトイン移送。</div><div class="t"><span class="b b-now">今</span><span class="b b-ext">拡張</span><span class="b b-plan">構想済</span></div></div>
+    </div>
+  </div>
+
+  <div class="layer lE">
+    <div class="lh">E. 教育 <span class="tag" style="background:#fdece3;color:#b45309">マーケットの供給源を育てる装置</span></div>
+    <div class="lb">
+      <div class="item"><div class="n">E-1 副業Tシャツ講座「作って売る技術」<span class="src">進行中（v2確定・別法人・Gate0弁護士）</span></div><div class="d">無地T＋DTF原価¥800→名入れ¥3,000。<b>卒業生がそのままC-1柄マーケットの「作者」になる循環</b>がこの地図の急所。</div><div class="t"><span class="b b-now">今</span><span class="b b-rare">希少</span><span class="b b-proto">進行中</span></div></div>
+      <div class="item"><div class="n">E-2 ソーイング/柄づくりオンライン講座<span class="src">新規（E-1の横）</span></div><div class="d">「ガラリエで柄を作る→売る」までの講座。教材は既存機能の解説＝制作費ほぼゼロ。前受け。</div><div class="t"><span class="b b-next">次</span><span class="b b-ext">拡張</span><span class="b b-new">新規提案</span></div></div>
+    </div>
+  </div>
+
+  <div class="layer lF">
+    <div class="lh">F. 外部展開 <span class="tag" style="background:#eef0f4;color:var(--muted)">遠い・原則封印を含む</span></div>
+    <div class="lb">
+      <div class="item"><div class="n">F-1 海外販売（Etsy / Shopify Markets）<span class="src">新規（既存正典に言及なし）</span></div><div class="d">和柄・日本製テキスタイルは海外プレミアムが付く。ただし<b>送料・関税・英語CSの運用負荷</b>。移管・国内安定後の選択肢として棚に置く。</div><div class="t"><span class="b b-no">張らない(今は)</span><span class="b b-ext">拡張</span><span class="b b-new">新規提案</span></div></div>
+      <div class="item"><div class="n">F-2 ガラリエエンジンのライセンス外販<span class="src">新規</span></div><div class="d">他の印刷所にツールを貸す案。<b>堀の切り売りになるため原則封印</b>（自前マーケットが立つ前に供給側を武装させる愚）。</div><div class="t"><span class="b b-no">封印</span><span class="b b-ext">拡張</span><span class="b b-new">新規提案</span></div></div>
+      <div class="item"><div class="n">F-3 他モール出品（Creema等）<span class="src">新規</span></div><div class="d">完成品でなく「柄生地」での出店は集客の入口にはなるが、手数料と世界観分散。<b>LINE/ライブへの移送装置と割り切るなら可</b>。</div><div class="t"><span class="b b-no">張らない(今は)</span><span class="b b-ext">拡張</span><span class="b b-new">新規提案</span></div></div>
+    </div>
+  </div>
+
+  <h2>2. マーケットプレイス化の設計（本丸の解像度を上げる）</h2>
+
+  <div class="box info"><b>なぜ「柄マーケット単体」では勝てないか</b>realfabricは既にユーザー柄41,362件・ランキング・作者ロイヤリティを持つ（＝あちらの堀）。同じものを後追いで作るのは「拡張」。土屋が勝てる形は<b>供給源の独自性</b>＝①講座受講生（E-1/E-2が作者養成所）②ライブ視聴者（「あなたの柄、今夜のライブで売ります」ができるのは土屋だけ）③残反×柄×型紙が同じ店にある、の3点接続。正典の判断基準どおり<b>「Phase1-2の売上と供給源（講座/ライブ)の伸びを見てから張る」</b>。</div>
+
+  <div class="tblwrap"><table>
+    <tr><th></th><th>C-1 柄マーケット</th><th>C-2 型紙マーケット</th><th>C-3 残反委託マーケット</th></tr>
+    <tr><td><b>出品者</b></td><td>講座卒業生・ライブ視聴者・一般</td><td>型紙作家・パターンチーム</td><td>同業生地屋・作家・アパレル工場</td></tr>
+    <tr><td><b>買う人</b></td><td>ハンドメイドママ・作家</td><td>作家・ソーイング層（S〜3L対応が売り）</td><td>既存のライブ・EC顧客</td></tr>
+    <tr><td><b>土屋の取り分（たたき台）</b></td><td>売上の70〜85%（作者15〜30%還元）</td><td>販売額の30〜50%（グレーディング付加価値分）</td><td>委託手数料30〜40%＋ライブ販売料</td></tr>
+    <tr><td><b>使う既存資産</b></td><td>ガラリエ・預かり所・Mimaki・受注デスク</td><td>グレーディングエンジン試作・パターンチーム</td><td>目利き・ライブ・LINE・物流</td></tr>
+    <tr><td><b>在庫リスク</b></td><td>ゼロ（受注生産）</td><td>ゼロ（デジタル）</td><td>ゼロ（委託・預かり）</td></tr>
+    <tr><td><b>技術の重さ</b></td><td>大（Shopifyだけでは無理→カスタムアプリ/ヘッドレス）</td><td>中（エンジンは動く・検品体制が課題）</td><td>小（委託管理＋既存EC）</td></tr>
+    <tr><td><b>先行指標（張る前に見る数字）</b></td><td>講座卒業生数・ガラリエ月間注文</td><td>型紙単品の販売実績・検品コスト</td><td>委託持込みの引き合い件数</td></tr>
+  </table></div>
+
+  <h3>作者ロイヤリティの設計原則（C-1/C-2共通・弁護士確認前提）</h3>
+  <div class="card">
+    <p>① <b>ポイント制にしない</b>。独自ポイントで貯めさせると資金決済法（前払式・資金移動）の射程に入る。<b>現金の売上分配（業務委託報酬）を月次締めで銀行振込</b>が最も軽い。② 源泉徴収の要否（デザイン報酬の区分）と支払調書を税理士確認。③ 最低支払額（例: ¥3,000未満は繰越）で振込コストを制御。④ 出品規約に<b>著作権の表明保証・侵害時の即時取下げ（ノーティス&テイクダウン）・キャラクター/ロゴ柄の禁止明記</b>。アップロード柄の権利リスクは現状もあるが「他人に販売」で一段重くなる＝マーケット開始前に規約整備が必須ゲート。</p>
+  </div>
+
+  <h2>3. 優先順位（結論）</h2>
+  <div class="prio">
+    <div class="pcol"><h4>🟢 今（移管前後・現金と土台）</h4><ol>
+      <li>B-5 積み生地福袋・予約販売 <span class="why">前受け現金・システム不要</span></li>
+      <li>A-4 入園入学の名入れ攻勢 <span class="why">1〜3月の山へ10月仕込み</span></li>
+      <li>A-1 ライブ資産化 <span class="why">月700万の取りこぼし回収・入口の本命</span></li>
+      <li>A-7 商用利用可否の明示 <span class="why">表示だけで差別化・即日</span></li>
+      <li>E-1 Tシャツ講座 <span class="why">進行中・将来の作者供給源</span></li>
+    </ol></div>
+    <div class="pcol"><h4>🔵 次（会員と継続収益）</h4><ol>
+      <li>B-1 ガラリエメンバー発動 <span class="why">移管＋注文安定が条件</span></li>
+      <li>D-1/D-2 印刷受託・スワッチ <span class="why">B2B単価・realfabric対抗C2と両取り</span></li>
+      <li>A-5 うちの子ペット <span class="why">成長市場・ギフト単価</span></li>
+      <li>B-2 定期便サブスク <span class="why">財務が落ち着いてから（正典どおり）</span></li>
+    </ol></div>
+    <div class="pcol"><h4>🟣 堀（Phase3・数字を見てから張る）</h4><ol>
+      <li>C-3 残反委託マーケット <span class="why">技術が軽く芯に近い＝マーケット化の一番手</span></li>
+      <li>C-1 柄マーケット <span class="why">講座卒業生とガラリエ注文の伸びが基準</span></li>
+      <li>C-2 型紙×自動グレーディング <span class="why">世界的に希少・検品体制が鍵</span></li>
+      <li>B-3 マイ生地棚 / C-4 UGC <span class="why">堀の完成形・スイッチングコスト</span></li>
+    </ol></div>
+    <div class="pcol"><h4>⚪ 張らない/封印</h4><ol>
+      <li>F-2 エンジンライセンス <span class="why">堀の切り売り</span></li>
+      <li>完成品マーケット <span class="why">minne/Creema正面衝突</span></li>
+      <li>D-3 ライブ代行 <span class="why">属人の時間切り売り</span></li>
+      <li>F-1 海外 / F-3 他モール <span class="why">国内安定後の棚</span></li>
+    </ol></div>
+  </div>
+  <div class="box ok"><b>順番の芯</b>「今」で現金と入口を太らせる → 「次」で会員・B2Bのストックを重ねる → その売上と講座/ライブの伸び（先行指標）が基準を超えたら「堀」＝マーケットプレイスに張る。<b>マーケット一番手は技術が最も軽く芯（残反×目利き×ライブ）に最も近いC-3残反委託</b>。C-1柄マーケットはrealfabricの正面なので、供給源（作者）が育つ前に開けない。</div>
+
+  <h2>4. 法務・前提ゲート（マーケット化はここを跨いでから）</h2>
+  <div class="tblwrap"><table>
+    <tr><th>ゲート</th><th>対象</th><th>内容</th></tr>
+    <tr><td>ストア移管・プラン契約</td><td>全部</td><td>開発ストアは実決済不可。移管＋Cloudflare譲渡が全展開の前提0号</td></tr>
+    <tr><td>弁護士確認</td><td>C-1/C-2/C-3</td><td>出品規約・著作権の表明保証と取下げ手順・ロイヤリティの税務（源泉/支払調書）・委託販売契約書。E-1講座は既存Gate0で確認中の枠に相乗り</td></tr>
+    <tr><td>資金決済法の回避設計</td><td>C-1/C-2</td><td>独自ポイント発行をしない（現金分配のみ）。クーポンはShopify標準機能の範囲で</td></tr>
+    <tr><td>景表法・ステマ規制</td><td>C-1/E系</td><td>ランキング表示の根拠・作者に宣伝させる際の関係明示（#PR）・「売れる」系の断定表現禁止（講座はv2で成果非約束確定済み）</td></tr>
+    <tr><td>特商法表示</td><td>全部</td><td>プラットフォーム運営者としての表示整備（現行ポリシー6項目の拡張）</td></tr>
+    <tr><td>不利益変更の告知</td><td>B-1</td><td>無料機能を閉じる際は2週間前告知＋経過措置（会員設計v1.1に記載済み）</td></tr>
+  </table></div>
+
+  <h2>5. 次の一手（3つだけ）</h2>
+  <div class="card">
+    <p><b>① 土屋さんと「この地図の丸付け」30分</b> — 24案に○△×を付けてもらう。特に「今」の5つと、マーケット一番手をC-3にする順番の合意。</p>
+    <p><b>② B-5福袋＋A-7商用可否明示を今月中に実施</b> — どちらもシステム不要・現金と差別化が即日出る。</p>
+    <p><b>③ A-1ライブ資産化の要件定義に着手</b> — ピースユーのアーカイブ取得可否ヒアリング（正典の未解決項目）から。ここが月700万の取りこぼし回収の入口。</p>
+  </div>
+
+  <div class="foot">
+    土屋商店 事業展開マップ v1 ／ 2026-07-13 ／ 🟧コンサル案件（マクロズ自社事業とは分離）<br>
+    出典正典: <code>00_システム構想_日本一の生地屋_v1.md</code>（機能A〜G）・<code>kirutile_03_realfabric上位互換マップ_v1.md</code>（M1〜M3・Phase判断基準）・<code>03_勝ち筋・顧客獲得戦略_v1.md</code>・<code>02_市場分析・勝てる穴_v1.md</code>・<code>ガラリエ_有料会員設計_2026-07-13.html</code><br>
+    市場数字は正典記載の公表値（2013〜16年基準が多い）。取り分・還元率はすべてたたき台。本書は選択肢の地図であり、実行判断は土屋さん合意＋法務ゲート通過後。
+  </div>
+</div>
+</body>
+</html>
